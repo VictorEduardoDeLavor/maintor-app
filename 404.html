@@ -3,200 +3,241 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Victor de Lavor — do software ao cliente</title>
-<meta name="description" content="Construo o produto e trago os clientes. Apps sob medida, sites que ranqueiam e marketing que roda sozinho — com casos reais no ar.">
-<link rel="canonical" href="https://maintor.app/">
+<title>Maintor Flow — sites, lojas e marketing para quem vende de verdade</title>
+<meta name="description" content="Criamos sua loja virtual ou site, colocamos no ar e continuamos junto: manutenção, conteúdo e as campanhas que trazem cliente. São Paulo e região.">
+<link rel="canonical" href="https://maintorflow.com.br/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Victor de Lavor — do software ao cliente">
-<meta property="og:description" content="Construo o produto e trago os clientes. Casos reais, no ar, com tela de verdade.">
+<meta property="og:title" content="Maintor Flow — operação que flui">
+<meta property="og:description" content="A gente monta, coloca no ar e continua junto. Loja virtual, site, marketing e sistemas sob medida.">
 <meta property="og:locale" content="pt_BR">
-<meta name="theme-color" content="#0B0D10">
+<meta name="theme-color" content="#1F4747">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"ProfessionalService",
- "name":"Victor de Lavor","url":"https://maintor.app/",
- "description":"Desenvolvimento de aplicações sob medida e marketing digital operado por automação.",
- "areaServed":"BR",
- "knowsAbout":["desenvolvimento de software","SaaS","SEO","automação de marketing","inteligência artificial aplicada"]}
+ "name":"Maintor Flow",
+ "legalName":"MAINTOR TECNOLOGIA LTDA",
+ "taxID":"66.511.174/0001-27",
+ "url":"https://maintorflow.com.br/",
+ "email":"victor@maintor.com.br",
+ "telephone":"+55-11-94661-0634",
+ "description":"Criação de lojas virtuais, sites e sistemas sob medida, com marketing e manutenção contínua para pequenos negócios.",
+ "areaServed":{"@type":"City","name":"São Paulo"},
+ "knowsAbout":["criação de loja virtual","desenvolvimento de sites","marketing digital","automação de atendimento","desenvolvimento de software"]}
 </script>
 <style>
-  /* Identidade própria: grafite profundo + osso + âmbar de sinalização
-     industrial. Nem o azul/violeta do CMMS nem o verde/mostarda do Flow — esta
-     página vende QUEM constrói, não os produtos. O âmbar vem do chão de fábrica,
-     que é a origem técnica do trabalho, e evita o verde-ácido genérico. */
+  /* Marca Maintor Flow, manual v1.0: verde petróleo + mostarda + creme.
+     Regra 60-30-10 — mostarda SÓ em fio, barra e acento, nunca fundo dominante:
+     é o erro que mais rápido faz a marca parecer amadora.
+     Georgia itálico no lugar da DM Serif Display: é o substituto aprovado no
+     próprio manual, e evita depender de fonte externa que pode não carregar. */
   :root{
-    --fundo:#0B0D10; --fundo2:#121519; --linha:#232830;
-    --osso:#EDEAE5; --suave:#9BA3AE; --ambar:#F5A524; --ambar-forte:#FFB840;
+    --creme:#FAF7F2; --bege:#E6DDD0; --branco:#FFFFFF;
+    --petroleo:#1F4747; --profundo:#143535;
+    --mostarda:#D4A574; --caramelo:#B8895A;
+    --grafite:#2D2D2D; --cinza:#6B6B6B;
   }
   *{box-sizing:border-box;margin:0}
   html{scroll-behavior:smooth}
-  body{background:var(--fundo);color:var(--osso);line-height:1.6;
+  body{background:var(--creme);color:var(--grafite);line-height:1.6;
        font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
        -webkit-font-smoothing:antialiased}
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
   a{color:inherit}
+  .serif{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:400}
 
-  /* topo */
-  header{position:sticky;top:0;z-index:20;background:rgba(11,13,16,.86);
-         backdrop-filter:blur(10px);border-bottom:1px solid var(--linha)}
+  header{position:sticky;top:0;z-index:20;background:rgba(250,247,242,.9);
+         backdrop-filter:blur(10px);border-bottom:1px solid var(--bege)}
   .navrow{display:flex;align-items:center;justify-content:space-between;
-          padding:16px 0;gap:16px}
-  .marca{font-weight:800;letter-spacing:-.4px;font-size:17px}
-  .marca i{color:var(--ambar);font-style:normal}
-  .navlinks{display:flex;gap:22px;font-size:14.5px;color:var(--suave)}
-  .navlinks a:hover{color:var(--osso)}
-  .btn{display:inline-block;background:var(--ambar);color:#1A1206;font-weight:700;
-       padding:11px 20px;border-radius:9px;text-decoration:none;font-size:14.5px;
-       white-space:nowrap;transition:background .15s}
-  .btn:hover{background:var(--ambar-forte)}
-  .btn-fantasma{background:transparent;color:var(--osso);border:1px solid var(--linha)}
-  .btn-fantasma:hover{background:var(--fundo2);border-color:var(--suave)}
+          padding:15px 0;gap:16px}
+  .marca{font-size:19px;color:var(--petroleo)}
+  .marca b{font-weight:700;font-style:normal;letter-spacing:-.3px}
+  .navlinks{display:flex;gap:22px;font-size:14.5px;color:var(--cinza)}
+  .navlinks a{text-decoration:none}
+  .navlinks a:hover{color:var(--petroleo)}
+  .btn{display:inline-block;background:var(--petroleo);color:var(--creme);
+       font-weight:600;padding:11px 20px;border-radius:8px;text-decoration:none;
+       font-size:14.5px;white-space:nowrap;transition:background .15s}
+  .btn:hover{background:var(--profundo)}
+  .btn-claro{background:var(--mostarda);color:var(--profundo);font-weight:700}
+  .btn-claro:hover{background:var(--caramelo)}
+  .btn-fantasma{background:transparent;color:var(--petroleo);
+                border:1px solid var(--bege)}
+  .btn-fantasma:hover{background:var(--branco);border-color:var(--caramelo)}
   @media(max-width:760px){.navlinks{display:none}}
 
-  /* herói */
-  .heroi{padding:86px 0 70px;border-bottom:1px solid var(--linha)}
-  .eyebrow{color:var(--ambar);font-size:13px;font-weight:700;letter-spacing:1.6px;
-           text-transform:uppercase;margin-bottom:20px}
-  h1{font-size:clamp(38px,6.4vw,68px);line-height:1.04;letter-spacing:-2px;
-     font-weight:800;max-width:16ch}
-  h1 em{font-style:normal;color:var(--ambar)}
-  .lead{color:var(--suave);font-size:clamp(17px,2.1vw,20px);max-width:56ch;
+  .heroi{padding:84px 0 66px}
+  .eyebrow{color:var(--caramelo);font-size:12.5px;font-weight:700;
+           letter-spacing:1.8px;text-transform:uppercase;margin-bottom:20px}
+  h1{font-size:clamp(38px,6.2vw,64px);line-height:1.06;letter-spacing:-1.6px;
+     font-weight:700;max-width:15ch;color:var(--petroleo)}
+  h1 em{color:var(--caramelo)}
+  .lead{color:var(--cinza);font-size:clamp(17px,2.1vw,20px);max-width:56ch;
         margin:26px 0 34px}
   .acoes{display:flex;gap:12px;flex-wrap:wrap}
 
-  /* prova */
-  .prova{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-         gap:1px;background:var(--linha);border-bottom:1px solid var(--linha)}
-  .prova div{background:var(--fundo);padding:26px 24px}
-  .prova b{display:block;font-size:30px;font-weight:800;letter-spacing:-1px;
-           color:var(--ambar)}
-  .prova span{color:var(--suave);font-size:13.5px}
+  .tiras{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+         gap:1px;background:var(--bege);border-top:1px solid var(--bege);
+         border-bottom:1px solid var(--bege)}
+  .tiras div{background:var(--creme);padding:24px}
+  .tiras b{display:block;color:var(--petroleo);font-size:16px;margin-bottom:4px}
+  .tiras span{color:var(--cinza);font-size:13.5px}
 
-  section{padding:74px 0}
-  h2{font-size:clamp(27px,3.6vw,38px);letter-spacing:-1px;font-weight:800;
+  section{padding:72px 0}
+  h2{font-size:clamp(28px,3.6vw,40px);letter-spacing:-.8px;color:var(--petroleo);
      margin-bottom:12px}
-  .sub{color:var(--suave);max-width:60ch;margin-bottom:44px}
+  .sub{color:var(--cinza);max-width:62ch;margin-bottom:42px}
 
-  /* serviços */
-  .servs{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  @media(max-width:820px){.servs{grid-template-columns:1fr}}
-  .serv{background:var(--fundo2);border:1px solid var(--linha);border-radius:16px;
-        padding:30px}
-  .serv h3{font-size:21px;margin-bottom:8px;letter-spacing:-.4px}
-  .serv .tag{color:var(--ambar);font-size:12.5px;font-weight:700;
-             letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px}
-  .serv p{color:var(--suave);font-size:15.5px}
-  .serv ul{list-style:none;padding:0;margin:18px 0 0;font-size:15px}
-  .serv li{padding:7px 0 7px 22px;position:relative;color:var(--osso)}
-  .serv li::before{content:"";position:absolute;left:0;top:15px;width:8px;height:8px;
-                   background:var(--ambar);border-radius:2px}
+  .servs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+  .serv{background:var(--branco);border:1px solid var(--bege);border-radius:14px;
+        padding:28px}
+  .serv h3{font-size:20px;margin-bottom:8px;letter-spacing:-.3px;color:var(--petroleo)}
+  .serv .tag{color:var(--caramelo);font-size:12px;font-weight:700;
+             letter-spacing:1.2px;text-transform:uppercase;margin-bottom:13px}
+  .serv p{color:var(--cinza);font-size:15px}
+  .serv ul{list-style:none;padding:0;margin:16px 0 0;font-size:14.5px}
+  .serv li{padding:6px 0 6px 20px;position:relative}
+  .serv li::before{content:"";position:absolute;left:0;top:14px;width:7px;height:7px;
+                   background:var(--mostarda);border-radius:2px}
 
-  /* cases */
-  .case{display:grid;grid-template-columns:1fr 1.3fr;gap:40px;align-items:center;
-        padding:38px 0;border-top:1px solid var(--linha)}
-  /* Nos cases pares o texto troca de lado. O TEMPLATE tambem inverte: com
-     order sozinho, a imagem caia na coluna estreita (1fr) e aparecia com 441px
-     de largura contra 551px nos impares — desalinhado e cortando mais. */
+  /* case principal: cliente real ganha painel próprio, não linha de lista */
+  .destaque{background:var(--petroleo);color:var(--creme);border-radius:16px;
+            padding:40px;margin-bottom:14px}
+  .destaque .quem{color:var(--mostarda);font-size:12px;font-weight:700;
+                  letter-spacing:1.4px;text-transform:uppercase;margin-bottom:12px}
+  .destaque h3{font-size:clamp(26px,3.4vw,34px);letter-spacing:-.6px;
+               margin-bottom:14px;color:var(--creme)}
+  .destaque p{color:#A9BCB8;max-width:64ch;margin-bottom:20px}
+  .destaque .fio{height:1px;background:linear-gradient(90deg,var(--mostarda),transparent);
+                 margin:24px 0}
+  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:20px}
+  .grid4 .k{color:var(--mostarda);font-size:11px;font-weight:700;letter-spacing:1.2px;
+            text-transform:uppercase;margin-bottom:5px}
+  .grid4 .v{font-size:15px;color:var(--creme)}
+  .link-claro{display:inline-block;margin-top:24px;color:var(--mostarda);
+              font-size:15px;font-weight:600;text-decoration:none}
+  .link-claro:hover{text-decoration:underline}
+
+  .case{display:grid;grid-template-columns:1fr 1.3fr;gap:38px;align-items:center;
+        padding:36px 0;border-top:1px solid var(--bege)}
+  /* Nos pares o texto troca de lado — e o TEMPLATE precisa inverter junto: com
+     order sozinho a imagem caía na coluna estreita e ficava menor que nos ímpares. */
   .case:nth-child(even){grid-template-columns:1.3fr 1fr}
   .case:nth-child(even) .txt{order:2}
   @media(max-width:880px){.case,.case:nth-child(even){grid-template-columns:1fr;gap:22px}
-                          .case:nth-child(even) .txt{order:0}}
-  /* height:auto e OBRIGATORIO antes do aspect-ratio: o atributo height="675"
-     do HTML vira altura explicita e ANULA o aspect-ratio, que so vale quando a
-     altura e auto. Sem isto a caixa ficava com 675px de altura e o `cover`
-     comia as laterais do print — cortando justamente o titulo da tela. */
+                          .case:nth-child(even) .txt{order:0}
+                          .destaque{padding:28px 22px}}
+  /* height:auto ANTES do aspect-ratio: o atributo height="675" do HTML vira
+     altura explícita e anula o aspect-ratio, que só vale com altura auto. */
   .case img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;
-            object-position:top center;
-            border-radius:12px;border:1px solid var(--linha);display:block}
-  .case h3{font-size:24px;letter-spacing:-.6px;margin-bottom:6px}
-  .case .quem{color:var(--ambar);font-size:12.5px;font-weight:700;
-              letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px}
-  .case p{color:var(--suave);font-size:15.5px;margin-bottom:14px}
+            object-position:top center;border-radius:12px;
+            border:1px solid var(--bege);display:block}
+  .case h3{font-size:23px;letter-spacing:-.4px;margin-bottom:6px;color:var(--petroleo)}
+  .case .quem{color:var(--caramelo);font-size:12px;font-weight:700;
+              letter-spacing:1.2px;text-transform:uppercase;margin-bottom:11px}
+  .case p{color:var(--cinza);font-size:15px;margin-bottom:14px}
   .fatos{display:flex;gap:8px;flex-wrap:wrap}
-  .fato{background:var(--fundo2);border:1px solid var(--linha);border-radius:999px;
-        padding:5px 13px;font-size:13px;color:var(--osso)}
-  .link-vivo{display:inline-block;margin-top:14px;color:var(--ambar);
+  .fato{background:var(--branco);border:1px solid var(--bege);border-radius:999px;
+        padding:5px 13px;font-size:13px}
+  .link-vivo{display:inline-block;margin-top:14px;color:var(--caramelo);
              font-size:14.5px;font-weight:600;text-decoration:none}
   .link-vivo:hover{text-decoration:underline}
 
-  /* método */
-  .passos{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:20px}
-  .passo{border-top:2px solid var(--ambar);padding-top:18px}
-  .passo b{display:block;font-size:13px;color:var(--ambar);letter-spacing:1.4px;
-           margin-bottom:8px}
-  .passo p{color:var(--suave);font-size:15px}
+  .citacao{background:var(--branco);border:1px solid var(--bege);border-radius:14px;
+           padding:34px 38px;margin:8px 0 0}
+  .citacao q{font-family:Georgia,serif;font-style:italic;font-size:clamp(19px,2.4vw,24px);
+             line-height:1.45;color:var(--petroleo);quotes:none;display:block;
+             max-width:52ch}
+  .citacao .autor{color:var(--cinza);font-size:13.5px;margin-top:14px}
 
-  /* fecho */
-  .fecho{background:var(--fundo2);border-top:1px solid var(--linha);
-         border-bottom:1px solid var(--linha);text-align:center;padding:76px 0}
-  .fecho p{color:var(--suave);max-width:52ch;margin:14px auto 30px}
-  footer{padding:34px 0;color:var(--suave);font-size:13.5px;
+  .passos{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:20px}
+  .passo{border-top:2px solid var(--mostarda);padding-top:18px}
+  .passo b{display:block;font-size:12.5px;color:var(--caramelo);letter-spacing:1.4px;
+           margin-bottom:8px}
+  .passo p{color:var(--cinza);font-size:14.5px}
+
+  .fecho{background:var(--petroleo);color:var(--creme);text-align:center;padding:74px 0}
+  .fecho h2{color:var(--creme)}
+  .fecho p{color:#A9BCB8;max-width:52ch;margin:14px auto 30px}
+  footer{padding:32px 0;color:var(--cinza);font-size:13.5px;
          display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
-  footer a{color:var(--ambar);text-decoration:none}
+  footer a{color:var(--caramelo);text-decoration:none}
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap navrow">
-    <div class="marca">Victor <i>de Lavor</i></div>
+    <div class="marca"><b>Maintor</b> <span class="serif">Flow</span></div>
     <nav class="navlinks">
       <a href="#servicos">Serviços</a>
       <a href="#trabalhos">Trabalhos</a>
-      <a href="#metodo">Como trabalho</a>
+      <a href="#metodo">Como funciona</a>
     </nav>
-    <a class="btn" href="https://wa.me/5511946610634?text=Oi%20Victor,%20vim%20pelo%20seu%20site">Falar comigo</a>
+    <a class="btn" href="https://wa.me/5511946610634?text=Oi!%20Vim%20pelo%20site%20da%20Maintor%20Flow">Falar no WhatsApp</a>
   </div>
 </header>
 
 <div class="heroi">
   <div class="wrap">
-    <div class="eyebrow">Software + Marketing</div>
-    <h1>Eu construo o produto <em>e</em> trago os clientes.</h1>
-    <p class="lead">A maioria entrega uma das duas metades: o dev some depois do
-    deploy, a agência não entende o produto. Eu faço o caminho inteiro — do
-    banco de dados ao anúncio que traz gente para dentro.</p>
+    <div class="eyebrow">Sites · Lojas · Marketing</div>
+    <h1>A gente monta, põe no ar <em>e continua junto.</em></h1>
+    <p class="lead">Plataforma pronta te entrega uma ferramenta e um tutorial.
+    Aqui você tem alguém que conhece a sua loja, atende no WhatsApp e resolve —
+    do catálogo ao anúncio que traz cliente para dentro.</p>
     <div class="acoes">
-      <a class="btn" href="https://wa.me/5511946610634?text=Oi%20Victor,%20quero%20conversar%20sobre%20um%20projeto">Conversar sobre meu projeto</a>
-      <a class="btn btn-fantasma" href="#trabalhos">Ver trabalhos</a>
+      <a class="btn btn-claro" href="https://wa.me/5511946610634?text=Oi!%20Queria%20um%20or%C3%A7amento%20para%20o%20meu%20neg%C3%B3cio">Pedir um orçamento</a>
+      <a class="btn btn-fantasma" href="#trabalhos">Ver o que já está no ar</a>
     </div>
   </div>
 </div>
 
-<div class="prova">
-  <div><b>39</b><span>telas em produção num só produto</span></div>
-  <div><b>9</b><span>com IA de verdade, não de fachada</span></div>
-  <div><b>33</b><span>páginas de conteúdo que ranqueiam</span></div>
-  <div><b>118</b><span>peças de vídeo e design produzidas</span></div>
+<div class="tiras">
+  <div><b>Loja completa</b><span>Catálogo, Pix, cartão e frete calculado</span></div>
+  <div><b>O painel é seu</b><span>Você mexe em preço e foto sem depender de ninguém</span></div>
+  <div><b>Sem fidelidade</b><span>Fica porque está funcionando, não por contrato</span></div>
+  <div><b>Alguém do outro lado</b><span>WhatsApp com nome, não formulário de suporte</span></div>
 </div>
 
 <section id="servicos">
   <div class="wrap">
-    <h2>O que eu faço</h2>
-    <p class="sub">Duas frentes que se completam. Dá para contratar uma só — mas
-    é quando andam juntas que o resultado aparece rápido.</p>
+    <h2>O que fazemos</h2>
+    <p class="sub">Dá para contratar uma coisa só. Mas é quando o site e o
+    marketing andam juntos que o resultado aparece rápido — um traz a visita, o
+    outro transforma em venda.</p>
     <div class="servs">
       <div class="serv">
-        <div class="tag">Produto</div>
-        <h3>Aplicações sob medida</h3>
-        <p>Sistemas que resolvem o processo real da empresa — não um template
-        adaptado na marra.</p>
+        <div class="tag">No ar</div>
+        <h3>Loja virtual e site</h3>
+        <p>A loja pronta para vender: catálogo, pagamento, frete e um painel
+        simples para o dono tocar o dia a dia.</p>
         <ul>
-          <li>SaaS e sistemas internos de gestão</li>
-          <li>Integrações entre o que você já usa</li>
-          <li>IA aplicada onde melhora a decisão</li>
-          <li>Automação que tira trabalho manual da frente</li>
+          <li>Loja completa com Pix, cartão e frete</li>
+          <li>Site institucional que abre rápido no celular</li>
+          <li>Controle de estoque e fila de espera</li>
+          <li>Manutenção e ajustes todo mês</li>
         </ul>
       </div>
       <div class="serv">
         <div class="tag">Demanda</div>
-        <h3>Marketing que roda sozinho</h3>
-        <p>Presença construída para trazer cliente, com máquina que continua
-        funcionando quando ninguém está olhando.</p>
+        <h3>Marketing que roda</h3>
+        <p>Presença construída para trazer cliente — e que continua funcionando
+        quando ninguém está olhando.</p>
         <ul>
-          <li>Sites e landing pages que convertem</li>
-          <li>Conteúdo e SEO para aparecer no Google</li>
-          <li>Vídeo, reels e social com produção própria</li>
-          <li>WhatsApp e e-mail atendendo automaticamente</li>
+          <li>Conteúdo e publicação nas redes</li>
+          <li>SEO para aparecer no Google sem pagar clique</li>
+          <li>Vídeo e design com produção própria</li>
+          <li>WhatsApp e e-mail respondendo sozinhos</li>
+        </ul>
+      </div>
+      <div class="serv">
+        <div class="tag">Sob medida</div>
+        <h3>Sistemas e aplicativos</h3>
+        <p>Quando nenhum template resolve o processo da empresa, a gente
+        desenvolve o que falta.</p>
+        <ul>
+          <li>Sistemas internos de gestão</li>
+          <li>Integração entre o que você já usa</li>
+          <li>IA aplicada onde melhora a decisão</li>
+          <li>Automação do trabalho manual repetitivo</li>
         </ul>
       </div>
     </div>
@@ -206,16 +247,36 @@
 <section id="trabalhos">
   <div class="wrap">
     <h2>Trabalhos</h2>
-    <p class="sub">Tudo aqui está no ar e pode ser aberto agora. As imagens são
-    telas reais do sistema rodando — nenhuma é maquete.</p>
+    <p class="sub">Tudo aqui está no ar e pode ser aberto agora.</p>
+
+    <div class="destaque">
+      <div class="quem">Cliente · moda fitness</div>
+      <h3 class="serif">VOKE WEAR</h3>
+      <p>Loja completa entregue e vendendo: 15 peças da primeira coleção, Pix com
+      desconto automático, parcelamento, frete grátis acima de R$ 300 e troca em
+      7 dias. O estoque baixa sozinho a cada venda — quando um tamanho esgota, a
+      cliente entra numa fila e é avisada por e-mail assim que ele volta.</p>
+      <p>A dona atualiza preço, foto e estoque num painel próprio, sem depender
+      de nós. E cada venda chega no e-mail dela com um botão que abre o pedido
+      direto.</p>
+      <div class="fio"></div>
+      <div class="grid4">
+        <div><div class="k">Pagamento</div><div class="v">Pix, cartão em 12x</div></div>
+        <div><div class="k">Frete</div><div class="v">Cálculo e etiqueta</div></div>
+        <div><div class="k">Painel</div><div class="v">Da loja, não nosso</div></div>
+        <div><div class="k">Extras</div><div class="v">Fila de espera e newsletter</div></div>
+      </div>
+      <a class="link-claro" href="https://vokewear.com.br" target="_blank" rel="noopener">Ver a loja no ar →</a>
+    </div>
 
     <div class="case">
       <div class="txt">
         <div class="quem">Produto próprio · SaaS industrial</div>
         <h3>Maintor CMMS</h3>
-        <p>Plataforma completa de manutenção industrial: ordens de serviço,
-        ativos com histórico, preventivas, estoque que baixa sozinho quando o
-        técnico aponta a peça, e painel preditivo.</p>
+        <p>Nossa própria plataforma de manutenção industrial: ordens de serviço,
+        ativos com histórico, preventivas e estoque que baixa sozinho quando o
+        técnico aponta a peça. É o que a gente construiu para provar que dá conta
+        de sistema grande.</p>
         <div class="fatos">
           <span class="fato">39 telas</span>
           <span class="fato">multiempresa</span>
@@ -229,27 +290,11 @@
 
     <div class="case">
       <div class="txt">
-        <div class="quem">IA aplicada</div>
-        <h3>Copiloto de manutenção</h3>
-        <p>O gestor pergunta em português e a IA lê os dados reais da fábrica —
-        histórico do equipamento, falhas parecidas, ordens abertas — e devolve
-        causa provável e o que verificar primeiro. IA que usa o dado da empresa,
-        não que responde de forma genérica.</p>
-        <div class="fatos">
-          <span class="fato">LLM sobre dados próprios</span>
-          <span class="fato">análise preditiva</span>
-        </div>
-      </div>
-      <img src="midia/case-ia.png" alt="Copiloto de manutenção respondendo com análise do ativo" width="1200" height="675" loading="lazy">
-    </div>
-
-    <div class="case">
-      <div class="txt">
-        <div class="quem">Marketing · conteúdo e SEO</div>
-        <h3>Site que trabalha por você</h3>
-        <p>Landing de venda mais 33 páginas de conteúdo técnico — glossário,
-        artigos e calculadoras interativas que respondem o que o cliente
-        pesquisa no Google e trazem visita todo dia, sem pagar por clique.</p>
+        <div class="quem">Conteúdo e SEO</div>
+        <h3>Site que trabalha sozinho</h3>
+        <p>Landing de venda mais 33 páginas de conteúdo — glossário, artigos e
+        calculadoras interativas que respondem o que o cliente pesquisa no Google
+        e trazem visita todo dia, sem pagar por clique.</p>
         <div class="fatos">
           <span class="fato">33 páginas</span>
           <span class="fato">4 calculadoras</span>
@@ -258,16 +303,16 @@
         </div>
         <a class="link-vivo" href="https://maintor.com.br/glossario/" target="_blank" rel="noopener">Ver o conteúdo →</a>
       </div>
-      <img src="midia/case-calc.png" alt="Calculadora interativa de ROI publicada no site" width="1200" height="675" loading="lazy">
+      <img src="midia/case-calc.png" alt="Calculadora interativa publicada no site" width="1200" height="675" loading="lazy">
     </div>
 
     <div class="case">
       <div class="txt">
-        <div class="quem">Automação · operação</div>
+        <div class="quem">Automação</div>
         <h3>A máquina que opera sozinha</h3>
         <p>Um sistema que grava a tela do produto, edita o vídeo com narração e
         legenda, publica nas redes no horário certo, responde o WhatsApp de quem
-        chega e me avisa no celular quando precisa de decisão humana.</p>
+        chega e avisa no celular quando precisa de decisão humana.</p>
         <div class="fatos">
           <span class="fato">WhatsApp + e-mail</span>
           <span class="fato">publicação automática</span>
@@ -277,18 +322,24 @@
       </div>
       <img src="midia/case-social.png" alt="Peça de social produzida automaticamente pelo sistema" width="1200" height="675" loading="lazy">
     </div>
+
+    <div class="citacao">
+      <q>Ela é ótima e é mais barata mesmo. A diferença é que lá você tem uma
+      ferramenta, e aqui você tem alguém.</q>
+      <div class="autor">— nossa resposta quando perguntam por que não usar uma plataforma pronta.</div>
+    </div>
   </div>
 </section>
 
 <section id="metodo">
   <div class="wrap">
-    <h2>Como eu trabalho</h2>
+    <h2>Como funciona</h2>
     <p class="sub">Sem proposta de 40 páginas e sem sumir no meio do caminho.</p>
     <div class="passos">
       <div class="passo">
         <b>01 — CONVERSA</b>
-        <p>20 minutos para entender o processo real e onde dói. Se eu não for a
-        pessoa certa, digo na hora.</p>
+        <p>20 minutos para entender o que você vende e onde dói. Se não formos a
+        escolha certa, falamos na hora.</p>
       </div>
       <div class="passo">
         <b>02 — ESCOPO CURTO</b>
@@ -302,8 +353,8 @@
       </div>
       <div class="passo">
         <b>04 — DEPOIS DO NO AR</b>
-        <p>Publicar é o começo. Acompanho o que acontece com usuário de verdade
-        e ajusto.</p>
+        <p>Publicar é o começo. A gente treina você no painel e continua junto
+        no que aparecer.</p>
       </div>
     </div>
   </div>
@@ -311,17 +362,17 @@
 
 <div class="fecho">
   <div class="wrap">
-    <h2>Me conta o que você precisa</h2>
-    <p>Se for algo que eu não faço bem, eu falo — e indico quem faz. A conversa
-    é rápida e sem compromisso.</p>
-    <a class="btn" href="https://wa.me/5511946610634?text=Oi%20Victor,%20vim%20pelo%20seu%20site%20e%20queria%20conversar">Chamar no WhatsApp</a>
+    <h2>Conta o que você vende</h2>
+    <p>A gente diz o que dá para fazer, quanto custa e em quanto tempo. Conversa
+    rápida e sem compromisso.</p>
+    <a class="btn btn-claro" href="https://wa.me/5511946610634?text=Oi!%20Vim%20pelo%20site%20e%20queria%20conversar%20sobre%20o%20meu%20neg%C3%B3cio">Chamar no WhatsApp</a>
   </div>
 </div>
 
 <div class="wrap">
   <footer>
-    <div>Victor Eduardo de Lavor · desenvolvimento e marketing</div>
-    <div><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a></div>
+    <div>MAINTOR TECNOLOGIA LTDA · CNPJ 66.511.174/0001-27 · São Paulo/SP</div>
+    <div><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · (11) 94661-0634</div>
   </footer>
 </div>
 
