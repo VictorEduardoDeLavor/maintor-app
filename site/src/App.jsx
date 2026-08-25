@@ -44,7 +44,7 @@ function Palavras({ texto, destaque = [] }) {
 
 /* Objeto 3D da marca flutuando na cena: o wrapper respira em CSS,
    o miolo persegue o mouse com inércia (parallax por profundidade). */
-function IconeFlutuante({ src, largura, profundidade = 1, giro = 6, estilo }) {
+function IconeFlutuante({ src, largura, profundidade = 1, giro = 6, estilo, variante }) {
   const ref = useRef(null)
   useEffect(() => {
     const el = ref.current
@@ -66,7 +66,11 @@ function IconeFlutuante({ src, largura, profundidade = 1, giro = 6, estilo }) {
     return () => window.removeEventListener('pointermove', mover)
   }, [profundidade, giro])
   return (
-    <div className="icone-flutuante" style={{ width: largura, ...estilo }} aria-hidden="true">
+    <div
+      className={variante === 'vitrine' ? 'icone-vitrine' : 'icone-flutuante'}
+      style={{ width: largura, ...estilo }}
+      aria-hidden="true"
+    >
       <img ref={ref} src={src} alt="" width="640" height="640" loading="lazy" />
     </div>
   )
@@ -503,22 +507,54 @@ export default function App() {
                 <span className="micro">Da mesma bancada</span>
                 <span className="micro">Sistemas que a gente desenvolveu e mantém</span>
               </div>
-              <div className="linhas">
-                <LinhaEd
-                  idx="01"
-                  rot="Task · operação e qualidade"
-                  val="POPs, checklists e tarefas por setor e responsável, com tratamento de não conformidade e plano de ação no padrão ISO 9001"
-                />
-                <LinhaEd
-                  idx="02"
-                  rot="GateKeeper · portaria digital"
-                  val="visitante, prestador e fornecedor do agendamento à saída — triagem, operação de doca e pontualidade de fornecedor medida"
-                />
-                <LinhaEd
-                  idx="03"
-                  rot="RH · gestão de pessoas"
-                  val="admissão, ponto, férias, folha, recrutamento com vaga pública e treinamento com certificado"
-                />
+              <div className="bancada-grade">
+                <div className="bancada-item">
+                  <IconeFlutuante
+                    variante="vitrine"
+                    src="/midia/icones/prancheta.webp"
+                    largura="clamp(96px, 8vw, 130px)"
+                    profundidade={0.5}
+                    giro={4}
+                  />
+                  <h3 className="serif">Task</h3>
+                  <div className="micro">Operação e qualidade</div>
+                  <p>
+                    POPs, checklists e tarefas por setor e responsável, com
+                    tratamento de não conformidade e plano de ação no padrão
+                    ISO 9001.
+                  </p>
+                </div>
+                <div className="bancada-item">
+                  <IconeFlutuante
+                    variante="vitrine"
+                    src="/midia/icones/chave.webp"
+                    largura="clamp(96px, 8vw, 130px)"
+                    profundidade={0.6}
+                    giro={5}
+                  />
+                  <h3 className="serif">GateKeeper</h3>
+                  <div className="micro">Portaria digital</div>
+                  <p>
+                    Visitante, prestador e fornecedor do agendamento à saída —
+                    triagem, operação de doca e pontualidade de fornecedor
+                    medida.
+                  </p>
+                </div>
+                <div className="bancada-item">
+                  <IconeFlutuante
+                    variante="vitrine"
+                    src="/midia/icones/cracha.webp"
+                    largura="clamp(96px, 8vw, 130px)"
+                    profundidade={0.4}
+                    giro={4}
+                  />
+                  <h3 className="serif">RH</h3>
+                  <div className="micro">Gestão de pessoas</div>
+                  <p>
+                    Admissão, ponto, férias, folha, recrutamento com vaga
+                    pública e treinamento com certificado.
+                  </p>
+                </div>
               </div>
               <p className="corpo-apoio" style={{ marginTop: 'var(--s3)' }}>
                 Cada um nasceu de uma dor real de operação. O próximo pode ser o
