@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState, lazy, Suspense } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
-import { blipHover } from './audio.js'
+import { blipHover, alternarAmbiente, modularPorScroll } from './audio.js'
 
 // Canvas 3D entra depois do primeiro paint — não segura o LCP
 const FlowCanvas = lazy(() => import('./FlowCanvas.jsx'))
@@ -15,6 +15,7 @@ const OBJETIVOS = [
   'Loja virtual',
   'Site',
   'Automação de atendimento',
+  'Sistema para minha clínica',
   'Sistema sob medida',
   'Marketing e tráfego',
 ]
@@ -83,6 +84,7 @@ export default function App() {
   const [objetivo, setObjetivo] = useState(null)
   const [nome, setNome] = useState('')
   const [negocio, setNegocio] = useState('')
+  const [somLigado, setSomLigado] = useState(false)
 
   /* preloader curto: assina a entrada e cobre o primeiro paint do canvas */
   useEffect(() => {
@@ -190,6 +192,10 @@ export default function App() {
       palcoTilt.addEventListener('pointerleave', tiltLeave, { passive: true })
     }
 
+    // velocidade do scroll → abertura do filtro do pad ambiente
+    const tickAudio = () => modularPorScroll(velocidadeRef.current)
+    gsap.ticker.add(tickAudio)
+
     // âncoras suaves via Lenis
     const onClickAncora = (e) => {
       const a = e.target.closest('a[href^="#"]')
@@ -204,6 +210,7 @@ export default function App() {
 
     return () => {
       ctx.revert()
+      gsap.ticker.remove(tickAudio)
       document.removeEventListener('click', onClickAncora)
       if (aoMover) window.removeEventListener('pointermove', aoMover)
       if (aoHover) window.removeEventListener('pointerover', aoHover)
@@ -261,9 +268,20 @@ export default function App() {
             <a href="#tecnologia">Tecnologia</a>
             <a href="#contato">Contato</a>
           </nav>
-          <a className="nav-cta" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
-            WhatsApp ↗
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)' }}>
+            <button
+              type="button"
+              className="som-toggle"
+              aria-pressed={somLigado}
+              title="Som ambiente do site — liga e desliga"
+              onClick={() => setSomLigado(alternarAmbiente())}
+            >
+              {somLigado ? 'som ●' : 'som ○'}
+            </button>
+            <a className="nav-cta" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
+              WhatsApp ↗
+            </a>
+          </div>
         </div>
       </header>
 
