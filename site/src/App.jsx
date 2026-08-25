@@ -42,6 +42,36 @@ function Palavras({ texto, destaque = [] }) {
   ))
 }
 
+/* Objeto 3D da marca flutuando na cena: o wrapper respira em CSS,
+   o miolo persegue o mouse com inércia (parallax por profundidade). */
+function IconeFlutuante({ src, largura, profundidade = 1, giro = 6, estilo }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const temMouse = matchMedia('(pointer: fine)').matches && window.innerWidth >= 1024
+    const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!temMouse || reduzido) return
+    const qx = gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power2.out' })
+    const qy = gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power2.out' })
+    const qr = gsap.quickTo(el, 'rotation', { duration: 1.2, ease: 'power2.out' })
+    const mover = (e) => {
+      const nx = (e.clientX / window.innerWidth) * 2 - 1
+      const ny = (e.clientY / window.innerHeight) * 2 - 1
+      qx(nx * 26 * profundidade)
+      qy(ny * 18 * profundidade)
+      qr(nx * giro)
+    }
+    window.addEventListener('pointermove', mover, { passive: true })
+    return () => window.removeEventListener('pointermove', mover)
+  }, [profundidade, giro])
+  return (
+    <div className="icone-flutuante" style={{ width: largura, ...estilo }} aria-hidden="true">
+      <img ref={ref} src={src} alt="" width="640" height="640" loading="lazy" />
+    </div>
+  )
+}
+
 function Regua({ esquerda, direita }) {
   return (
     <div className="regua" data-reveal>
@@ -294,6 +324,13 @@ export default function App() {
 
         {/* ============ CENA 1 · HERO — manchete full-bleed ============ */}
         <section className="cena" id="topo">
+          <IconeFlutuante
+            src="/midia/icones/fluxo.webp"
+            largura="clamp(140px, 15vw, 230px)"
+            profundidade={1.4}
+            giro={9}
+            estilo={{ top: '13%', right: '7%' }}
+          />
           <div className="wrap">
             <div className="micro" data-reveal style={{ color: 'var(--mostarda)', marginBottom: 'var(--s3)' }}>
               Estúdio de serviços digitais — São Paulo
@@ -324,6 +361,13 @@ export default function App() {
         {/* ============ CENA 2 · LOJAS E SITES (VOKE) ============ */}
         <section className="cena" id="vitrine">
           <span className="num-fantasma serif" aria-hidden="true">01</span>
+          <IconeFlutuante
+            src="/midia/icones/sacola.webp"
+            largura="clamp(110px, 10vw, 160px)"
+            profundidade={0.9}
+            giro={6}
+            estilo={{ top: '15%', right: '9%' }}
+          />
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="01 · Lojas e sites" direita="Case — VOKE WEAR" />
             <h2 className="titulo-cena serif" data-palavras>
@@ -385,6 +429,13 @@ export default function App() {
         {/* ============ CENA 3 · AUTOMAÇÃO ============ */}
         <section className="cena" id="automacao">
           <span className="num-fantasma serif" aria-hidden="true">02</span>
+          <IconeFlutuante
+            src="/midia/icones/aviao.webp"
+            largura="clamp(120px, 11vw, 175px)"
+            profundidade={1.2}
+            giro={8}
+            estilo={{ bottom: '9%', left: '3%' }}
+          />
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="02 · Automação de atendimento" direita="WhatsApp + e-mail" />
             <div className="cena-grid">
@@ -417,7 +468,7 @@ export default function App() {
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="03 · Tecnologia própria" direita="SorrIA — simulação de sorriso" />
             <div className="cena-grid">
-              <div>
+              <div style={{ position: 'relative' }}>
                 <h2 className="titulo-cena serif" data-palavras>
                   <Palavras texto="Tecnologia própria, que nenhum template tem." destaque={[0, 1]} />
                 </h2>
@@ -431,6 +482,13 @@ export default function App() {
                   “A plataforma pronta é ótima e é mais barata mesmo. A diferença
                   é que lá você tem uma ferramenta — e aqui você tem alguém.”
                 </blockquote>
+                <IconeFlutuante
+                  src="/midia/icones/dente.webp"
+                  largura="clamp(100px, 9vw, 140px)"
+                  profundidade={0.8}
+                  giro={5}
+                  estilo={{ right: '-32%', bottom: '-4%' }}
+                />
               </div>
               <div className="linhas" data-reveal>
                 <LinhaEd idx="01" rot="Foto → simulação" val="resultado provável em minutos" />
@@ -472,6 +530,13 @@ export default function App() {
 
         {/* ============ CENA 5 · CONTATO ============ */}
         <section className="cena" id="contato">
+          <IconeFlutuante
+            src="/midia/icones/balao.webp"
+            largura="clamp(120px, 11vw, 170px)"
+            profundidade={1.1}
+            giro={7}
+            estilo={{ top: '34%', right: '10%' }}
+          />
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="Contato" direita="Sem compromisso — sem reunião de uma hora" />
             <h2 className="manchete serif" style={{ fontSize: 'clamp(44px, 8.5vw, 130px)' }} data-palavras>

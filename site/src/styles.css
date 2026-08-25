@@ -238,6 +238,22 @@ header {
   position: relative;
 }
 
+/* objetos 3D da marca flutuando nas cenas */
+.icone-flutuante {
+  position: absolute;
+  z-index: 1; /* abaixo do canvas (2): as partículas passam na frente */
+  pointer-events: none;
+  animation: flutuar 7s ease-in-out infinite;
+  filter: drop-shadow(0 26px 44px rgba(0, 0, 0, .45));
+}
+.icone-flutuante img { display: block; width: 100%; height: auto; }
+@keyframes flutuar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@media (max-width: 900px) { .icone-flutuante { display: none; } }
+@media (prefers-reduced-motion: reduce) { .icone-flutuante { animation: none; } }
+
 /* número fantasma da cena */
 .num-fantasma {
   position: absolute;
