@@ -10,6 +10,9 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     assetsInlineLimit: 0,
+    /* Testado e descartado: tirar o chunk `three` do modulepreload não mudou
+       o FCP (mediana 460ms → 456ms em Fast 3G, dentro do ruído) e ATRASA as
+       partículas, já que o canvas é visível desde o hero. O preload fica. */
     rollupOptions: {
       output: {
         /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup
