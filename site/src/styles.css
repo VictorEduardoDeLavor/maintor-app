@@ -28,7 +28,12 @@
 
 * { box-sizing: border-box; margin: 0; }
 
-html { scroll-behavior: auto; }
+html {
+  scroll-behavior: auto;
+  /* clip (não hidden) contém o sangramento do número fantasma sem criar
+     contexto de scroll — position:fixed do canvas e do header seguem ok */
+  overflow-x: clip;
+}
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 
@@ -516,6 +521,34 @@ h2.titulo-cena em { color: var(--mostarda); }
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+/* ---- painéis de foto (objetos da marca em cena) -------------- */
+.painel-foto {
+  margin: 0 0 var(--s4);
+  border-radius: 16px;
+  overflow: hidden;
+  border: var(--hairline);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .45);
+  background: var(--profundo);
+}
+.painel-foto img { display: block; width: 100%; height: auto; }
+
+/* variante solta na cena (contato): sem moldura, objeto respirando */
+.painel-foto.solto-direita {
+  position: absolute;
+  top: 30%;
+  right: 6%;
+  width: clamp(200px, 22vw, 330px);
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  border-radius: 0;
+  z-index: 0;
+  pointer-events: none;
+  animation: flutuar 8s ease-in-out infinite;
+}
+@media (max-width: 900px) { .painel-foto.solto-direita { display: none; } }
+@media (prefers-reduced-motion: reduce) { .painel-foto.solto-direita { animation: none; } }
 
 /* ---- citação de marca ---------------------------------------- */
 .citacao {

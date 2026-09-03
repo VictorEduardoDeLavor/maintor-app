@@ -433,13 +433,6 @@ export default function App() {
         {/* ============ CENA 3 · AUTOMAÇÃO ============ */}
         <section className="cena" id="automacao">
           <span className="num-fantasma serif" aria-hidden="true">02</span>
-          <IconeFlutuante
-            src="/midia/icones/aviao.webp"
-            largura="clamp(120px, 11vw, 175px)"
-            profundidade={1.2}
-            giro={8}
-            estilo={{ bottom: '9%', left: '3%' }}
-          />
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="02 · Automação de atendimento" direita="WhatsApp + e-mail" />
             <div className="cena-grid">
@@ -455,6 +448,13 @@ export default function App() {
                   vira aviso com resposta pronta — ou resposta automática, quando
                   fizer sentido. Você decide o que é máquina e o que é você.
                 </p>
+                <figure className="painel-foto" style={{ marginTop: 'var(--s4)' }} data-reveal>
+                  <img
+                    src="/midia/automacao-avioes.webp"
+                    alt="Aviões de papel em latão e cerâmica voando em formação — as mensagens seguindo sozinhas"
+                    loading="lazy" width="1000" height="558"
+                  />
+                </figure>
               </div>
               <div className="linhas" data-reveal>
                 <LinhaEd idx="01" rot="Cliente chama" val="confirmação na hora, sem você tocar no telefone" />
@@ -486,19 +486,21 @@ export default function App() {
                   “A plataforma pronta é ótima e é mais barata mesmo. A diferença
                   é que lá você tem uma ferramenta — e aqui você tem alguém.”
                 </blockquote>
-                <IconeFlutuante
-                  src="/midia/icones/dente.webp"
-                  largura="clamp(100px, 9vw, 140px)"
-                  profundidade={0.8}
-                  giro={5}
-                  estilo={{ right: '-32%', bottom: '-4%' }}
-                />
               </div>
-              <div className="linhas" data-reveal>
-                <LinhaEd idx="01" rot="Foto → simulação" val="resultado provável em minutos" />
-                <LinhaEd idx="02" rot="LGPD a sério" val="fotos de paciente em armazenamento privado" />
-                <LinhaEd idx="03" rot="Proposta rastreável" val="a clínica sabe quem abriu e quando" />
-                <LinhaEd idx="04" rot="Feito em casa" val="desenvolvido, mantido e evoluído pela Maintor" />
+              <div>
+                <figure className="painel-foto" data-reveal>
+                  <img
+                    src="/midia/sorria-pedestal.webp"
+                    alt="Objeto de porcelana representando o SorrIA, a tecnologia própria da Maintor Flow"
+                    loading="lazy" width="760" height="1017"
+                  />
+                </figure>
+                <div className="linhas" data-reveal>
+                  <LinhaEd idx="01" rot="Foto → simulação" val="resultado provável em minutos" />
+                  <LinhaEd idx="02" rot="LGPD a sério" val="fotos de paciente em armazenamento privado" />
+                  <LinhaEd idx="03" rot="Proposta rastreável" val="a clínica sabe quem abriu e quando" />
+                  <LinhaEd idx="04" rot="Feito em casa" val="desenvolvido, mantido e evoluído pela Maintor" />
+                </div>
               </div>
             </div>
 
@@ -566,13 +568,13 @@ export default function App() {
 
         {/* ============ CENA 5 · CONTATO ============ */}
         <section className="cena" id="contato">
-          <IconeFlutuante
-            src="/midia/icones/balao.webp"
-            largura="clamp(120px, 11vw, 170px)"
-            profundidade={1.1}
-            giro={7}
-            estilo={{ top: '34%', right: '10%' }}
-          />
+          <figure className="painel-foto solto-direita" data-reveal>
+            <img
+              src="/midia/contato-balao.webp"
+              alt="Balão de conversa em cerâmica — a conversa começa no WhatsApp"
+              loading="lazy" width="760" height="760"
+            />
+          </figure>
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="Contato" direita="Sem compromisso — sem reunião de uma hora" />
             <h2 className="manchete serif" style={{ fontSize: 'clamp(44px, 8.5vw, 130px)' }} data-palavras>
