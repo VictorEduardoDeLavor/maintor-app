@@ -319,6 +319,16 @@ header .navrow {
   user-select: none;
   z-index: 0;
 }
+/* no celular ele cobria o rótulo da régua (o "01" passava por cima de
+   "CASE — VOKE WEAR"): sai do topo e enfraquece o traço */
+@media (max-width: 820px) {
+  .num-fantasma {
+    top: auto;
+    bottom: 6vh;
+    font-size: 46vw;
+    -webkit-text-stroke-color: rgba(230, 221, 208, .08);
+  }
+}
 
 /* ---- manchete (hero e CTA) ----------------------------------- */
 .manchete {
@@ -329,6 +339,7 @@ header .navrow {
   max-width: none;
 }
 .manchete .linha { display: block; }
+.manchete-cta { font-size: clamp(52px, 9.5vw, 132px); }
 .manchete .linha.recuo { padding-left: clamp(40px, 12vw, 220px); }
 .manchete .linha.direita { text-align: right; }
 .manchete em { color: var(--mostarda); font-style: italic; }

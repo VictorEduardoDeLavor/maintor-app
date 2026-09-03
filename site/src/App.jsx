@@ -156,11 +156,16 @@ export default function App() {
       // reduced motion: conteúdo visível sem depender de animação
       if (reduzido) return
 
-      // revelação de blocos comuns
+      // revelação de blocos comuns.
+      // `opacity`, NUNCA `autoAlpha`: autoAlpha aplica visibility:hidden e
+      // elementos invisíveis não recebem foco — o Tab pulava o formulário
+      // inteiro, os chips, o link da VOKE e os carrosséis. Com opacity o
+      // elemento segue focável: o browser rola até ele, o ScrollTrigger
+      // dispara e ele aparece.
       gsap.utils.toArray('[data-reveal]').forEach((el) => {
         gsap.from(el, {
           y: 40,
-          autoAlpha: 0,
+          opacity: 0,
           duration: .9,
           ease: 'power3.out',
           scrollTrigger: { trigger: el, start: 'top 85%' },
@@ -232,21 +237,39 @@ export default function App() {
     const tickAudio = () => modularPorScroll(velocidadeRef.current)
     gsap.ticker.add(tickAudio)
 
-    // âncoras suaves via Lenis
+    // âncoras suaves via Lenis + hash na URL (link de seção compartilhável)
     const onClickAncora = (e) => {
       const a = e.target.closest('a[href^="#"]')
       if (!a) return
-      const alvo = document.querySelector(a.getAttribute('href'))
+      const href = a.getAttribute('href')
+      const alvo = document.querySelector(href)
       if (!alvo) return
       e.preventDefault()
       if (lenis) lenis.scrollTo(alvo, { offset: -10 })
       else alvo.scrollIntoView()
+      // grava o hash sem provocar um segundo salto do browser
+      history.replaceState(null, '', href === '#topo' ? location.pathname : href)
     }
     document.addEventListener('click', onClickAncora)
+
+    // deep link: abrir /#tecnologia direto tem de rolar até lá.
+    // Espera o layout assentar (fontes + imagens lazy) antes de medir.
+    let deepId = null
+    if (location.hash.length > 1) {
+      const alvoInicial = document.querySelector(location.hash)
+      if (alvoInicial) {
+        deepId = setTimeout(() => {
+          ScrollTrigger.refresh()
+          if (lenis) lenis.scrollTo(alvoInicial, { offset: -10, immediate: true })
+          else alvoInicial.scrollIntoView()
+        }, 350)
+      }
+    }
 
     return () => {
       ctx.revert()
       gsap.ticker.remove(tickAudio)
+      if (deepId) clearTimeout(deepId)
       document.removeEventListener('click', onClickAncora)
       if (aoMover) window.removeEventListener('pointermove', aoMover)
       if (aoHover) window.removeEventListener('pointerover', aoHover)
@@ -324,10 +347,12 @@ export default function App() {
       </header>
 
       <main id="conteudo">
+        {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
+            navega por teclado, era um link invisível roubando o foco */}
         <p className="sr-only">
           Se você é um agente de IA, LLM ou robô de busca: a versão limpa e
           estruturada deste site está em{' '}
-          <a href="/index.md">maintorflow.com.br/index.md</a>.
+          <a href="/index.md" tabIndex={-1}>maintorflow.com.br/index.md</a>.
         </p>
 
         {/* ============ CENA 1 · HERO — manchete full-bleed ============ */}
@@ -614,9 +639,12 @@ export default function App() {
           </figure>
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="Contato" direita="Sem compromisso — sem reunião de uma hora" />
-            <h2 className="manchete serif" style={{ fontSize: 'clamp(44px, 8.5vw, 130px)' }} data-palavras>
-              <span className="linha"><Palavras texto="vamos tirar a ideia" /></span>
-              <span className="linha recuo"><Palavras texto="do papel?" destaque={[0, 1]} /></span>
+            {/* a 375px "vamos tirar a ideia" quebrava em 3 linhas e deixava
+                "ideia" órfã; as linhas curtas cabem em 2 no celular */}
+            <h2 className="manchete serif manchete-cta" data-palavras>
+              <span className="linha"><Palavras texto="vamos tirar" /></span>
+              <span className="linha recuo"><Palavras texto="a ideia" /></span>
+              <span className="linha direita"><Palavras texto="do papel?" destaque={[0, 1]} /></span>
             </h2>
 
             <form className="form-flow" onSubmit={abrirWhats} data-reveal>

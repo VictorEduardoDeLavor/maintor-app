@@ -25,9 +25,12 @@
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23143535'/%3E%3Ccircle cx='24' cy='32' r='9' fill='%23D4A574'/%3E%3Ccircle cx='42' cy='24' r='5' fill='%23FAF7F2'/%3E%3Ccircle cx='44' cy='42' r='4' fill='%23B8895A'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Fontes auto-hospedadas: sem requisição ao Google (não bloqueia o primeiro
+     paint e não entrega o IP do visitante a terceiro sem aviso) -->
+<!-- sem <link rel=preload> aqui: medido em Fast 3G, pré-carregar as duas
+     faces disputava banda e PIOROU o FCP (472ms → 620ms). Com font-display:
+     swap o texto pinta na fallback e troca quando a fonte chega. -->
+<link rel="stylesheet" href="/fontes/fontes.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"ProfessionalService",
  "name":"Maintor Flow",
@@ -43,9 +46,9 @@
  "areaServed":{"@type":"City","name":"São Paulo"},
  "knowsAbout":["criação de loja virtual","desenvolvimento de sites","marketing digital","automação de atendimento","desenvolvimento de software","simulação de sorriso com inteligência artificial"]}
 </script>
-  <script type="module" crossorigin src="/assets/index-1sHBlpfN.js"></script>
+  <script type="module" crossorigin src="/assets/index-Co4Gx9Ci.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/vendor-Biqc7o5-.js">
-  <link rel="stylesheet" crossorigin href="/assets/index-36rOHkOt.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-qylYEoEn.css">
 </head>
 <body>
 <div id="root"></div>
