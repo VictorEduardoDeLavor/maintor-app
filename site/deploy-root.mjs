@@ -15,6 +15,8 @@ if (!existsSync(dist)) {
 }
 
 const PRESERVAR = new Set(['.git', '.nojekyll', 'CNAME', 'site', 'README.md'])
+// 404.html não vem do build: é cópia do index (fallback de rota do GitHub Pages).
+// Recriar aqui evita depender de um `cp` manual lembrado a cada deploy.
 
 // limpa a raiz (só o que é build antigo)
 for (const item of readdirSync(raiz)) {
@@ -27,4 +29,6 @@ for (const item of readdirSync(dist)) {
   cpSync(join(dist, item), join(raiz, item), { recursive: true })
 }
 
-console.log('Build copiado para a raiz do repo. Confira com git status.')
+cpSync(join(dist, 'index.html'), join(raiz, '404.html'))
+
+console.log('Build copiado para a raiz do repo (+404.html). Confira com git status.')

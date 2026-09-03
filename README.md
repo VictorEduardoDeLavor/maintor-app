@@ -1,20 +1,49 @@
 # Site da Maintor Flow — maintorflow.com.br
 
-Landing estatica da marca de SERVICOS da Maintor Tecnologia Ltda
-(sites, lojas virtuais, marketing e sistemas sob medida).
+Site da marca de **serviços** da MAINTOR TECNOLOGIA LTDA: sites, lojas
+virtuais, marketing, automação de atendimento e sistemas sob medida para
+pequenos negócios.
 
-Nasceu como portfolio pessoal ("Victor de Lavor") e foi convertido em
-21/08/2026, quando o Flow foi definido como a empresa de servicos.
+> ⚠️ Este README é servido publicamente pelo GitHub Pages. Nada de segredo,
+> preço fechado, dado de cliente ou informação interna aqui.
 
-- Editar: `index.html` (autossuficiente: sem CDN, sem fonte externa, sem script)
-- Marca: manual v1.0 — verde petroleo #1F4747 + mostarda #D4A574 + creme #FAF7F2,
-  regra 60-30-10 (mostarda so em fio/barra/acento). Georgia italico e o
-  substituto aprovado da DM Serif Display.
-- Imagens dos cases: `midia/`, todas 16:9 — ver o comentario do CSS sobre
-  height:auto antes do aspect-ratio.
-- Publicar: `git push` (GitHub Pages, CNAME ja aponta para maintorflow.com.br)
+## Como mexer
 
-## Pendente
-- Print da loja VOKE (`midia/case-voke.png`) — hoje o case e um painel de texto
-  com link ao vivo, que ate funciona melhor; o print entra como reforco.
-- Depoimento da Poliana (VOKE) — o unico tipo de prova que a pagina ainda nao tem.
+A fonte fica em **`site/`** (Vite + React + React Three Fiber + GSAP + Lenis).
+A raiz do repo guarda o **build publicado** — não edite os arquivos da raiz
+à mão, eles são sobrescritos.
+
+```bash
+cd site
+npm install
+npm run dev            # servidor de desenvolvimento
+npm run build          # gera site/dist
+node deploy-root.mjs   # copia o build para a raiz (+404.html)
+git add -A && git commit && git push   # GitHub Pages publica
+```
+
+## Design system
+
+`site/MASTER.md` é a fonte única de verdade: paleta (verde petróleo `#1F4747`
+e profundo `#143535`, mostarda `#D4A574` só como acento pela regra 60-30-10,
+creme `#FAF7F2`), tipografia (DM Serif Display itálico + Inter), espaçamento
+e tokens de movimento. Nada de valor mágico fora dele.
+
+## Conteúdo com regra
+
+`site/src/dados.js` guarda depoimentos e telas dos sistemas. **Lista vazia =
+seção não renderiza.** Nunca preencher com exemplo ou texto fictício: só
+entra prova real e autorizada.
+
+## Armadilhas já pagas (não repetir)
+
+- O `manualChunks` como objeto arrastava o React para o chunk do three.js e
+  ~958KB entravam no caminho crítico. Hoje é função: `vendor` (React/GSAP) e
+  `three` (3D, carregado só quando o canvas monta).
+- O React Three Fiber escreve `pointer-events: auto` inline no canvas e no seu
+  wrapper. Sem `#canvas-root, #canvas-root * { pointer-events: none !important }`
+  o canvas cobre a página e **engole os cliques do formulário**.
+- `og:image` é **JPG** de propósito: o WhatsApp não renderiza WebP em preview,
+  e o link é compartilhado por lá.
+- O certificado HTTPS do domínio já falhou uma vez; o conserto é rebater o
+  domínio custom na API do Pages.

@@ -1,0 +1,8 @@
+# Maintor Flow — maintorflow.com.br
+User-agent: *
+Allow: /
+
+# Versão estruturada para agentes de IA e LLMs
+# https://maintorflow.com.br/index.md
+
+Sitemap: https://maintorflow.com.br/sitemap.xml

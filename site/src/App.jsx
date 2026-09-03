@@ -267,7 +267,9 @@ export default function App() {
     } else if (negocio.trim()) {
       partes.push(`Escrevo pelo negócio ${negocio.trim()}.`)
     }
-    window.open(`${WHATS}?text=${encodeURIComponent(partes.join(' '))}`, '_blank')
+    // 'noopener' evita reverse tabnabbing: sem ele a aba aberta recebe
+    // window.opener e pode reescrever a URL desta página
+    window.open(`${WHATS}?text=${encodeURIComponent(partes.join(' '))}`, '_blank', 'noopener')
   }
 
   return (
@@ -484,10 +486,18 @@ export default function App() {
                   para clínicas odontológicas — o paciente vê o resultado antes de
                   fechar o tratamento.
                 </p>
-                <blockquote className="citacao serif" data-reveal>
-                  “A plataforma pronta é ótima e é mais barata mesmo. A diferença
-                  é que lá você tem uma ferramenta — e aqui você tem alguém.”
-                </blockquote>
+                {/* atribuição explícita: é a nossa posição, não depoimento de
+                    cliente — sem isso a aspas podia ser lida como prova social */}
+                <figure className="citacao-bloco" data-reveal>
+                  <blockquote className="citacao serif">
+                    “A plataforma pronta é ótima e é mais barata mesmo. A diferença
+                    é que lá você tem uma ferramenta — e aqui você tem alguém.”
+                  </blockquote>
+                  <figcaption className="micro citacao-autoria">
+                    Como a gente responde quando perguntam por que não usar uma
+                    plataforma pronta
+                  </figcaption>
+                </figure>
               </div>
               <div>
                 <figure className="painel-foto" data-reveal>

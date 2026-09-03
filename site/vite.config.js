@@ -12,8 +12,16 @@ export default defineConfig({
     assetsInlineLimit: 0,
     rollupOptions: {
       output: {
-        manualChunks: {
-          three: ['three', '@react-three/fiber', '@react-three/drei'],
+        /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup
+           arrastava o React para dentro do chunk do three (fiber depende dele),
+           e o modulepreload puxava ~958KB antes do primeiro pixel — anulando o
+           lazy load do canvas. Aqui o 3D fica isolado de verdade. */
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('/three/') || id.includes('@react-three') || id.includes('/zustand/')) {
+            return 'three'
+          }
+          return 'vendor' // react, react-dom, gsap, lenis
         },
       },
     },
