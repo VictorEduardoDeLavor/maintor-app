@@ -3,6 +3,8 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { blipHover, alternarAmbiente, modularPorScroll } from './audio.js'
+import { CarrosselDepoimentos, CarrosselTelas } from './Carrosseis.jsx'
+import { depoimentos, telas } from './dados.js'
 
 // Canvas 3D entra depois do primeiro paint — não segura o LCP
 const FlowCanvas = lazy(() => import('./FlowCanvas.jsx'))
@@ -563,8 +565,33 @@ export default function App() {
                 do seu negócio.
               </p>
             </div>
+
+            {telas.length > 0 && (
+              <div style={{ marginTop: 'var(--s6)' }} data-reveal>
+                <div className="regua" style={{ marginBottom: 'var(--s4)' }}>
+                  <span className="micro">Por dentro</span>
+                  <span className="micro">Telas dos sistemas · use ← → para navegar</span>
+                </div>
+                <CarrosselTelas itens={telas} />
+              </div>
+            )}
           </div>
         </section>
+
+        {/* ============ DEPOIMENTOS (só com prova real) ============ */}
+        {depoimentos.length > 0 && (
+          <section className="cena" id="depoimentos">
+            <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+              <Regua esquerda="Quem já contratou" direita="Na palavra de quem usa todo dia" />
+              <h2 className="titulo-cena serif" data-palavras style={{ marginBottom: 'var(--s5)' }}>
+                <Palavras texto="Não somos nós dizendo." destaque={[2, 3]} />
+              </h2>
+              <div data-reveal>
+                <CarrosselDepoimentos itens={depoimentos} />
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ============ CENA 5 · CONTATO ============ */}
         <section className="cena" id="contato">

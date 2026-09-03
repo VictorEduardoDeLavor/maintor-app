@@ -68,6 +68,11 @@ a { color: inherit; }
   pointer-events: none;
   animation: canvas-aparecer 1.4s ease-out both; /* sem "estalo" quando o chunk 3D chega */
 }
+/* O R3F escreve pointer-events:auto INLINE no <canvas>, sobrepondo o none do
+   pai — e o canvas (z-index 2) cobre todo o conteúdo (z-index 1), engolindo
+   os cliques do formulário e dos carrosséis. O !important é obrigatório aqui:
+   sem ele, o CTA do site fica inoperante. */
+#canvas-root, #canvas-root * { pointer-events: none !important; }
 @keyframes canvas-aparecer { from { opacity: 0; } to { opacity: 1; } }
 
 /* fundo do papel: gradiente fica no body, atrás de tudo */
@@ -610,6 +615,138 @@ h2.titulo-cena em { color: var(--mostarda); }
 .form-flow input:focus { border-bottom: 1px solid var(--mostarda); }
 .form-flow input::placeholder { color: rgba(169, 188, 184, .5); }
 .form-obs { font-size: 13px; color: var(--cinza-claro); }
+
+/* ================================================================
+   CARROSSÉIS — depoimentos e telas dos sistemas
+   Padrão de interação da referência, na linguagem do MASTER.md
+   ================================================================ */
+.carrossel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+.carrossel-nav .seta {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: 1px solid rgba(230, 221, 208, .25);
+  background: transparent;
+  color: var(--creme);
+  font-size: 17px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--t-rapido), background var(--t-rapido),
+              transform var(--t-rapido);
+  font-family: inherit;
+}
+.carrossel-nav .seta:hover {
+  border-color: var(--mostarda);
+  background: rgba(250, 247, 242, .06);
+  transform: translateY(-2px);
+}
+.carrossel-nav .pontos { display: flex; gap: 9px; }
+.carrossel-nav .ponto {
+  width: 8px; height: 8px;
+  padding: 0;
+  border: none; border-radius: 50%;
+  background: rgba(230, 221, 208, .28);
+  cursor: pointer;
+  transition: background var(--t-rapido), transform var(--t-rapido);
+}
+.carrossel-nav .ponto:hover { background: rgba(230, 221, 208, .5); }
+.carrossel-nav .ponto.ativo { background: var(--mostarda); transform: scale(1.35); }
+
+/* entrada de cada slide (equivale ao AnimatePresence da referência) */
+@keyframes slide-entra {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---- depoimentos ---- */
+.depo-palco { outline: none; }
+.depo-palco:focus-visible { outline: 2px solid var(--mostarda); outline-offset: 12px; }
+
+.depo-corpo {
+  display: flex;
+  align-items: center;
+  animation: slide-entra .5s ease-out both;
+}
+.depo-retrato {
+  margin: 0;
+  width: clamp(220px, 30vw, 400px);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  border: var(--hairline);
+  background: var(--profundo);
+}
+.depo-retrato img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* o cartão monta sobre o retrato — o gesto que define a referência */
+.depo-cartao {
+  margin: 0 0 0 -70px;
+  background: rgba(20, 53, 53, .88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: var(--hairline);
+  border-radius: 20px;
+  padding: clamp(28px, 3.4vw, 46px);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, .5);
+  max-width: 640px;
+}
+.depo-cartao.sem-foto { margin-left: 0; max-width: 820px; }
+.depo-texto {
+  font-size: clamp(20px, 2.3vw, 30px);
+  line-height: 1.42;
+  color: var(--creme);
+  margin-bottom: var(--s3);
+}
+.depo-cartao footer { border-top: var(--hairline); padding-top: 16px; }
+.depo-nome { font-weight: 700; font-size: 16.5px; color: var(--creme); }
+.depo-papel { color: var(--mostarda); margin-top: 4px; }
+.depo-cartao .link-mostarda { margin-top: 14px; }
+
+@media (max-width: 860px) {
+  .depo-corpo { flex-direction: column; align-items: stretch; }
+  .depo-retrato { width: 100%; max-width: 340px; margin: 0 auto; }
+  .depo-cartao { margin: -46px 0 0; }
+}
+
+/* ---- telas dos sistemas ---- */
+.telas-palco { outline: none; }
+.telas-palco:focus-visible { outline: 2px solid var(--mostarda); outline-offset: 12px; }
+
+.telas-moldura {
+  margin: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: var(--hairline);
+  background: var(--profundo);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, .5);
+  animation: slide-entra .5s ease-out both;
+}
+.telas-moldura img { display: block; width: 100%; height: auto; }
+
+.telas-legenda {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s3);
+  border-top: var(--hairline);
+  margin-top: var(--s3);
+  padding-top: 16px;
+  flex-wrap: wrap;
+}
+.telas-sistema { color: var(--mostarda); margin-bottom: 6px; }
+.telas-titulo { font-size: clamp(20px, 2.4vw, 28px); color: var(--creme); }
+.telas-nota { color: var(--cinza-claro); font-size: 14.5px; margin-top: 6px; max-width: 62ch; }
+.telas-contador { color: var(--cinza-claro); white-space: nowrap; padding-top: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .depo-corpo, .telas-moldura { animation: none; }
+}
 
 /* ---- rodapé --------------------------------------------------- */
 footer {
