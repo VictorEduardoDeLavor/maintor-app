@@ -424,6 +424,8 @@ export default function App() {
                 </div>
                 <img
                   src="/midia/voke-home.webp"
+                  srcSet="/midia/voke-home-640.webp 640w, /midia/voke-home-800.webp 800w, /midia/voke-home.webp 1280w"
+                  sizes="(max-width: 900px) 92vw, 1140px"
                   alt="Loja da VOKE WEAR no ar — página inicial"
                   loading="lazy"
                   width="1280"
@@ -646,6 +648,23 @@ export default function App() {
               <span className="linha recuo"><Palavras texto="a ideia" /></span>
               <span className="linha direita"><Palavras texto="do papel?" destaque={[0, 1]} /></span>
             </h2>
+
+            {/* Lista de serviços em texto lido. O marquee é decorativo
+                (aria-hidden), então sem isto marketing, tráfego pago e
+                manutenção mensal não existiam para leitor de tela nem
+                para buscador — só apareciam nos chips do formulário. */}
+            <div className="servicos-lista" data-reveal>
+              <h3 className="micro servicos-titulo">O que a Flow faz</h3>
+              <ul>
+                <li><b>Loja virtual</b><span>catálogo, Pix, cartão, frete e painel do dono</span></li>
+                <li><b>Site institucional</b><span>rápido no celular, com texto que vende</span></li>
+                <li><b>Manutenção mensal</b><span>atualização, correção e acompanhamento</span></li>
+                <li><b>Marketing e redes</b><span>conteúdo, publicação, SEO e vídeo</span></li>
+                <li><b>Tráfego pago</b><span>Google Ads e Meta, criativos e otimização</span></li>
+                <li><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></li>
+                <li><b>Sistemas sob medida</b><span>quando o template pronto não resolve</span></li>
+              </ul>
+            </div>
 
             <form className="form-flow" onSubmit={abrirWhats} data-reveal>
               <label className="micro">Qual é o seu objetivo hoje?</label>

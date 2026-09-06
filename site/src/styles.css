@@ -81,7 +81,10 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: radial-gradient(120% 90% at 72% 16%, #164040 0%, var(--abismo) 62%);
+  /* --petroleo da paleta, não um verde inventado (o #164040 anterior não
+     constava do MASTER.md, que declara as cores imutáveis) */
+  background: radial-gradient(120% 90% at 72% 16%,
+    color-mix(in srgb, var(--petroleo) 62%, var(--abismo)) 0%, var(--abismo) 62%);
 }
 
 /* grão de filme — tile PNG estático: decodifica uma vez, custo zero por frame */
@@ -170,7 +173,9 @@ header .navrow {
   gap: var(--s2);
 }
 .marca { font-size: 21px; color: var(--creme); text-decoration: none; }
-.marca b { font-weight: 700; font-style: normal; letter-spacing: -.3px; }
+/* peso 400: a DM Serif Display só existe nesse peso — pedir 700 fazia o
+   navegador sintetizar o negrito e engrossar o wordmark artificialmente */
+.marca b { font-weight: 400; font-style: normal; letter-spacing: -.3px; }
 .marca .fio-marca { color: var(--mostarda); }
 .navlinks { display: flex; gap: var(--s4); }
 .navlinks a {
@@ -567,9 +572,11 @@ h2.titulo-cena em { color: var(--mostarda); }
 /* variante solta na cena (contato): sem moldura, objeto respirando */
 .painel-foto.solto-direita {
   position: absolute;
-  top: 30%;
-  right: 6%;
-  width: clamp(200px, 22vw, 330px);
+  /* abaixo da manchete: com a lista de serviços a cena cresceu e o balão
+     passou a cair em cima de "do papel?" */
+  top: 62%;
+  right: 5%;
+  width: clamp(170px, 17vw, 250px);
   border: none;
   box-shadow: none;
   background: transparent;
@@ -613,6 +620,28 @@ h2.titulo-cena em { color: var(--mostarda); }
   z-index: 1;
 }
 @media (max-width: 900px) { .cena-grid { grid-template-columns: 1fr; } }
+
+/* ---- lista de serviços (texto lido, não decorativo) ---------- */
+.servicos-lista { margin-top: var(--s5); }
+.servicos-titulo { color: var(--mostarda); margin-bottom: var(--s2); }
+.servicos-lista ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0 var(--s4);
+}
+.servicos-lista li {
+  border-top: var(--hairline);
+  padding: 14px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+.servicos-lista b { color: var(--creme); font-size: 15.5px; font-weight: 600; }
+.servicos-lista span { color: var(--cinza-claro); font-size: 14px; }
 
 /* ---- formulário CTA ------------------------------------------ */
 .form-flow { display: grid; gap: var(--s3); max-width: 560px; margin-top: var(--s5); }
