@@ -226,6 +226,73 @@ header .navrow {
 .som-toggle[aria-pressed="true"] { color: var(--mostarda); }
 @media (max-width: 820px) { .navlinks { display: none; } }
 
+/* ---- menu de seções do celular -------------------------------- */
+.menu-btn {
+  display: none;
+  width: 44px; height: 44px;
+  flex: none; /* sem isto o flex do header comprime para 39px */
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(230, 221, 208, .25);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: border-color var(--t-rapido);
+}
+.menu-btn:hover { border-color: var(--mostarda); }
+/* duas linhas que viram X — o traço central é o elemento, os outros
+   dois são pseudo-elementos deslocados */
+.menu-traco, .menu-traco::before, .menu-traco::after {
+  position: absolute;
+  left: 50%; width: 18px; height: 1.5px;
+  background: var(--creme);
+  transition: transform var(--t-medio) cubic-bezier(.2,.8,.3,1), opacity var(--t-rapido);
+}
+.menu-traco { top: 50%; transform: translate(-50%, -50%); }
+.menu-traco::before, .menu-traco::after { content: ""; left: 0; }
+.menu-traco::before { top: -6px; }
+.menu-traco::after { top: 6px; }
+.menu-btn[aria-expanded="true"] .menu-traco { background: transparent; }
+.menu-btn[aria-expanded="true"] .menu-traco::before { transform: translateY(6px) rotate(45deg); background: var(--mostarda); }
+.menu-btn[aria-expanded="true"] .menu-traco::after { transform: translateY(-6px) rotate(-45deg); background: var(--mostarda); }
+
+.menu-painel {
+  position: fixed;
+  inset: 0;
+  z-index: 29; /* sob o header (30): o botão de fechar continua acessível */
+  background: var(--abismo);
+  padding: 104px clamp(24px, 7vw, 48px) 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--s4);
+  overflow-y: auto;
+}
+.menu-painel nav { display: flex; flex-direction: column; }
+.menu-painel nav a {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: var(--hairline);
+  text-decoration: none;
+  color: var(--creme);
+  font-size: clamp(28px, 8vw, 40px);
+  transition: color var(--t-rapido);
+}
+.menu-painel nav a:last-child { border-bottom: var(--hairline); }
+.menu-painel nav a:hover, .menu-painel nav a:focus-visible { color: var(--mostarda); }
+.menu-painel .idx-menu { color: var(--mostarda); font-size: 11px; }
+.menu-pe { display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap; }
+.som-no-menu { padding: 12px 4px; }
+
+@media (max-width: 820px) {
+  .menu-btn { display: block; }
+  /* o botão de som sai do header (espremia a marca) e vai para o painel */
+  .navrow > div > .som-toggle { display: none; }
+}
+@media (min-width: 821px) { .menu-painel { display: none; } }
+
 /* ---- util ----------------------------------------------------- */
 .wrap {
   width: 100%; /* flex item com margin auto encolhe p/ conteúdo sem isto */

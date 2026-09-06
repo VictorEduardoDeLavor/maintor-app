@@ -13,6 +13,13 @@ gsap.registerPlugin(ScrollTrigger)
 
 const WHATS = 'https://wa.me/5511946610634'
 
+const SECOES = [
+  { href: '#vitrine', rotulo: 'Lojas e sites' },
+  { href: '#automacao', rotulo: 'Automação' },
+  { href: '#tecnologia', rotulo: 'Tecnologia' },
+  { href: '#contato', rotulo: 'Contato' },
+]
+
 const OBJETIVOS = [
   'Loja virtual',
   'Site',
@@ -121,6 +128,10 @@ export default function App() {
   const [nome, setNome] = useState('')
   const [negocio, setNegocio] = useState('')
   const [somLigado, setSomLigado] = useState(false)
+  const [menuAberto, setMenuAberto] = useState(false)
+  const botaoMenuRef = useRef(null)
+  const painelMenuRef = useRef(null)
+  const lenisRef = useRef(null)
 
   /* preloader curto: assina a entrada e cobre o primeiro paint do canvas */
   useEffect(() => {
@@ -136,6 +147,7 @@ export default function App() {
     if (!reduzido) {
       // toque já rola nativo por padrão no Lenis (syncTouch off) — mobile intacto
       lenis = new Lenis({ lerp: 0.09 })
+      lenisRef.current = lenis
       lenis.on('scroll', (e) => {
         ScrollTrigger.update()
         velocidadeRef.current = e.velocity // alimenta a deformação das partículas
@@ -279,6 +291,42 @@ export default function App() {
     }
   }, [reduzido])
 
+  /* Menu do celular: trava o scroll (o Lenis continuaria rolando por baixo),
+     prende o foco no painel, Escape fecha e o foco volta para o botão. */
+  useEffect(() => {
+    if (!menuAberto) return
+    const lenis = lenisRef.current
+    lenis?.stop()
+    document.body.style.overflow = 'hidden'
+    const painel = painelMenuRef.current
+    const focaveis = painel?.querySelectorAll('a[href], button') || []
+    focaveis[0]?.focus()
+
+    const aoTeclar = (e) => {
+      if (e.key === 'Escape') { setMenuAberto(false); return }
+      if (e.key !== 'Tab' || !focaveis.length) return
+      const primeiro = focaveis[0]
+      const ultimo = focaveis[focaveis.length - 1]
+      if (e.shiftKey && document.activeElement === primeiro) { e.preventDefault(); ultimo.focus() }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primeiro.focus() }
+    }
+    document.addEventListener('keydown', aoTeclar)
+    return () => {
+      document.removeEventListener('keydown', aoTeclar)
+      lenis?.start()
+      document.body.style.overflow = ''
+      botaoMenuRef.current?.focus()
+    }
+  }, [menuAberto])
+
+  // fecha o menu se a tela crescer e as âncoras do header voltarem
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 821px)')
+    const aoMudar = (e) => { if (e.matches) setMenuAberto(false) }
+    mq.addEventListener('change', aoMudar)
+    return () => mq.removeEventListener('change', aoMudar)
+  }, [])
+
   const abrirWhats = (e) => {
     e.preventDefault()
     const partes = ['Olá! Vim pelo site da Maintor Flow.']
@@ -324,10 +372,9 @@ export default function App() {
             <b>maintor</b> <span className="fio-marca">flow</span>
           </a>
           <nav className="navlinks">
-            <a href="#vitrine">Lojas e sites</a>
-            <a href="#automacao">Automação</a>
-            <a href="#tecnologia">Tecnologia</a>
-            <a href="#contato">Contato</a>
+            {SECOES.map((s) => (
+              <a key={s.href} href={s.href}>{s.rotulo}</a>
+            ))}
           </nav>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)' }}>
             <button
@@ -342,9 +389,60 @@ export default function App() {
             <a className="nav-cta" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
               WhatsApp ↗
             </a>
+            {/* abaixo de 820px as âncoras somem: sem isto, o celular só
+                podia rolar a página inteira para achar uma seção */}
+            <button
+              type="button"
+              className="menu-btn"
+              ref={botaoMenuRef}
+              aria-expanded={menuAberto}
+              aria-controls="menu-secoes"
+              onClick={() => setMenuAberto((v) => !v)}
+            >
+              <span className="menu-traco" aria-hidden="true" />
+              <span className="sr-only">{menuAberto ? 'Fechar menu' : 'Abrir menu de seções'}</span>
+            </button>
           </div>
         </div>
       </header>
+
+      {/* painel de seções do celular */}
+      <div
+        id="menu-secoes"
+        className={`menu-painel${menuAberto ? ' aberto' : ''}`}
+        ref={painelMenuRef}
+        hidden={!menuAberto}
+      >
+        <nav aria-label="Seções do site">
+          {SECOES.map((s, i) => (
+            <a key={s.href} href={s.href} onClick={() => setMenuAberto(false)}>
+              <span className="micro idx-menu">{String(i + 1).padStart(2, '0')}</span>
+              <span className="serif">{s.rotulo}</span>
+            </a>
+          ))}
+        </nav>
+        <div className="menu-pe">
+          <a
+            className="btn menu-whats"
+            href={WHATS}
+            target="_blank"
+            rel="noopener"
+            onClick={() => setMenuAberto(false)}
+          >
+            Chamar no WhatsApp
+          </a>
+          {/* o controle de som vive aqui no celular: no header ele espremia
+              a marca em duas linhas */}
+          <button
+            type="button"
+            className="som-toggle som-no-menu"
+            aria-pressed={somLigado}
+            onClick={() => setSomLigado(alternarAmbiente())}
+          >
+            {somLigado ? 'som ●' : 'som ○'}
+          </button>
+        </div>
+      </div>
 
       <main id="conteudo">
         {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
