@@ -106,8 +106,9 @@ prova prática de que "sistema sob medida" aqui não é promessa:
   indexáveis por buscadores convencionais e motores de busca por IA — este
   próprio arquivo é a versão estruturada para máquinas.
 
-## Páginas por segmento
+## Páginas de serviço e segmento
 
+- Automação de atendimento: https://maintorflow.com.br/automacao-de-atendimento/
 - Site para clínica odontológica: https://maintorflow.com.br/site-para-clinica-odontologica/
 - Loja virtual para moda fitness: https://maintorflow.com.br/loja-virtual-moda-fitness/
 

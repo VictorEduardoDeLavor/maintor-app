@@ -593,6 +593,11 @@ export default function App() {
                 <LinhaEd idx="02" rot="Pedido feito" val="aviso automático com status para o cliente" />
                 <LinhaEd idx="03" rot="Fora do script" val="cai para você, já com resposta sugerida" />
                 <LinhaEd idx="04" rot="Ninguém respondeu" val="o sistema cobra — a mensagem não morre esquecida" />
+                <div style={{ marginTop: 'var(--s3)' }}>
+                  <a className="link-mostarda" href="/automacao-de-atendimento/">
+                    Ver como funciona →
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -767,9 +772,10 @@ export default function App() {
               </ul>
               {/* páginas por segmento: URL, título e texto próprios (SEO) */}
               <p className="servicos-nichos">
-                <span className="micro">Por segmento</span>
+                <span className="micro">Saiba mais</span>
                 <a href="/site-para-clinica-odontologica/">Site para clínica odontológica</a>
                 <a href="/loja-virtual-moda-fitness/">Loja virtual para moda fitness</a>
+                <a href="/automacao-de-atendimento/">Automação de atendimento</a>
               </p>
             </div>
 
