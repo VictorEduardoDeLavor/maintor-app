@@ -762,6 +762,12 @@ export default function App() {
                 <li><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></li>
                 <li><b>Sistemas sob medida</b><span>quando o template pronto não resolve</span></li>
               </ul>
+              {/* páginas por segmento: URL, título e texto próprios (SEO) */}
+              <p className="servicos-nichos">
+                <span className="micro">Por segmento</span>
+                <a href="/site-para-clinica-odontologica/">Site para clínica odontológica</a>
+                <a href="/loja-virtual-moda-fitness/">Loja virtual para moda fitness</a>
+              </p>
             </div>
 
             <form className="form-flow" onSubmit={abrirWhats} data-reveal>
