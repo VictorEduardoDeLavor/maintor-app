@@ -38,6 +38,7 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-tres p { color: var(--cinza-claro); font-size: 15.5px; }
 .pg-tres .micro { color: var(--mostarda); margin-bottom: 12px; display: block; }
 .pg-passos > div { border-top: 2px solid var(--mostarda); }
+.pg-ico { display: block; width: 96px; height: 96px; margin-bottom: 14px; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .45)); }
 .pg-quatro { grid-template-columns: repeat(2, minmax(0, 1fr)); } /* 4 blocos: 2×2, não 3+1 */
 
 /* duas colunas: texto + figura */
