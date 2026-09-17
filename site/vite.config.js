@@ -30,6 +30,7 @@ export default defineConfig({
         sites: aqui + 'sites/index.html',
         sistemas: aqui + 'sistemas-sob-medida/index.html',
         manutencao: aqui + 'manutencao-mensal/index.html',
+        marketing: aqui + 'marketing-e-redes/index.html',
       },
       output: {
         /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup

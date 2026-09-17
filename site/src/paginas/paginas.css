@@ -67,6 +67,8 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-faq summary:hover { color: var(--mostarda); }
 .pg-faq summary:focus-visible { outline: 2px solid var(--mostarda); outline-offset: 4px; }
 .pg-faq p { color: var(--cinza-claro); padding: 0 0 20px; max-width: 60ch; }
+.pg-faq p a { display: inline-block; padding: 9px 0; color: var(--creme); text-decoration-color: rgba(212, 165, 116, .5); text-underline-offset: 4px; }
+.pg-faq p a:hover { color: var(--mostarda); }
 
 /* CTA final */
 .pg-cta { border-top: var(--hairline); padding: var(--s6) 0; }
