@@ -268,6 +268,11 @@ header .navrow {
   gap: var(--s4);
   overflow-y: auto;
 }
+/* 🚨 [hidden] precisa vencer o display:flex acima. Sem esta regra o painel
+   (fixed, inset:0, opaco) cobria a home inteira no celular — esteve assim em
+   produção de 26/08 a 17/09 sem ninguém ver, porque a verificação da home
+   rodava só em 1280px. Atributo (0,1,1) > classe (0,1,0). */
+.menu-painel[hidden] { display: none; }
 .menu-painel nav { display: flex; flex-direction: column; }
 .menu-painel nav a {
   display: flex;
@@ -709,6 +714,12 @@ h2.titulo-cena em { color: var(--mostarda); }
 }
 .servicos-lista b { color: var(--creme); font-size: 15.5px; font-weight: 600; }
 .servicos-lista span { color: var(--cinza-claro); font-size: 14px; }
+.servicos-lista li a {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
+  width: 100%; color: inherit; text-decoration: none;
+}
+.servicos-lista li a:hover b, .servicos-lista li a:focus-visible b { color: var(--mostarda); }
+.servicos-lista li a::after { content: "→"; color: var(--mostarda); margin-left: auto; opacity: .7; }
 .servicos-nichos {
   display: flex; flex-wrap: wrap; align-items: baseline;
   gap: 4px 20px; margin-top: var(--s3); font-size: 14.5px;

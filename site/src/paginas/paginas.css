@@ -88,3 +88,16 @@ body.pagina .link-mostarda { padding: 10px 0; }
   .btn { transition: none; }
   .btn:hover { transform: none; }
 }
+
+/* trilha (por-onde-comecar): etapas numeradas */
+.pg-trilha { margin-top: var(--s2); }
+.pg-etapa { display: grid; grid-template-columns: 96px 1fr; gap: var(--s3); border-top: var(--hairline); padding: var(--s4) 0; align-items: start; scroll-margin-top: 96px; }
+.pg-etapa .num { font-size: clamp(44px, 5vw, 72px); line-height: .9; color: var(--mostarda); }
+.pg-etapa h3 { font-family: 'DM Serif Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.1; margin-bottom: 10px; }
+.pg-etapa p { color: var(--cinza-claro); max-width: 60ch; }
+.pg-etapa p + p { margin-top: 10px; }
+.pg-etapa p strong { color: var(--creme); font-weight: 600; }
+.pg-etapa .micro { color: var(--mostarda); display: block; margin-bottom: 8px; }
+.pg-etapa .acoes { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 0 20px; }
+.pg-lista li span { color: var(--cinza-claro); }
+@media (max-width: 600px) { .pg-etapa { grid-template-columns: 52px 1fr; gap: var(--s2); } }

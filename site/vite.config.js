@@ -31,6 +31,8 @@ export default defineConfig({
         sistemas: aqui + 'sistemas-sob-medida/index.html',
         manutencao: aqui + 'manutencao-mensal/index.html',
         marketing: aqui + 'marketing-e-redes/index.html',
+        trafego: aqui + 'trafego-pago/index.html',
+        trilha: aqui + 'por-onde-comecar/index.html',
       },
       output: {
         /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup

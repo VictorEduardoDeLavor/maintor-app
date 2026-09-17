@@ -762,25 +762,21 @@ export default function App() {
             <div className="servicos-lista" data-reveal>
               <h3 className="micro servicos-titulo">O que a Flow faz</h3>
               <ul>
-                <li><b>Loja virtual</b><span>catálogo, Pix, cartão, frete e painel do dono</span></li>
-                <li><b>Site institucional</b><span>rápido no celular, com texto que vende</span></li>
-                <li><b>Manutenção mensal</b><span>atualização, correção e acompanhamento</span></li>
-                <li><b>Marketing e redes</b><span>conteúdo, publicação, SEO e vídeo</span></li>
-                <li><b>Tráfego pago</b><span>Google Ads e Meta, criativos e otimização</span></li>
-                <li><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></li>
-                <li><b>Sistemas sob medida</b><span>quando o template pronto não resolve</span></li>
+                <li><a href="/loja-virtual/"><b>Loja virtual</b><span>catálogo, Pix, cartão, frete e painel do dono</span></a></li>
+                <li><a href="/sites/"><b>Site institucional</b><span>rápido no celular, com texto que vende</span></a></li>
+                <li><a href="/manutencao-mensal/"><b>Manutenção mensal</b><span>atualização, correção e acompanhamento</span></a></li>
+                <li><a href="/marketing-e-redes/"><b>Marketing e redes</b><span>conteúdo, publicação, SEO e vídeo</span></a></li>
+                <li><a href="/trafego-pago/"><b>Tráfego pago</b><span>Google Ads e Meta, criativos e otimização</span></a></li>
+                <li><a href="/automacao-de-atendimento/"><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></a></li>
+                <li><a href="/sistemas-sob-medida/"><b>Sistemas sob medida</b><span>quando o template pronto não resolve</span></a></li>
               </ul>
               {/* páginas por segmento: URL, título e texto próprios (SEO) */}
               <p className="servicos-nichos">
-                <span className="micro">Saiba mais</span>
-                <a href="/loja-virtual/">Loja virtual</a>
-                <a href="/sites/">Sites</a>
-                <a href="/sistemas-sob-medida/">Sistemas sob medida</a>
-                <a href="/manutencao-mensal/">Manutenção mensal</a>
-                <a href="/marketing-e-redes/">Marketing e redes</a>
-                <a href="/site-para-clinica-odontologica/">Site para clínica odontológica</a>
-                <a href="/loja-virtual-moda-fitness/">Loja virtual para moda fitness</a>
-                <a href="/automacao-de-atendimento/">Automação de atendimento</a>
+                <span className="micro">Por onde começar</span>
+                <a href="/por-onde-comecar/">A trilha, na ordem certa</a>
+                <a href="/site-para-clinica-odontologica/">Clínica odontológica</a>
+                <a href="/loja-virtual-moda-fitness/">Moda fitness</a>
+                <a href="/casos/voke-wear/">Case VOKE</a>
               </p>
             </div>
 

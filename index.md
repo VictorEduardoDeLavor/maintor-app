@@ -106,6 +106,16 @@ prova prática de que "sistema sob medida" aqui não é promessa:
   indexáveis por buscadores convencionais e motores de busca por IA — este
   próprio arquivo é a versão estruturada para máquinas.
 
+## Por onde começar — a trilha que a Flow indica
+
+Na ordem certa, cada real trabalha para o próximo: (1) site ou loja que
+converte; (2) Perfil da Empresa no Google preenchido + Search Console;
+(3) cadastros no seu nome com a mesma identidade (Instagram/Facebook
+comercial, WhatsApp Business, e-mail no domínio); (4) atendimento que
+responde na hora; (5) conteúdo constante; (6) só então tráfego pago.
+A manutenção mensal atravessa todas. Detalhe em
+https://maintorflow.com.br/por-onde-comecar/
+
 ## Páginas de serviço e segmento
 
 - Loja virtual: https://maintorflow.com.br/loja-virtual/
@@ -113,6 +123,8 @@ prova prática de que "sistema sob medida" aqui não é promessa:
 - Sistemas sob medida: https://maintorflow.com.br/sistemas-sob-medida/
 - Manutenção mensal: https://maintorflow.com.br/manutencao-mensal/
 - Marketing e redes: https://maintorflow.com.br/marketing-e-redes/
+- Tráfego pago: https://maintorflow.com.br/trafego-pago/
+- Por onde começar (a trilha, na ordem certa): https://maintorflow.com.br/por-onde-comecar/
 - Automação de atendimento: https://maintorflow.com.br/automacao-de-atendimento/
 - Site para clínica odontológica: https://maintorflow.com.br/site-para-clinica-odontologica/
 - Loja virtual para moda fitness: https://maintorflow.com.br/loja-virtual-moda-fitness/
