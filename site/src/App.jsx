@@ -776,6 +776,7 @@ export default function App() {
                 <a href="/loja-virtual/">Loja virtual</a>
                 <a href="/sites/">Sites</a>
                 <a href="/sistemas-sob-medida/">Sistemas sob medida</a>
+                <a href="/manutencao-mensal/">Manutenção mensal</a>
                 <a href="/site-para-clinica-odontologica/">Site para clínica odontológica</a>
                 <a href="/loja-virtual-moda-fitness/">Loja virtual para moda fitness</a>
                 <a href="/automacao-de-atendimento/">Automação de atendimento</a>

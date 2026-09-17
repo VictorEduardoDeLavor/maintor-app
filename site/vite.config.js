@@ -29,6 +29,7 @@ export default defineConfig({
         lojaVirtual: aqui + 'loja-virtual/index.html',
         sites: aqui + 'sites/index.html',
         sistemas: aqui + 'sistemas-sob-medida/index.html',
+        manutencao: aqui + 'manutencao-mensal/index.html',
       },
       output: {
         /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup
