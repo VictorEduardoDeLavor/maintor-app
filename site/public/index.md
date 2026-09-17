@@ -129,6 +129,13 @@ https://maintorflow.com.br/por-onde-comecar/
 - Site para clínica odontológica: https://maintorflow.com.br/site-para-clinica-odontologica/
 - Loja virtual para moda fitness: https://maintorflow.com.br/loja-virtual-moda-fitness/
 
+## Guias para decidir antes de gastar
+
+- Loja própria ou plataforma pronta? A resposta honesta (inclusive "fique onde está"): https://maintorflow.com.br/guias/loja-propria-ou-plataforma-pronta/
+- Quanto custa uma loja virtual, com a conta aberta (montar, rodar, alimentar, cuidar; o que fica de fora): https://maintorflow.com.br/guias/quanto-custa-uma-loja-virtual/
+- E se o desenvolvedor sumir? As sete chaves que precisam estar no seu nome: https://maintorflow.com.br/guias/se-o-desenvolvedor-sumir/
+- Índice: https://maintorflow.com.br/guias/
+
 ## Perguntas frequentes
 
 **Quanto custa um site ou uma loja virtual?**

@@ -33,6 +33,10 @@ export default defineConfig({
         marketing: aqui + 'marketing-e-redes/index.html',
         trafego: aqui + 'trafego-pago/index.html',
         trilha: aqui + 'por-onde-comecar/index.html',
+        guias: aqui + 'guias/index.html',
+        guiaPlataforma: aqui + 'guias/loja-propria-ou-plataforma-pronta/index.html',
+        guiaCusto: aqui + 'guias/quanto-custa-uma-loja-virtual/index.html',
+        guiaSumir: aqui + 'guias/se-o-desenvolvedor-sumir/index.html',
       },
       output: {
         /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup

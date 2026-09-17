@@ -810,6 +810,7 @@ export default function App() {
                 <a href="/site-para-clinica-odontologica/">Clínica odontológica</a>
                 <a href="/loja-virtual-moda-fitness/">Moda fitness</a>
                 <a href="/casos/voke-wear/">Case VOKE</a>
+                <a href="/guias/">Guias para decidir</a>
               </p>
             </div>
 
