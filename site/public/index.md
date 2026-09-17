@@ -129,6 +129,29 @@ https://maintorflow.com.br/por-onde-comecar/
 - Site para clínica odontológica: https://maintorflow.com.br/site-para-clinica-odontologica/
 - Loja virtual para moda fitness: https://maintorflow.com.br/loja-virtual-moda-fitness/
 
+## Perguntas frequentes
+
+**Quanto custa um site ou uma loja virtual?**
+Depende do tamanho: quantas páginas ou peças entram, se você já tem fotos e quem vai cuidar do conteúdo depois. A primeira conversa é para entender isso — sai uma proposta fechada, sem surpresa no meio do caminho.
+
+**Quanto tempo leva?**
+De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo.
+
+**Por que não usar uma plataforma pronta?**
+Use, se o que te falta é ferramenta — elas são boas e mais baratas. A diferença aparece no dia em que a foto corta, o frete calcula errado ou você quer mudar a home antes do lançamento. Lá você abre chamado. Aqui você chama no WhatsApp e alguém resolve.
+
+**Vocês entregam e vão embora?**
+Não. O modelo é projeto mais acompanhamento mensal: manutenção, correção, conteúdo e as campanhas que trazem cliente. O site de ontem não resolve o problema de amanhã.
+
+**E se eu quiser sair?**
+Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Sem fidelidade e sem multa — trinta dias de aviso e acabou.
+
+**Por onde eu começo?**
+Pela base: site ou loja que converte, depois o Google, os cadastros, o atendimento, o conteúdo — e só então o anúncio. Na ordem certa, cada real trabalha para o próximo.
+
+**Atendem fora de São Paulo?**
+Sim. O trabalho é remoto na maior parte do tempo; a distância não muda a entrega.
+
 ## Fale com a gente
 
 Valorizamos o seu tempo: sem reunião de uma hora, sem proposta cheia de

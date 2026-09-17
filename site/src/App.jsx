@@ -20,6 +20,16 @@ const SECOES = [
   { href: '#contato', rotulo: 'Contato' },
 ]
 
+const PERGUNTAS = [
+  { p: "Quanto custa um site ou uma loja virtual?", r: "Depende do tamanho: quantas páginas ou peças entram, se você já tem fotos e quem vai cuidar do conteúdo depois. A primeira conversa é para entender isso — sai uma proposta fechada, sem surpresa no meio do caminho.", href: "/loja-virtual/", rotulo: "Ver os formatos de loja →" },
+  { p: "Quanto tempo leva?", r: "De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo." },
+  { p: "Por que não usar uma plataforma pronta?", r: "Use, se o que te falta é ferramenta — elas são boas e mais baratas. A diferença aparece no dia em que a foto corta, o frete calcula errado ou você quer mudar a home antes do lançamento. Lá você abre chamado. Aqui você chama no WhatsApp e alguém resolve." },
+  { p: "Vocês entregam e vão embora?", r: "Não. O modelo é projeto mais acompanhamento mensal: manutenção, correção, conteúdo e as campanhas que trazem cliente. O site de ontem não resolve o problema de amanhã.", href: "/manutencao-mensal/", rotulo: "Como funciona a manutenção →" },
+  { p: "E se eu quiser sair?", r: "Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Sem fidelidade e sem multa — trinta dias de aviso e acabou." },
+  { p: "Por onde eu começo?", r: "Pela base: site ou loja que converte, depois o Google, os cadastros, o atendimento, o conteúdo — e só então o anúncio. Na ordem certa, cada real trabalha para o próximo.", href: "/por-onde-comecar/", rotulo: "Ver a trilha completa →" },
+  { p: "Atendem fora de São Paulo?", r: "Sim. O trabalho é remoto na maior parte do tempo; a distância não muda a entrega." },
+]
+
 const OBJETIVOS = [
   'Loja virtual',
   'Site',
@@ -735,6 +745,29 @@ export default function App() {
             </div>
           </section>
         )}
+
+        {/* ============ PERGUNTAS FREQUENTES ============ */}
+        {/* <details> nativo: focável e funciona sem JS; o bloco revela com
+            opacity (nunca autoAlpha — elemento invisível não recebe foco) */}
+        <section className="cena cena-curta" id="perguntas">
+          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+            <Regua esquerda="Perguntas frequentes" direita="O que todo dono pergunta primeiro" />
+            <h2 className="titulo-cena serif" data-palavras>
+              <Palavras texto="Antes de chamar, o que a maioria quer saber." destaque={[7, 8]} />
+            </h2>
+            <div className="faq-home" data-reveal>
+              {PERGUNTAS.map((q) => (
+                <details key={q.p}>
+                  <summary>{q.p}</summary>
+                  <p>
+                    {q.r}
+                    {q.href && <> <a href={q.href}>{q.rotulo}</a></>}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* ============ CENA 5 · CONTATO ============ */}
         <section className="cena" id="contato">
