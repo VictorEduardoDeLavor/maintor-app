@@ -10,6 +10,7 @@ body.pagina { overflow-x: clip; }
 body.pagina .marca { display: inline-flex; align-items: center; min-height: 44px; }
 body.pagina .navlinks a { display: inline-flex; align-items: center; min-height: 44px; }
 body.pagina .rodape-linhas a { padding: 12px 0; }
+body.pagina .link-mostarda { padding: 10px 0; }
 
 /* hero: o header é fixo, então a primeira dobra abre espaço para ele */
 .pg-hero { padding: calc(var(--s7) + 8px) 0 var(--s6); position: relative; }

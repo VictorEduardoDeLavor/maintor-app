@@ -64,6 +64,7 @@ em https://vokewear.com.br — visite e teste.
   em até 12x; frete grátis automático acima de R$ 300; baixa de estoque
   automática; fila de espera por tamanho; troca em até 7 dias; newsletter e
   integração com Instagram.
+- **Case completo:** https://maintorflow.com.br/casos/voke-wear/
 
 ## Tecnologia própria: SorrIA
 

@@ -551,9 +551,12 @@ export default function App() {
               <LinhaEd idx="—" rot="Estoque" val="Baixa sozinho · fila de espera por tamanho" />
               <LinhaEd idx="—" rot="Pós-venda" val="Troca em até 7 dias" />
             </div>
-            <div style={{ marginTop: 'var(--s3)' }} data-reveal>
+            <div style={{ marginTop: 'var(--s3)', display: 'flex', flexWrap: 'wrap', gap: 'var(--s2) var(--s4)' }} data-reveal>
               <a className="link-mostarda" href="https://vokewear.com.br" target="_blank" rel="noopener">
                 Visitar a loja ao vivo →
+              </a>
+              <a className="link-mostarda" href="/casos/voke-wear/">
+                Ver o case completo →
               </a>
             </div>
           </div>

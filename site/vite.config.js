@@ -24,6 +24,7 @@ export default defineConfig({
         home: aqui + 'index.html',
         clinica: aqui + 'site-para-clinica-odontologica/index.html',
         modaFitness: aqui + 'loja-virtual-moda-fitness/index.html',
+        casoVoke: aqui + 'casos/voke-wear/index.html',
       },
       output: {
         /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup
