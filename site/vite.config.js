@@ -27,6 +27,7 @@ export default defineConfig({
         casoVoke: aqui + 'casos/voke-wear/index.html',
         automacao: aqui + 'automacao-de-atendimento/index.html',
         lojaVirtual: aqui + 'loja-virtual/index.html',
+        sites: aqui + 'sites/index.html',
       },
       output: {
         /* Função, não objeto: com `{three: ['three','@react-three/*']}` o Rollup

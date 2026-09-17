@@ -45,6 +45,8 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-texto p { color: var(--cinza-claro); font-size: 16.5px; max-width: 58ch; }
 .pg-texto p + p { margin-top: var(--s3); }
 .pg-texto p strong { color: var(--creme); font-weight: 600; }
+.pg-texto a { display: inline-block; padding: 9px 0; color: var(--creme); text-decoration-color: rgba(212, 165, 116, .5); text-underline-offset: 4px; }
+.pg-texto a:hover { color: var(--mostarda); }
 .pg-fig { margin: 0; }
 .pg-fig img { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .5)); }
 

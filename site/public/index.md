@@ -109,6 +109,7 @@ prova prática de que "sistema sob medida" aqui não é promessa:
 ## Páginas de serviço e segmento
 
 - Loja virtual: https://maintorflow.com.br/loja-virtual/
+- Sites: https://maintorflow.com.br/sites/
 - Automação de atendimento: https://maintorflow.com.br/automacao-de-atendimento/
 - Site para clínica odontológica: https://maintorflow.com.br/site-para-clinica-odontologica/
 - Loja virtual para moda fitness: https://maintorflow.com.br/loja-virtual-moda-fitness/
