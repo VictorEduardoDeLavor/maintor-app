@@ -130,3 +130,9 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-card h2 { font-size: clamp(24px, 2.4vw, 30px); line-height: 1.1; }
 .pg-card p { color: var(--cinza-claro); flex: 1; }
 @media (max-width: 900px) { .pg-cards { grid-template-columns: 1fr; } .pg-artigo ol li { padding-left: 44px; } }
+
+/* O link "Todos os guias" mora dentro da régua, onde o texto tem 14px de altura
+   — abaixo do alvo de toque de 44px que a bateria exige. Cresce a área de
+   toque por dentro e devolve o espaço com margem negativa, para a régua
+   continuar desenhada na mesma altura. */
+.regua a { display: inline-flex; align-items: center; min-height: 44px; margin: -15px 0; }
