@@ -13,7 +13,8 @@
  *
  * Uso: npm run build (roda automaticamente depois do vite build).
  */
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
+import net from 'node:net'
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -37,10 +38,31 @@ try {
   process.exit(0)
 }
 
+/* Trava: se já existe um servidor na porta (um `vite preview` órfão de outro
+   build, de outra pasta), o --strictPort faz o NOSSO preview falhar em
+   silêncio e o Playwright lê o servidor antigo — o HTML gravado na home sai
+   desatualizado sem nenhum erro. Aconteceu em 03/10/2026. Melhor parar. */
+const ocupada = await new Promise((r) => {
+  const s = net.connect(PORTA, 'localhost')
+  s.once('connect', () => { s.destroy(); r(true) })
+  s.once('error', () => r(false))
+})
+if (ocupada) {
+  console.error(`prerender: a porta ${PORTA} já tem um servidor (provável vite preview órfão). Encerre-o e rode o build de novo.`)
+  process.exit(1)
+}
+
 const preview = spawn('npx', ['vite', 'preview', '--port', String(PORTA), '--strictPort'], {
   cwd: aqui, shell: true, stdio: 'ignore',
 })
-const encerrar = () => { try { preview.kill() } catch {} }
+/* No Windows, com shell:true, preview.kill() mata só o cmd.exe e o node do
+   vite fica órfão segurando a porta. taskkill /T derruba a árvore inteira. */
+const encerrar = () => {
+  try {
+    if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(preview.pid), '/T', '/F'], { stdio: 'ignore' })
+    else preview.kill()
+  } catch {}
+}
 process.on('exit', encerrar)
 
 await new Promise((r) => setTimeout(r, 4000))
