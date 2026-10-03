@@ -38,8 +38,36 @@
 {"@type":"ListItem","position":1,"name":"Maintor Flow","item":"https://maintorflow.com.br/"},
 {"@type":"ListItem","position":2,"name":"Guias","item":"https://maintorflow.com.br/guias/"}]}
 </script>
-  <link rel="stylesheet" crossorigin href="/assets/styles-DEoN-QKV.css">
-  <link rel="stylesheet" crossorigin href="/assets/paginas-mUsOnPqx.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles-CfQhbkly.css">
+  <link rel="stylesheet" crossorigin href="/assets/paginas-DO2CX9HH.css">
+  <script>(function () {
+  var ROT = { gbp: 'Te achei no Google.', google: 'Te achei no Google.',
+    instagram: 'Vim pelo Instagram.', ig: 'Vim pelo Instagram.',
+    facebook: 'Vim pelo Facebook.', fb: 'Vim pelo Facebook.',
+    whatsapp: 'Vim por um grupo do WhatsApp.' };
+  var CHAVE = 'flow.origem';
+  try {
+    var u = new URLSearchParams(location.search).get('utm_source');
+    if (u) sessionStorage.setItem(CHAVE, u.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40));
+  } catch (e) {}
+  function guardada() { try { return sessionStorage.getItem(CHAVE) || ''; } catch (e) { return ''; } }
+  function comOrigem(t) {
+    var r = ROT[guardada()];
+    if (!r || t.indexOf(r) >= 0) return t;
+    return /^Olá!/.test(t) ? t.replace(/^Olá!/, 'Olá! ' + r) : r + ' ' + t;
+  }
+  window.__flowOrigem = guardada;
+  window.__flowComOrigem = comOrigem;
+  document.addEventListener('click', function (e) {
+    try {
+      var a = e.target && e.target.closest && e.target.closest('a[href*="wa.me/"]');
+      if (!a || !ROT[guardada()]) return;
+      var partes = a.href.split('?');
+      var texto = new URLSearchParams(partes[1] || '').get('text') || 'Olá!';
+      a.href = partes[0] + '?text=' + encodeURIComponent(comOrigem(texto));
+    } catch (err) {}
+  }, true);
+})();</script>
 </head>
 <body class="pagina">
 <header>
@@ -93,7 +121,7 @@
         <a class="btn" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pelos%20guias%20do%20site." target="_blank" rel="noopener">Chamar no WhatsApp</a>
         <a class="btn btn-fantasma" href="/por-onde-comecar/">Por onde começar</a>
       </div>
-      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a></p>
+      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pelos%20guias%20do%20site." target="_blank" rel="noopener">(11) 94661-0634</a></p>
     </div>
   </section>
 </main>
@@ -103,7 +131,7 @@
     <div><span class="serif" style="color:var(--creme)"><b style="font-style:normal">maintor</b> <span style="color:var(--mostarda)">flow</span></span> · operação que flui</div>
     <div>
       <a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> ·
-      <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a> ·
+      <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pelos%20guias%20do%20site." target="_blank" rel="noopener">(11) 94661-0634</a> ·
       <a href="https://instagram.com/maintorflow" target="_blank" rel="noopener">@maintorflow</a>
     </div>
     <div>MAINTOR TECNOLOGIA LTDA · CNPJ 66.511.174/0001-27 · São Paulo/SP</div>

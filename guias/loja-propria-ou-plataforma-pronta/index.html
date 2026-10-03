@@ -39,7 +39,7 @@
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Dá para migrar da plataforma pronta para uma loja própria depois?","acceptedAnswer":{"@type":"Answer","text":"Na maioria dos casos, sim: produtos, fotos e cadastro de clientes costumam sair por exportação. O que não migra é o tema e a configuração — isso é reconstruído. Vale começar na plataforma e trocar quando bater no teto."}},
 {"@type":"Question","name":"Perco o histórico de pedidos na troca?","acceptedAnswer":{"@type":"Answer","text":"Depende do que a plataforma deixa exportar. Antes de trocar, exporte tudo o que ela permitir e guarde. O histórico serve para saber quem comprou e o quê — mesmo que a loja nova comece do zero em pedidos."}},
-{"@type":"Question","name":"Loja própria é mais cara?","acceptedAnswer":{"@type":"Answer","text":"O começo custa mais: tem projeto. O mês a mês costuma ser comparável, e a agência não cobra por venda — a taxa por transação é do meio de pagamento, em qualquer caminho. A conta fecha ou não conforme o volume: com poucas vendas, a plataforma sai mais barata; com muitas, a taxa por venda dela começa a pesar."}},
+{"@type":"Question","name":"Loja própria é mais cara?","acceptedAnswer":{"@type":"Answer","text":"No começo, sim: tem projeto, e o plano grátis de uma plataforma pronta custa zero. Depois de pronta, a loja da Flow não tem mensalidade nem comissão sobre venda; a taxa por transação é do meio de pagamento, em qualquer caminho. O que você paga a mais é a loja do seu jeito e alguém que conhece ela por dentro."}},
 {"@type":"Question","name":"A Maintor Flow trabalha com Nuvemshop ou Shopify?","acceptedAnswer":{"@type":"Answer","text":"Não. A gente constrói loja própria. Se a plataforma pronta resolve o seu caso, eu digo isso na primeira conversa — e não vendo nada. É a regra da casa: dizer o que é melhor para você, mesmo quando não é a gente."}},
 {"@type":"Question","name":"Quanto tempo leva a troca?","acceptedAnswer":{"@type":"Answer","text":"De três a quatro semanas depois que temos as fotos e a lista de peças com preço, tamanho e estoque. A loja antiga continua no ar até a nova estar testada; a troca do domínio é o último passo, e leva horas."}}
 ]}
@@ -50,8 +50,36 @@
 {"@type":"ListItem","position":2,"name":"Guias","item":"https://maintorflow.com.br/guias/"},
 {"@type":"ListItem","position":3,"name":"Loja própria ou plataforma pronta?","item":"https://maintorflow.com.br/guias/loja-propria-ou-plataforma-pronta/"}]}
 </script>
-  <link rel="stylesheet" crossorigin href="/assets/styles-DEoN-QKV.css">
-  <link rel="stylesheet" crossorigin href="/assets/paginas-mUsOnPqx.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles-CfQhbkly.css">
+  <link rel="stylesheet" crossorigin href="/assets/paginas-DO2CX9HH.css">
+  <script>(function () {
+  var ROT = { gbp: 'Te achei no Google.', google: 'Te achei no Google.',
+    instagram: 'Vim pelo Instagram.', ig: 'Vim pelo Instagram.',
+    facebook: 'Vim pelo Facebook.', fb: 'Vim pelo Facebook.',
+    whatsapp: 'Vim por um grupo do WhatsApp.' };
+  var CHAVE = 'flow.origem';
+  try {
+    var u = new URLSearchParams(location.search).get('utm_source');
+    if (u) sessionStorage.setItem(CHAVE, u.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40));
+  } catch (e) {}
+  function guardada() { try { return sessionStorage.getItem(CHAVE) || ''; } catch (e) { return ''; } }
+  function comOrigem(t) {
+    var r = ROT[guardada()];
+    if (!r || t.indexOf(r) >= 0) return t;
+    return /^Olá!/.test(t) ? t.replace(/^Olá!/, 'Olá! ' + r) : r + ' ' + t;
+  }
+  window.__flowOrigem = guardada;
+  window.__flowComOrigem = comOrigem;
+  document.addEventListener('click', function (e) {
+    try {
+      var a = e.target && e.target.closest && e.target.closest('a[href*="wa.me/"]');
+      if (!a || !ROT[guardada()]) return;
+      var partes = a.href.split('?');
+      var texto = new URLSearchParams(partes[1] || '').get('text') || 'Olá!';
+      a.href = partes[0] + '?text=' + encodeURIComponent(comOrigem(texto));
+    } catch (err) {}
+  }, true);
+})();</script>
 </head>
 <body class="pagina">
 <header>
@@ -130,7 +158,7 @@
       <div class="pg-faq">
         <details><summary>Dá para migrar da plataforma pronta para uma loja própria depois?</summary><p>Na maioria dos casos, sim: produtos, fotos e cadastro de clientes costumam sair por exportação. O que não migra é o tema e a configuração — isso é reconstruído. Vale começar na plataforma e trocar quando bater no teto.</p></details>
         <details><summary>Perco o histórico de pedidos na troca?</summary><p>Depende do que a plataforma deixa exportar. Antes de trocar, exporte tudo o que ela permitir e guarde. O histórico serve para saber quem comprou e o quê — mesmo que a loja nova comece do zero em pedidos.</p></details>
-        <details><summary>Loja própria é mais cara?</summary><p>O começo custa mais: tem projeto. O mês a mês costuma ser comparável, e a agência não cobra por venda — a taxa por transação é do meio de pagamento, em qualquer caminho. A conta fecha ou não conforme o volume: com poucas vendas, a plataforma sai mais barata; com muitas, a taxa por venda dela começa a pesar.</p></details>
+        <details><summary>Loja própria é mais cara?</summary><p>No começo, sim: tem projeto, e o plano grátis de uma plataforma pronta custa zero. Depois de pronta, a loja da Flow não tem mensalidade nem comissão sobre venda; a taxa por transação é do meio de pagamento, em qualquer caminho. O que você paga a mais é a loja do seu jeito e alguém que conhece ela por dentro.</p></details>
         <details><summary>A Maintor Flow trabalha com Nuvemshop ou Shopify?</summary><p>Não. A gente constrói loja própria. Se a plataforma pronta resolve o seu caso, eu digo isso na primeira conversa — e não vendo nada. É a regra da casa: dizer o que é melhor para você, mesmo quando não é a gente.</p></details>
         <details><summary>Quanto tempo leva a troca?</summary><p>De três a quatro semanas depois que temos as fotos e a lista de peças com preço, tamanho e estoque. A loja antiga continua no ar até a nova estar testada; a troca do domínio é o último passo, e leva horas.</p></details>
       </div>
@@ -145,7 +173,7 @@
         <a class="btn" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Li%20o%20guia%20%22loja%20pr%C3%B3pria%20ou%20plataforma%20pronta%22.%20Quero%20saber%20se%20vale%20trocar%20no%20meu%20caso." target="_blank" rel="noopener">Chamar no WhatsApp</a>
         <a class="btn btn-fantasma" href="/guias/quanto-custa-uma-loja-virtual/">Quanto custa, com a conta aberta</a>
       </div>
-      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a></p>
+      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Li%20o%20guia%20%22loja%20pr%C3%B3pria%20ou%20plataforma%20pronta%22.%20Quero%20saber%20se%20vale%20trocar%20no%20meu%20caso." target="_blank" rel="noopener">(11) 94661-0634</a></p>
     </div>
   </section>
 </main>
@@ -155,7 +183,7 @@
     <div><span class="serif" style="color:var(--creme)"><b style="font-style:normal">maintor</b> <span style="color:var(--mostarda)">flow</span></span> · operação que flui</div>
     <div>
       <a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> ·
-      <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a> ·
+      <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Li%20o%20guia%20%22loja%20pr%C3%B3pria%20ou%20plataforma%20pronta%22.%20Quero%20saber%20se%20vale%20trocar%20no%20meu%20caso." target="_blank" rel="noopener">(11) 94661-0634</a> ·
       <a href="https://instagram.com/maintorflow" target="_blank" rel="noopener">@maintorflow</a>
     </div>
     <div>MAINTOR TECNOLOGIA LTDA · CNPJ 66.511.174/0001-27 · São Paulo/SP</div>

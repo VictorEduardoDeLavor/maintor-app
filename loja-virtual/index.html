@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Criação de loja virtual completa | Maintor Flow</title>
-<meta name="description" content="Loja virtual com catálogo, Pix com desconto, cartão em 12x, frete pelo CEP e painel que você opera. A gente monta, coloca no ar no seu domínio e continua junto.">
+<title>Loja virtual a partir de R$ 1.500, sem mensalidade | Maintor Flow</title>
+<meta name="description" content="Loja virtual no seu domínio por R$ 1.500, R$ 2.200 ou R$ 3.500, pagamento único. Pix com desconto, cartão parcelado, frete pelo CEP e painel que você opera. Sem mensalidade e sem comissão.">
 <link rel="canonical" href="https://maintorflow.com.br/loja-virtual/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Loja virtual — Maintor Flow">
-<meta property="og:description" content="Catálogo, Pix, cartão, frete e um painel que é seu. A gente monta, coloca no ar e continua junto.">
+<meta property="og:description" content="Catálogo, Pix, cartão, frete e um painel que é seu. A partir de R$ 1.500, pagamento único, sem mensalidade.">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://maintorflow.com.br/loja-virtual/">
 <meta property="og:image" content="https://maintorflow.com.br/midia/og-image.jpg">
@@ -18,7 +18,7 @@
 <meta property="og:image:alt" content="Maintor Flow — operação que flui">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Loja virtual — Maintor Flow">
-<meta name="twitter:description" content="Catálogo, Pix, cartão, frete e um painel que é seu. A gente monta, coloca no ar e continua junto.">
+<meta name="twitter:description" content="Catálogo, Pix, cartão, frete e um painel que é seu. A partir de R$ 1.500, pagamento único, sem mensalidade.">
 <meta name="twitter:image" content="https://maintorflow.com.br/midia/og-image.jpg">
 <meta name="theme-color" content="#143535">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -29,7 +29,7 @@
 <link rel="stylesheet" href="/fontes/fontes.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"Quanto custa uma loja virtual?","acceptedAnswer":{"@type":"Answer","text":"Depende de quantas peças entram, se você tem as fotos e de quem vai cadastrar produto no dia a dia. A conversa inicial define isso e sai uma proposta fechada, sem surpresa no meio do caminho."}},
+{"@type":"Question","name":"Quanto custa uma loja virtual?","acceptedAnswer":{"@type":"Answer","text":"R$ 1.500 se você cadastra as peças (a gente entrega de 5 a 10 já cadastradas como modelo), R$ 2.200 se a gente cadastra até 50 peças, R$ 3.500 com o estúdio de fotos no painel. É pagamento único, sem mensalidade: metade no aceite, metade no dia em que a loja sobe."}},
 {"@type":"Question","name":"Quanto tempo leva para a loja ficar pronta?","acceptedAnswer":{"@type":"Answer","text":"De três a quatro semanas, a partir do momento em que temos as fotos e a lista de peças com preço, tamanho e estoque. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo."}},
 {"@type":"Question","name":"Já tenho loja na Nuvemshop ou na Shopify. Dá para migrar?","acceptedAnswer":{"@type":"Answer","text":"Na maioria dos casos dá para levar produtos, fotos e cadastro de clientes. É a primeira coisa que a gente olha na conversa — e se a plataforma pronta ainda resolve o seu caso, eu digo."}},
 {"@type":"Question","name":"O que eu preciso ter pronto para começar?","acceptedAnswer":{"@type":"Answer","text":"As fotos das peças e a lista com preço, tamanho e estoque. Para o domínio e a conta de pagamento no seu nome, o CNPJ. O resto a gente monta junto."}},
@@ -41,8 +41,36 @@
 {"@type":"ListItem","position":1,"name":"Maintor Flow","item":"https://maintorflow.com.br/"},
 {"@type":"ListItem","position":2,"name":"Loja virtual","item":"https://maintorflow.com.br/loja-virtual/"}]}
 </script>
-  <link rel="stylesheet" crossorigin href="/assets/styles-DEoN-QKV.css">
-  <link rel="stylesheet" crossorigin href="/assets/paginas-mUsOnPqx.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles-CfQhbkly.css">
+  <link rel="stylesheet" crossorigin href="/assets/paginas-DO2CX9HH.css">
+  <script>(function () {
+  var ROT = { gbp: 'Te achei no Google.', google: 'Te achei no Google.',
+    instagram: 'Vim pelo Instagram.', ig: 'Vim pelo Instagram.',
+    facebook: 'Vim pelo Facebook.', fb: 'Vim pelo Facebook.',
+    whatsapp: 'Vim por um grupo do WhatsApp.' };
+  var CHAVE = 'flow.origem';
+  try {
+    var u = new URLSearchParams(location.search).get('utm_source');
+    if (u) sessionStorage.setItem(CHAVE, u.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40));
+  } catch (e) {}
+  function guardada() { try { return sessionStorage.getItem(CHAVE) || ''; } catch (e) { return ''; } }
+  function comOrigem(t) {
+    var r = ROT[guardada()];
+    if (!r || t.indexOf(r) >= 0) return t;
+    return /^Olá!/.test(t) ? t.replace(/^Olá!/, 'Olá! ' + r) : r + ' ' + t;
+  }
+  window.__flowOrigem = guardada;
+  window.__flowComOrigem = comOrigem;
+  document.addEventListener('click', function (e) {
+    try {
+      var a = e.target && e.target.closest && e.target.closest('a[href*="wa.me/"]');
+      if (!a || !ROT[guardada()]) return;
+      var partes = a.href.split('?');
+      var texto = new URLSearchParams(partes[1] || '').get('text') || 'Olá!';
+      a.href = partes[0] + '?text=' + encodeURIComponent(comOrigem(texto));
+    } catch (err) {}
+  }, true);
+})();</script>
 </head>
 <body class="pagina">
 <header>
@@ -59,7 +87,7 @@
       <div>
         <p class="micro pg-eyebrow">Loja virtual · para pequenos negócios · São Paulo e todo o Brasil</p>
         <h1 class="serif pg-h1">Sua loja no ar, vendendo <em>sem depender de ninguém.</em></h1>
-        <p class="pg-lead">Catálogo, Pix, cartão, frete e um painel que é seu. A gente monta a loja, coloca no ar no seu domínio e continua junto — manutenção, conteúdo e as campanhas que trazem cliente.</p>
+        <p class="pg-lead">Catálogo, Pix, cartão, frete e um painel que é seu. A gente monta a loja e coloca no ar no seu domínio. A partir de R$ 1.500, pagamento único: sem mensalidade e sem comissão sobre as suas vendas.</p>
         <div class="pg-acoes">
           <a class="btn" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20loja%20virtual.%20Quero%20conversar%20sobre%20a%20loja%20do%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Conversar no WhatsApp</a>
           <span class="nota">Primeira conversa sem compromisso · (11) 94661-0634</span>
@@ -110,14 +138,14 @@
 
   <section class="pg-secao">
     <div class="wrap">
-      <div class="regua"><span class="micro">04 · Três formatos</span><span class="micro">O que muda é quem faz o quê</span></div>
+      <div class="regua"><span class="micro">04 · Três formatos</span><span class="micro">Pagamento único, sem mensalidade</span></div>
       <h2 class="serif pg-h2">A mesma loja, <em>três jeitos de entregar.</em></h2>
       <div class="pg-tres pg-passos">
-        <div><span class="micro">Essencial</span><b>Você cadastra</b><p>A mesma loja, o mesmo checkout, os mesmos e-mails automáticos. Você cadastra as peças; o tratamento de fotos fica de fora. Para quem tem tempo e quer investir menos.</p></div>
-        <div><span class="micro">Completo</span><b>A gente entrega pronta</b><p>A gente cadastra o catálogo, trata as fotos e entrega a loja pronta para vender. Você recebe treinada no painel para tocar sozinha.</p></div>
-        <div><span class="micro">Operado</span><b>A gente opera</b><p>Para quem não vai mexer no painel: a gente cuida do dia a dia — cadastro, fotos, preço, pedidos — e você cuida do produto.</p></div>
+        <div><span class="micro">Essencial · R$ 1.500</span><b>Você cadastra</b><p>A loja completa, com todas as integrações. A gente entrega com 5 a 10 peças já cadastradas como modelo, e você segue cadastrando o resto no painel.</p></div>
+        <div><span class="micro">Completo · R$ 2.200</span><b>A gente entrega pronta</b><p>Tudo do Essencial, mais o cadastro de até 50 peças feito por nós: fotos tratadas, descrição, tamanho, cor e estoque preenchidos. Você recebe tudo no lugar.</p></div>
+        <div><span class="micro">Estúdio · R$ 3.500</span><b>Foto pronta pelo celular</b><p>Tudo do Completo, mais o estúdio de fotos dentro do painel: fotografe a peça com o celular e a imagem sai pronta para a loja e para as redes, a cada coleção nova.</p></div>
       </div>
-      <p class="pg-lead" style="margin-top:var(--s4);font-size:16px">Os valores saem na proposta, depois de uma conversa de quinze minutos. O preço depende do tamanho do catálogo e de quem vai cuidar do dia a dia — por isso não tem tabela aqui.</p>
+      <p class="pg-lead" style="margin-top:var(--s4);font-size:16px">Pagamento em duas partes: metade no aceite, metade no dia em que a loja sobe. O prazo é de 3 a 4 semanas, contando do dia em que chegam as fotos e a lista de peças. Acima de 50 peças, o cadastro extra é combinado à parte. <strong>Não existe mensalidade:</strong> a loja é comprada, não alugada.</p>
     </div>
   </section>
 
@@ -140,11 +168,11 @@
   <section class="pg-secao">
     <div class="wrap">
       <div class="regua"><span class="micro">06 · Como funciona</span><span class="micro">Três etapas, uma responsável</span></div>
-      <h2 class="serif pg-h2">Monta. Coloca no ar. <em>Continua junto.</em></h2>
+      <h2 class="serif pg-h2">Monta. Coloca no ar. <em>Entrega a chave.</em></h2>
       <div class="pg-tres pg-passos">
         <div><span class="micro">Montar</span><b>O projeto</b><p>Uma conversa para entender o negócio, as peças, a grade e quem vai cuidar do dia a dia. Aí a gente constrói, com código próprio, leve, feito para o seu caso.</p></div>
         <div><span class="micro">No ar</span><b>A publicação</b><p>Domínio registrado no seu CNPJ, pagamento na sua conta, tudo testado antes de abrir. O dinheiro não passa pela gente.</p></div>
-        <div><span class="micro">Junto</span><b>O mês a mês</b><p>Manutenção, conteúdo, campanhas e evolução. A loja de ontem não resolve o problema de amanhã.</p></div>
+        <div><span class="micro">Depois</span><b>A loja é sua</b><p>Você opera pelo painel, com treinamento e manual na entrega. Sem mensalidade. Conteúdo, campanha ou acompanhamento depois são serviços à parte — e só se você quiser.</p></div>
       </div>
     </div>
   </section>
@@ -155,7 +183,7 @@
         <div class="regua"><span class="micro">07 · A regra da casa</span><span class="micro">Sem reféns</span></div>
         <h2 class="serif pg-h2">A chave fica <em>com você.</em></h2>
         <p>A pergunta mais honesta que um dono de negócio faz é: <strong>e se você sumir?</strong></p>
-        <p>Por isso a regra aqui é fixa. O domínio fica registrado no seu CNPJ. Os pagamentos caem na sua conta. Os dados dos seus clientes ficam nos seus sistemas. O código é entregue documentado. Sem fidelidade e sem multa — trinta dias de aviso e acabou.</p>
+        <p>Por isso a regra aqui é fixa. O domínio fica registrado no seu CNPJ. Os pagamentos caem na sua conta. Os dados dos seus clientes ficam nos seus sistemas. O código é entregue documentado. Sem mensalidade e sem comissão: se um dia quiser outro parceiro, você leva a loja inteira.</p>
         <p><strong>Você nunca fica refém, nem da gente.</strong></p>
       </div>
       <figure class="pg-fig"><img src="/midia/gatekeeper-chave.webp" width="900" height="900" alt="Chave de latão com cabeça de cerâmica verde" loading="lazy" decoding="async"></figure>
@@ -166,7 +194,7 @@
     <div class="wrap">
       <div class="regua"><span class="micro">08 · Perguntas frequentes</span><span class="micro">O que todo dono pergunta primeiro</span></div>
       <div class="pg-faq">
-        <details><summary>Quanto custa uma loja virtual?</summary><p>Depende de quantas peças entram, se você tem as fotos e de quem vai cadastrar produto no dia a dia. A conversa inicial define isso e sai uma proposta fechada, sem surpresa no meio do caminho.</p></details>
+        <details><summary>Quanto custa uma loja virtual?</summary><p>R$ 1.500 se você cadastra as peças (a gente entrega de 5 a 10 já cadastradas como modelo), R$ 2.200 se a gente cadastra até 50 peças, R$ 3.500 com o estúdio de fotos no painel. É pagamento único, sem mensalidade: metade no aceite, metade no dia em que a loja sobe.</p></details>
         <details><summary>Quanto tempo leva para a loja ficar pronta?</summary><p>De três a quatro semanas, a partir do momento em que temos as fotos e a lista de peças com preço, tamanho e estoque. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo.</p></details>
         <details><summary>Já tenho loja na Nuvemshop ou na Shopify. Dá para migrar?</summary><p>Na maioria dos casos dá para levar produtos, fotos e cadastro de clientes. É a primeira coisa que a gente olha na conversa — e se a plataforma pronta ainda resolve o seu caso, eu digo.</p></details>
         <details><summary>O que eu preciso ter pronto para começar?</summary><p>As fotos das peças e a lista com preço, tamanho e estoque. Para o domínio e a conta de pagamento no seu nome, o CNPJ. O resto a gente monta junto.</p></details>
@@ -210,7 +238,7 @@
         <a class="btn" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20loja%20virtual.%20Quero%20conversar%20sobre%20a%20loja%20do%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">Chamar no WhatsApp</a>
         <a class="btn btn-fantasma" href="/loja-virtual-moda-fitness/">Tenho marca de moda fitness</a>
       </div>
-      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a></p>
+      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20loja%20virtual.%20Quero%20conversar%20sobre%20a%20loja%20do%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">(11) 94661-0634</a></p>
     </div>
   </section>
 </main>
@@ -220,7 +248,7 @@
     <div><span class="serif" style="color:var(--creme)"><b style="font-style:normal">maintor</b> <span style="color:var(--mostarda)">flow</span></span> · operação que flui</div>
     <div>
       <a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> ·
-      <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a> ·
+      <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20loja%20virtual.%20Quero%20conversar%20sobre%20a%20loja%20do%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">(11) 94661-0634</a> ·
       <a href="https://instagram.com/maintorflow" target="_blank" rel="noopener">@maintorflow</a>
     </div>
     <div>MAINTOR TECNOLOGIA LTDA · CNPJ 66.511.174/0001-27 · São Paulo/SP</div>

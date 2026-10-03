@@ -41,8 +41,36 @@
 {"@type":"ListItem","position":1,"name":"Maintor Flow","item":"https://maintorflow.com.br/"},
 {"@type":"ListItem","position":2,"name":"Manutenção mensal","item":"https://maintorflow.com.br/manutencao-mensal/"}]}
 </script>
-  <link rel="stylesheet" crossorigin href="/assets/styles-DEoN-QKV.css">
-  <link rel="stylesheet" crossorigin href="/assets/paginas-mUsOnPqx.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles-CfQhbkly.css">
+  <link rel="stylesheet" crossorigin href="/assets/paginas-DO2CX9HH.css">
+  <script>(function () {
+  var ROT = { gbp: 'Te achei no Google.', google: 'Te achei no Google.',
+    instagram: 'Vim pelo Instagram.', ig: 'Vim pelo Instagram.',
+    facebook: 'Vim pelo Facebook.', fb: 'Vim pelo Facebook.',
+    whatsapp: 'Vim por um grupo do WhatsApp.' };
+  var CHAVE = 'flow.origem';
+  try {
+    var u = new URLSearchParams(location.search).get('utm_source');
+    if (u) sessionStorage.setItem(CHAVE, u.toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40));
+  } catch (e) {}
+  function guardada() { try { return sessionStorage.getItem(CHAVE) || ''; } catch (e) { return ''; } }
+  function comOrigem(t) {
+    var r = ROT[guardada()];
+    if (!r || t.indexOf(r) >= 0) return t;
+    return /^Olá!/.test(t) ? t.replace(/^Olá!/, 'Olá! ' + r) : r + ' ' + t;
+  }
+  window.__flowOrigem = guardada;
+  window.__flowComOrigem = comOrigem;
+  document.addEventListener('click', function (e) {
+    try {
+      var a = e.target && e.target.closest && e.target.closest('a[href*="wa.me/"]');
+      if (!a || !ROT[guardada()]) return;
+      var partes = a.href.split('?');
+      var texto = new URLSearchParams(partes[1] || '').get('text') || 'Olá!';
+      a.href = partes[0] + '?text=' + encodeURIComponent(comOrigem(texto));
+    } catch (err) {}
+  }, true);
+})();</script>
 </head>
 <body class="pagina">
 <header>
@@ -59,7 +87,7 @@
       <div>
         <p class="micro pg-eyebrow">Manutenção mensal · sites, lojas e sistemas</p>
         <h1 class="serif pg-h1">O site de ontem não resolve <em>o problema de amanhã.</em></h1>
-        <p class="pg-lead">Depois de publicar, a gente continua junto: atualização, correção, hospedagem gerenciada e suporte direto — com alguém que conhece o seu site porque foi quem construiu. Sem fidelidade.</p>
+        <p class="pg-lead">Serviço opcional, contratado à parte: o site ou a loja é seu e não depende dele. Para quem quer alguém cuidando depois: atualização, correção, hospedagem gerenciada e suporte direto — com quem conhece o seu site porque foi quem construiu. Sem fidelidade.</p>
         <div class="pg-acoes">
           <a class="btn" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20manuten%C3%A7%C3%A3o%20mensal.%20Quero%20conversar%20sobre%20cuidar%20do%20meu%20site." target="_blank" rel="noopener">Conversar no WhatsApp</a>
           <span class="nota">Primeira conversa sem compromisso · (11) 94661-0634</span>
@@ -171,7 +199,7 @@
         <a class="btn" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20manuten%C3%A7%C3%A3o%20mensal.%20Quero%20conversar%20sobre%20cuidar%20do%20meu%20site." target="_blank" rel="noopener">Chamar no WhatsApp</a>
         <a class="btn btn-fantasma" href="/sites/">Ainda não tenho site</a>
       </div>
-      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a></p>
+      <p class="pg-contatos"><a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> · <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20manuten%C3%A7%C3%A3o%20mensal.%20Quero%20conversar%20sobre%20cuidar%20do%20meu%20site." target="_blank" rel="noopener">(11) 94661-0634</a></p>
     </div>
   </section>
 </main>
@@ -181,7 +209,7 @@
     <div><span class="serif" style="color:var(--creme)"><b style="font-style:normal">maintor</b> <span style="color:var(--mostarda)">flow</span></span> · operação que flui</div>
     <div>
       <a href="mailto:victor@maintor.com.br">victor@maintor.com.br</a> ·
-      <a href="https://wa.me/5511946610634" target="_blank" rel="noopener">(11) 94661-0634</a> ·
+      <a href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20de%20manuten%C3%A7%C3%A3o%20mensal.%20Quero%20conversar%20sobre%20cuidar%20do%20meu%20site." target="_blank" rel="noopener">(11) 94661-0634</a> ·
       <a href="https://instagram.com/maintorflow" target="_blank" rel="noopener">@maintorflow</a>
     </div>
     <div>MAINTOR TECNOLOGIA LTDA · CNPJ 66.511.174/0001-27 · São Paulo/SP</div>
