@@ -31,12 +31,14 @@ services:
 ## O que fazemos
 
 Montamos, colocamos no ar e cuidamos da operação digital de pequenos negócios
-— lojas, clínicas e prestadores de serviço. Não entregamos o site e vamos
-embora: ficamos junto, cuidando da manutenção mensal, do conteúdo e das
-campanhas que trazem cliente.
+— lojas, clínicas e prestadores de serviço. A loja ou o site é comprado, não
+alugado: pagamento único, sem mensalidade. Quem quiser alguém cuidando depois
+contrata à parte manutenção, conteúdo ou campanhas.
 
-O modelo de trabalho é projeto + acompanhamento mensal, operado pela MAINTOR
-TECNOLOGIA LTDA (CNPJ 66.511.174/0001-27, São Paulo/SP).
+O modelo de trabalho é pagamento único para site e loja (loja virtual por
+R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças). Mensalidade
+só existe quando há serviço contínuo contratado, como conteúdo ou campanha.
+Operado pela MAINTOR TECNOLOGIA LTDA (CNPJ 66.511.174/0001-27, São Paulo/SP).
 
 ## Serviços
 
@@ -139,7 +141,7 @@ https://maintorflow.com.br/por-onde-comecar/
 ## Perguntas frequentes
 
 **Quanto custa um site ou uma loja virtual?**
-Depende do tamanho: quantas páginas ou peças entram, se você já tem fotos e quem vai cuidar do conteúdo depois. A primeira conversa é para entender isso — sai uma proposta fechada, sem surpresa no meio do caminho.
+Loja virtual: R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças e se entra o estúdio de fotos. O site institucional sai fechado na proposta, pelo número de páginas. Nos dois casos, pagamento único, sem mensalidade.
 
 **Quanto tempo leva?**
 De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo.
@@ -148,10 +150,10 @@ De duas a quatro semanas, conforme o projeto, contando a partir do momento em qu
 Use, se o que te falta é ferramenta — elas são boas e mais baratas. A diferença aparece no dia em que a foto corta, o frete calcula errado ou você quer mudar a home antes do lançamento. Lá você abre chamado. Aqui você chama no WhatsApp e alguém resolve.
 
 **Vocês entregam e vão embora?**
-Não. O modelo é projeto mais acompanhamento mensal: manutenção, correção, conteúdo e as campanhas que trazem cliente. O site de ontem não resolve o problema de amanhã.
+Entregamos, e a loja ou o site passa a ser seu: pagamento único, sem mensalidade, com treinamento e manual. Se você quiser alguém cuidando depois — conteúdo, campanha, ajustes —, é um serviço à parte, com valor próprio, e só se fizer sentido para você.
 
 **E se eu quiser sair?**
-Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Sem fidelidade e sem multa — trinta dias de aviso e acabou.
+Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Nos serviços mensais, como conteúdo e campanha, sem fidelidade e sem multa: trinta dias de aviso e acabou.
 
 **Por onde eu começo?**
 Pela base: site ou loja que converte, depois o Google, os cadastros, o atendimento, o conteúdo — e só então o anúncio. Na ordem certa, cada real trabalha para o próximo.

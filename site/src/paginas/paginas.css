@@ -81,8 +81,10 @@ body.pagina .link-mostarda { padding: 10px 0; }
 @media (max-width: 900px) {
   .pg-tres, .pg-duas { grid-template-columns: 1fr; }
   .pg-hero { padding-top: calc(var(--s6) + 40px); }
-  .pg-hero-obj { order: -1; }
-  .pg-hero-obj img { width: min(60%, 260px); }
+  /* o objeto decorativo vem DEPOIS do botão: com order:-1 ele empurrava o
+     botão do hero para 840-895px, fora da primeira tela no celular */
+  .pg-hero-obj { order: 2; }
+  .pg-hero-obj img { width: min(40%, 160px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .btn { transition: none; }

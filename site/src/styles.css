@@ -482,6 +482,8 @@ h2.titulo-cena em { color: var(--mostarda); }
   gap: 14px;
   opacity: .75;
 }
+a.dica-scroll { min-height: 44px; text-decoration: none; color: var(--bege); opacity: .9; transition: color 180ms ease-out, opacity 180ms ease-out; }
+a.dica-scroll:hover, a.dica-scroll:focus-visible { color: var(--creme); opacity: 1; }
 .dica-scroll::after {
   content: "";
   width: 56px;

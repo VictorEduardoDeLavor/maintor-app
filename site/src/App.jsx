@@ -11,7 +11,10 @@ const FlowCanvas = lazy(() => import('./FlowCanvas.jsx'))
 
 gsap.registerPlugin(ScrollTrigger)
 
-const WHATS = 'https://wa.me/5511946610634'
+const WHATS_NUM = 'https://wa.me/5511946610634'
+// todo link do WhatsApp abre com a mensagem pronta: a conversa chega dizendo
+// que veio do site (e de onde, quando a visita trouxe utm_source — ver medicao.js)
+const WHATS = `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow.')}`
 
 const SECOES = [
   { href: '#vitrine', rotulo: 'Lojas e sites' },
@@ -21,11 +24,11 @@ const SECOES = [
 ]
 
 const PERGUNTAS = [
-  { p: "Quanto custa um site ou uma loja virtual?", r: "Depende do tamanho: quantas páginas ou peças entram, se você já tem fotos e quem vai cuidar do conteúdo depois. A primeira conversa é para entender isso — sai uma proposta fechada, sem surpresa no meio do caminho.", href: "/loja-virtual/", rotulo: "Ver os formatos de loja →" },
+  { p: "Quanto custa um site ou uma loja virtual?", r: "Loja virtual: R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças e se entra o estúdio de fotos. O site institucional sai fechado na proposta, pelo número de páginas. Nos dois casos, pagamento único, sem mensalidade.", href: "/loja-virtual/", rotulo: "Ver os formatos de loja →" },
   { p: "Quanto tempo leva?", r: "De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo." },
   { p: "Por que não usar uma plataforma pronta?", r: "Use, se o que te falta é ferramenta — elas são boas e mais baratas. A diferença aparece no dia em que a foto corta, o frete calcula errado ou você quer mudar a home antes do lançamento. Lá você abre chamado. Aqui você chama no WhatsApp e alguém resolve." },
-  { p: "Vocês entregam e vão embora?", r: "Não. O modelo é projeto mais acompanhamento mensal: manutenção, correção, conteúdo e as campanhas que trazem cliente. O site de ontem não resolve o problema de amanhã.", href: "/manutencao-mensal/", rotulo: "Como funciona a manutenção →" },
-  { p: "E se eu quiser sair?", r: "Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Sem fidelidade e sem multa — trinta dias de aviso e acabou." },
+  { p: "Vocês entregam e vão embora?", r: "Entregamos, e a loja ou o site passa a ser seu: pagamento único, sem mensalidade, com treinamento e manual. Se você quiser alguém cuidando depois — conteúdo, campanha, ajustes —, é um serviço à parte, com valor próprio, e só se fizer sentido para você.", href: "/manutencao-mensal/", rotulo: "Como funciona a manutenção →" },
+  { p: "E se eu quiser sair?", r: "Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Nos serviços mensais, como conteúdo e campanha, sem fidelidade e sem multa: trinta dias de aviso e acabou." },
   { p: "Por onde eu começo?", r: "Pela base: site ou loja que converte, depois o Google, os cadastros, o atendimento, o conteúdo — e só então o anúncio. Na ordem certa, cada real trabalha para o próximo.", href: "/por-onde-comecar/", rotulo: "Ver a trilha completa →" },
   { p: "Atendem fora de São Paulo?", r: "Sim. O trabalho é remoto na maior parte do tempo; a distância não muda a entrega." },
 ]
@@ -34,7 +37,7 @@ const OBJETIVOS = [
   'Loja virtual',
   'Site',
   'Automação de atendimento',
-  'Sistema para minha clínica',
+  'Site para minha clínica',
   'Sistema sob medida',
   'Marketing e tráfego',
 ]
@@ -350,7 +353,8 @@ export default function App() {
     }
     // 'noopener' evita reverse tabnabbing: sem ele a aba aberta recebe
     // window.opener e pode reescrever a URL desta página
-    window.open(`${WHATS}?text=${encodeURIComponent(partes.join(' '))}`, '_blank', 'noopener')
+    const texto = typeof window.__flowComOrigem === 'function' ? window.__flowComOrigem(partes.join(' ')) : partes.join(' ')
+    window.open(`${WHATS_NUM}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener')
   }
 
   return (
@@ -474,7 +478,7 @@ export default function App() {
           />
           <div className="wrap">
             <div className="micro" data-reveal style={{ color: 'var(--mostarda)', marginBottom: 'var(--s3)' }}>
-              Estúdio de serviços digitais — São Paulo
+              Lojas virtuais e sites — São Paulo
             </div>
             <h1 className="manchete serif" data-palavras>
               <span className="linha"><Palavras texto="seu negócio" /></span>
@@ -482,15 +486,21 @@ export default function App() {
               <span className="linha direita"><Palavras texto="fluindo." destaque={[0]} /></span>
             </h1>
             <div className="hero-base">
-              <div className="dica-scroll" data-reveal>role para ver o fluxo</div>
+              {/* a prova real na primeira tela: antes era "role para ver o fluxo",
+                  e a VOKE só aparecia a 888px de rolagem no celular */}
+              {/* sem data-reveal: fica a ~86% da altura da tela, abaixo do gatilho
+                  de 85%, e só apareceria depois de rolar */}
+              <a className="dica-scroll" href="/casos/voke-wear/">
+                Loja nossa no ar: VOKE WEAR
+              </a>
               <div className="lado-dir" data-reveal>
                 <p className="corpo-apoio">
-                  Sites, lojas virtuais, automação de atendimento e sistemas sob
-                  medida para pequenos negócios. A gente monta, coloca no ar e
-                  continua junto.
+                  Loja virtual com Pix, cartão, frete e painel que você opera,
+                  a partir de R$ 1.500 — pagamento único, sem mensalidade.
+                  Também sites, automação de atendimento e sistemas sob medida.
                 </p>
                 <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
-                  Começar uma conversa
+                  Pedir orçamento no WhatsApp
                 </a>
               </div>
             </div>
