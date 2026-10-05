@@ -50,6 +50,10 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-texto a:hover { color: var(--mostarda); }
 .pg-fig { margin: 0; }
 .pg-fig img { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .5)); }
+/* foto de ambiente (out/2026): moldura igual aos painéis da home, sem a sombra
+   recortada que serve aos objetos de cerâmica */
+.pg-fig.pg-foto img { border-radius: 16px; border: 1px solid rgba(230, 221, 208, .16); filter: none; box-shadow: 0 30px 70px rgba(0, 0, 0, .45); }
+.pg-texto .pg-lista li b { color: var(--creme); font-weight: 600; }
 
 /* lista com travessão */
 .pg-lista { list-style: none; padding: 0; margin: var(--s4) 0 0; }
@@ -138,3 +142,17 @@ body.pagina .link-mostarda { padding: 10px 0; }
    toque por dentro e devolve o espaço com margem negativa, para a régua
    continuar desenhada na mesma altura. */
 .regua a { display: inline-flex; align-items: center; min-height: 44px; margin: -15px 0; }
+
+/* vídeo vertical em página de serviço (vídeos personalizados, out/2026) */
+.pg-video { margin: 0; justify-self: center; width: min(100%, 340px); }
+.pg-video video { display: block; width: 100%; height: auto; border-radius: 22px; border: 1px solid rgba(230, 221, 208, .16); box-shadow: 0 30px 70px rgba(0, 0, 0, .45); background: #000; }
+.pg-video figcaption { color: var(--cinza-claro); margin-top: 12px; text-align: center; letter-spacing: .12em; line-height: 1.6; }
+/* faixa de foto de ambiente no fim da seção "para quem é" (out/2026) */
+.pg-foto-larga { margin: var(--s4) 0 0; border-radius: 16px; overflow: hidden; border: 1px solid rgba(230, 221, 208, .16); aspect-ratio: 21 / 9; background: var(--abismo); }
+.pg-foto-larga img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 700px) { .pg-foto-larga { aspect-ratio: 4 / 3; } }
+
+/* link solto dentro de cartão: alvo de toque de 44px */
+.pg-link { display: inline-flex; align-items: center; min-height: 44px; }
+/* os controles do vídeo recebem o foco no próprio <video>: o anel tem que aparecer nele */
+.pg-video video:focus, .pg-video video:focus-within { outline: 2px solid var(--mostarda); outline-offset: 3px; }

@@ -50,7 +50,8 @@ Operado pela MAINTOR TECNOLOGIA LTDA (CNPJ 66.511.174/0001-27, São Paulo/SP).
 | Marketing e redes | planejamento de conteúdo, publicação, SEO, vídeo |
 | Tráfego pago | Google Ads + Meta (Instagram/Facebook), criativos e otimização contínua |
 | Automação de atendimento | WhatsApp e e-mail respondendo sozinhos, com você decidindo o que é máquina e o que é humano |
-| Sistemas sob medida | ferramentas exclusivas quando o template pronto não resolve |
+| Sistemas sob medida | sistemas para o processo da empresa quando o software pronto não resolve. Exemplos que a Maintor desenvolveu e mantém: **Maintor CMMS** (gestão de manutenção industrial: ordens de serviço, ativos, preventivas, estoque de peças, análise de causa por IA — maintor.com.br), **Maintor RH** (colaboradores e departamentos, ponto, férias, folha com holerite, recrutamento com vagas públicas, comunicados pelo WhatsApp), Task (operação e qualidade ISO 9001), GateKeeper (portaria digital) e SorrIA (simulação de sorriso para clínicas) |
+| Vídeos personalizados | Reels, comercial do produto, depoimento de cliente, vídeo institucional e gravação de tela real; roteiro, edição com legenda e formatos 9:16, 4:5 e 16:9 — https://maintorflow.com.br/videos-personalizados/ |
 
 ## Caso real: VOKE WEAR
 
@@ -93,9 +94,13 @@ prova prática de que "sistema sob medida" aqui não é promessa:
   fornecedores do agendamento à saída — triagem, registro de entrada/saída,
   operação de doca com nota fiscal e itens, e medição de pontualidade de
   fornecedor com trilha de auditoria.
-- **RH (gestão de pessoas):** admissão, ponto, férias, folha de pagamento,
-  recrutamento com página pública de vagas e trilhas de treinamento com
-  certificado.
+- **Maintor RH (gestão de pessoas):** colaboradores e departamentos, ponto,
+  férias, folha de pagamento com holerite, recrutamento com página pública de
+  vagas e comunicados para a equipe pelo WhatsApp.
+- **Maintor CMMS (gestão de manutenção industrial):** ordens de serviço com
+  triagem por criticidade, árvore de máquinas, planos preventivos que geram a
+  OS sozinhos, estoque de peças com baixa automática, histórico por equipamento
+  e análise de causa por IA. Site do produto: https://maintor.com.br
 
 ## Princípios de entrega
 

@@ -17,10 +17,53 @@ const WHATS_NUM = 'https://wa.me/5511946610634'
 const WHATS = `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow.')}`
 
 const SECOES = [
+  { href: '#problemas', rotulo: 'Seu problema' },
   { href: '#vitrine', rotulo: 'Lojas e sites' },
-  { href: '#automacao', rotulo: 'Automação' },
-  { href: '#tecnologia', rotulo: 'Tecnologia' },
+  { href: '#sistemas', rotulo: 'Sistemas' },
+  { href: '#marketing', rotulo: 'Marketing' },
   { href: '#contato', rotulo: 'Contato' },
+]
+
+/* A narrativa da home começa pelo problema de quem visita, não pelo nosso
+   catálogo: cada cartão é uma dor dita do jeito que o dono diz, e a solução
+   que a gente constrói para ela. As fotos mostram o mundo do visitante
+   (ambientes, sem pessoas e sem tela falsa — regra de marca de 25/08). */
+const PROBLEMAS = [
+  {
+    area: 'Lojas de moda e varejo',
+    dor: 'Vendo pelo direct e não dou conta de responder todo mundo.',
+    solucao: 'Uma loja virtual que mostra o tamanho, cobra no Pix e calcula o frete sozinha. A partir de R$ 1.500, pagamento único.',
+    href: '/loja-virtual/', rotulo: 'Ver a loja virtual',
+    foto: 'loja-moda', alt: 'Loja de moda com arara de roupas coloridas e sacolas de papel no balcão, ao fim da tarde',
+  },
+  {
+    area: 'Atendimento',
+    dor: 'Respondo as mesmas perguntas o dia inteiro no WhatsApp.',
+    solucao: 'Automação que responde o que se repete, confirma pedido e só chama você quando precisa de você.',
+    href: '/automacao-de-atendimento/', rotulo: 'Ver a automação',
+    foto: 'balcao-pedidos', alt: 'Balcão à noite com celular, bloco de pedidos anotados à mão e pacotes prontos para envio',
+  },
+  {
+    area: 'Indústria e manutenção',
+    dor: 'A manutenção das máquinas vive em caderno e planilha.',
+    solucao: 'Um sistema de ordens de serviço, preventivas e estoque de peças — como o Maintor CMMS, que a gente desenvolveu e mantém.',
+    href: '/sistemas-sob-medida/#manutencao', rotulo: 'Ver o sistema de manutenção',
+    foto: 'manutencao-oficina', alt: 'Bancada de oficina industrial com caderno de manutenção aberto, prancheta e caixa de ferramentas',
+  },
+  {
+    area: 'Gestão de pessoas',
+    dor: 'O RH roda no papel: ponto, férias, folha e admissão.',
+    solucao: 'Um sistema de RH com ponto, férias, folha e recrutamento — como o Maintor RH, que a gente desenvolveu.',
+    href: '/sistemas-sob-medida/#rh', rotulo: 'Ver o sistema de RH',
+    foto: 'rh-papelada', alt: 'Mesa de escritório com pilhas de pastas, relógio de ponto antigo, crachás e calendário',
+  },
+  {
+    area: 'Marketing',
+    dor: 'Posto todo dia, e o cliente novo não chega.',
+    solucao: 'Conteúdo, vídeo personalizado e tráfego pago apontando para uma página que transforma visita em conversa.',
+    href: '/marketing-e-redes/', rotulo: 'Ver o marketing',
+    foto: 'estudio-conteudo', alt: 'Estúdio de conteúdo com celular no tripé e luz de anel gravando tênis e roupas coloridas',
+  },
 ]
 
 const PERGUNTAS = [
@@ -36,15 +79,15 @@ const PERGUNTAS = [
 const OBJETIVOS = [
   'Loja virtual',
   'Site',
+  'Sistema sob medida (RH, manutenção…)',
   'Automação de atendimento',
-  'Site para minha clínica',
-  'Sistema sob medida',
-  'Marketing e tráfego',
+  'Vídeos personalizados',
+  'Marketing e tráfego pago',
 ]
 
 const SERVICOS_MARQUEE = [
-  'loja virtual', 'site institucional', 'automação de atendimento',
-  'marketing e redes', 'tráfego pago', 'manutenção mensal', 'sistemas sob medida',
+  'loja virtual', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
+  'gestão de RH', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago',
 ]
 
 /* Divide o texto em palavras com máscara — revelação palavra a palavra.
@@ -478,7 +521,7 @@ export default function App() {
           />
           <div className="wrap">
             <div className="micro" data-reveal style={{ color: 'var(--mostarda)', marginBottom: 'var(--s3)' }}>
-              Lojas virtuais e sites — São Paulo
+              Sites, sistemas e marketing sob medida — São Paulo
             </div>
             <h1 className="manchete serif" data-palavras>
               <span className="linha"><Palavras texto="seu negócio" /></span>
@@ -495,12 +538,12 @@ export default function App() {
               </a>
               <div className="lado-dir" data-reveal>
                 <p className="corpo-apoio">
-                  Loja virtual com Pix, cartão, frete e painel que você opera,
-                  a partir de R$ 1.500 — pagamento único, sem mensalidade.
-                  Também sites, automação de atendimento e sistemas sob medida.
+                  A gente começa pelo problema do seu negócio e constrói a
+                  solução: loja virtual a partir de R$ 1.500, sistema de RH ou
+                  de manutenção, automação, vídeo e anúncio — do seu jeito.
                 </p>
                 <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
-                  Pedir orçamento no WhatsApp
+                  Contar meu problema no WhatsApp
                 </a>
               </div>
             </div>
@@ -508,6 +551,56 @@ export default function App() {
         </section>
 
         <Marquee />
+
+        {/* ============ PONTO DE PARTIDA · O PROBLEMA DE QUEM VISITA ============ */}
+        <section className="cena" id="problemas">
+          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+            <Regua esquerda="O ponto de partida" direita="Qual destas é a sua?" />
+            <h2 className="titulo-cena serif" data-palavras>
+              <Palavras texto="Tudo começa pelo problema do seu negócio." destaque={[3]} />
+            </h2>
+            <p className="corpo-apoio" data-reveal>
+              Não tem pacote pronto aqui. A gente escuta onde o seu dia trava e
+              constrói a solução que resolve aquilo — do tamanho do seu negócio,
+              no seu nome.
+            </p>
+            <div className="problemas-grade">
+              {PROBLEMAS.map((p) => (
+                <a className="problema" href={p.href} key={p.foto} data-reveal>
+                  <figure className="problema-foto">
+                    <img
+                      src={`/midia/fotos/${p.foto}-640.webp`}
+                      srcSet={`/midia/fotos/${p.foto}-640.webp 640w, /midia/fotos/${p.foto}-960.webp 960w`}
+                      sizes="(max-width: 700px) 92vw, (max-width: 1100px) 46vw, 380px"
+                      alt={p.alt}
+                      width="640" height="482" loading="lazy" decoding="async"
+                    />
+                  </figure>
+                  <div className="problema-corpo">
+                    <span className="micro">{p.area}</span>
+                    <p className="problema-dor serif">“{p.dor}”</p>
+                    <p className="problema-solucao"><b>A gente constrói:</b> {p.solucao}</p>
+                    <span className="problema-link">{p.rotulo} →</span>
+                  </div>
+                </a>
+              ))}
+              <div className="problema problema-outro" data-reveal>
+                <div className="problema-corpo">
+                  <span className="micro">Totalmente sob medida</span>
+                  <p className="problema-dor serif">O seu problema não está aqui?</p>
+                  <p className="problema-solucao">
+                    É o que a gente mais gosta de construir. Conta em três linhas
+                    onde o seu dia trava. Se uma ferramenta pronta resolver, eu
+                    digo — e você economiza.
+                  </p>
+                  <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
+                    Contar meu problema
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ============ CENA 2 · LOJAS E SITES (VOKE) ============ */}
         <section className="cena" id="vitrine">
@@ -582,150 +675,95 @@ export default function App() {
           </div>
         </section>
 
-        {/* ============ CENA 3 · AUTOMAÇÃO ============ */}
-        <section className="cena" id="automacao">
+        {/* ============ CENA 3 · SISTEMAS SOB MEDIDA ============ */}
+        <section className="cena" id="sistemas">
           <span className="num-fantasma serif" aria-hidden="true">02</span>
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="02 · Automação de atendimento" direita="WhatsApp + e-mail" />
-            <div className="cena-grid">
-              <div>
-                <h2 className="titulo-cena serif" data-palavras>
-                  <Palavras
-                    texto="Atendimento que responde enquanto você trabalha."
-                    destaque={[3, 4, 5]}
-                  />
-                </h2>
-                <p className="corpo-apoio" data-reveal>
-                  WhatsApp e e-mail deixam de ser pilha de mensagem. Cada contato
-                  vira aviso com resposta pronta — ou resposta automática, quando
-                  fizer sentido. Você decide o que é máquina e o que é você.
-                </p>
-                <figure className="painel-foto" style={{ marginTop: 'var(--s4)' }} data-reveal>
-                  <img
-                    src="/midia/automacao-avioes.webp"
-                    alt="Aviões de papel em latão e cerâmica voando em formação — as mensagens seguindo sozinhas"
-                    loading="lazy" width="1000" height="558"
-                  />
-                </figure>
-              </div>
-              <div className="linhas" data-reveal>
-                <LinhaEd idx="01" rot="Cliente chama" val="confirmação na hora, sem você tocar no telefone" />
-                <LinhaEd idx="02" rot="Pedido feito" val="aviso automático com status para o cliente" />
-                <LinhaEd idx="03" rot="Fora do script" val="cai para você, já com resposta sugerida" />
-                <LinhaEd idx="04" rot="Ninguém respondeu" val="o sistema cobra — a mensagem não morre esquecida" />
-                <div style={{ marginTop: 'var(--s3)' }}>
-                  <a className="link-mostarda" href="/automacao-de-atendimento/">
-                    Ver como funciona →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+            <Regua esquerda="02 · Sistemas sob medida" direita="Feitos por nós, rodando hoje" />
+            <h2 className="titulo-cena serif" data-palavras>
+              <Palavras texto="Quando o pronto não serve, a gente constrói." destaque={[5, 6]} />
+            </h2>
+            <p className="corpo-apoio" data-reveal>
+              Software pronto obriga você a trabalhar do jeito dele. Sistema sob
+              medida trabalha do seu. Não é promessa: estes nasceram assim, de
+              uma dor real de operação, e estão rodando.
+            </p>
 
-        {/* ============ CENA 4 · TECNOLOGIA PRÓPRIA ============ */}
-        <section className="cena" id="tecnologia">
-          <span className="num-fantasma serif" aria-hidden="true">03</span>
-          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="03 · Tecnologia própria" direita="SorrIA — simulação de sorriso" />
-            <div className="cena-grid">
-              <div style={{ position: 'relative' }}>
-                <h2 className="titulo-cena serif" data-palavras>
-                  <Palavras texto="Tecnologia própria, que nenhum template tem." destaque={[0, 1]} />
-                </h2>
-                <p className="corpo-apoio" data-reveal>
-                  Quando a prateleira não resolve, a gente desenvolve. O SorrIA é
-                  nosso: simulação estética de sorriso com inteligência artificial
-                  para clínicas odontológicas — o paciente vê o resultado antes de
-                  fechar o tratamento.
-                </p>
-                {/* atribuição explícita: é a nossa posição, não depoimento de
-                    cliente — sem isso a aspas podia ser lida como prova social */}
-                <figure className="citacao-bloco" data-reveal>
-                  <blockquote className="citacao serif">
-                    “A plataforma pronta é ótima e é mais barata mesmo. A diferença
-                    é que lá você tem uma ferramenta — e aqui você tem alguém.”
-                  </blockquote>
-                  <figcaption className="micro citacao-autoria">
-                    Como a gente responde quando perguntam por que não usar uma
-                    plataforma pronta
-                  </figcaption>
-                </figure>
-              </div>
-              <div>
-                <figure className="painel-foto" data-reveal>
+            <div className="sistemas-destaque">
+              <article className="sistema" id="sistema-manutencao" data-reveal>
+                <figure className="sistema-foto">
                   <img
-                    src="/midia/sorria-pedestal.webp"
-                    alt="Objeto de porcelana representando o SorrIA, a tecnologia própria da Maintor Flow"
-                    loading="lazy" width="760" height="1017"
+                    src="/midia/fotos/manutencao-oficina-640.webp"
+                    srcSet="/midia/fotos/manutencao-oficina-640.webp 640w, /midia/fotos/manutencao-oficina-960.webp 960w"
+                    sizes="(max-width: 900px) 92vw, 560px"
+                    alt="Bancada de oficina industrial com caderno de manutenção aberto, prancheta e caixa de ferramentas"
+                    width="640" height="482" loading="lazy" decoding="async"
                   />
                 </figure>
-                <div className="linhas" data-reveal>
-                  <LinhaEd idx="01" rot="Foto → simulação" val="resultado provável em minutos" />
-                  <LinhaEd idx="02" rot="LGPD a sério" val="fotos de paciente em armazenamento privado" />
-                  <LinhaEd idx="03" rot="Proposta rastreável" val="a clínica sabe quem abriu e quando" />
-                  <LinhaEd idx="04" rot="Feito em casa" val="desenvolvido, mantido e evoluído pela Maintor" />
+                <div className="micro">Gestão de manutenção</div>
+                <h3 className="serif">Maintor CMMS</h3>
+                <p>
+                  Ordens de serviço com triagem por criticidade, árvore de
+                  máquinas, planos preventivos que geram a OS sozinhos, baixa da
+                  peça no estoque e histórico de cada equipamento — com análise de
+                  causa por inteligência artificial.
+                </p>
+                <div className="sistema-links">
+                  <a className="link-mostarda" href="/sistemas-sob-medida/#manutencao">Como funciona →</a>
+                  <a className="link-mostarda" href="https://maintor.com.br" target="_blank" rel="noopener">maintor.com.br ↗</a>
                 </div>
-              </div>
+              </article>
+              <article className="sistema" id="sistema-rh" data-reveal>
+                <figure className="sistema-foto">
+                  <img
+                    src="/midia/fotos/rh-papelada-640.webp"
+                    srcSet="/midia/fotos/rh-papelada-640.webp 640w, /midia/fotos/rh-papelada-960.webp 960w"
+                    sizes="(max-width: 900px) 92vw, 560px"
+                    alt="Mesa de escritório com pilhas de pastas, relógio de ponto antigo, crachás e calendário"
+                    width="640" height="482" loading="lazy" decoding="async"
+                  />
+                </figure>
+                <div className="micro">Gestão de pessoas</div>
+                <h3 className="serif">Maintor RH</h3>
+                <p>
+                  Colaboradores e departamentos, ponto, férias, folha com
+                  holerite, recrutamento com página pública de vagas e
+                  comunicados para a equipe pelo WhatsApp — o RH saindo do papel.
+                </p>
+                <div className="sistema-links">
+                  <a className="link-mostarda" href="/sistemas-sob-medida/#rh">Como funciona →</a>
+                </div>
+              </article>
             </div>
 
-            <div style={{ marginTop: 'var(--s6)' }} data-reveal>
+            <div style={{ marginTop: 'var(--s5)' }} data-reveal>
               <div className="regua" style={{ marginBottom: 'var(--s4)' }}>
                 <span className="micro">Da mesma bancada</span>
-                <span className="micro">Sistemas que a gente desenvolveu e mantém</span>
+                <span className="micro">Outros sistemas que a gente mantém</span>
               </div>
               <div className="bancada-grade">
                 <div className="bancada-item">
-                  <IconeFlutuante
-                    variante="vitrine"
-                    src="/midia/icones/prancheta.webp"
-                    largura="clamp(96px, 8vw, 130px)"
-                    profundidade={0.5}
-                    giro={4}
-                  />
+                  <IconeFlutuante variante="vitrine" src="/midia/icones/prancheta.webp" largura="clamp(80px, 7vw, 110px)" profundidade={0.5} giro={4} />
                   <h3 className="serif">Task</h3>
                   <div className="micro">Operação e qualidade</div>
-                  <p>
-                    POPs, checklists e tarefas por setor e responsável, com
-                    tratamento de não conformidade e plano de ação no padrão
-                    ISO 9001.
-                  </p>
+                  <p>POPs, checklists e tarefas por setor e responsável, com não conformidade e plano de ação no padrão ISO 9001.</p>
                 </div>
                 <div className="bancada-item">
-                  <IconeFlutuante
-                    variante="vitrine"
-                    src="/midia/icones/chave.webp"
-                    largura="clamp(96px, 8vw, 130px)"
-                    profundidade={0.6}
-                    giro={5}
-                  />
+                  <IconeFlutuante variante="vitrine" src="/midia/icones/chave.webp" largura="clamp(80px, 7vw, 110px)" profundidade={0.6} giro={5} />
                   <h3 className="serif">GateKeeper</h3>
                   <div className="micro">Portaria digital</div>
-                  <p>
-                    Visitante, prestador e fornecedor do agendamento à saída —
-                    triagem, operação de doca e pontualidade de fornecedor
-                    medida.
-                  </p>
+                  <p>Visitante, prestador e fornecedor do agendamento à saída, com operação de doca e pontualidade de fornecedor medida.</p>
                 </div>
                 <div className="bancada-item">
-                  <IconeFlutuante
-                    variante="vitrine"
-                    src="/midia/icones/cracha.webp"
-                    largura="clamp(96px, 8vw, 130px)"
-                    profundidade={0.4}
-                    giro={4}
-                  />
-                  <h3 className="serif">RH</h3>
-                  <div className="micro">Gestão de pessoas</div>
-                  <p>
-                    Admissão, ponto, férias, folha, recrutamento com vaga
-                    pública e treinamento com certificado.
-                  </p>
+                  <IconeFlutuante variante="vitrine" src="/midia/icones/dente.webp" largura="clamp(80px, 7vw, 110px)" profundidade={0.4} giro={4} />
+                  <h3 className="serif">SorrIA</h3>
+                  <div className="micro">Clínicas odontológicas</div>
+                  <p>Simulação estética de sorriso com inteligência artificial: o paciente vê o resultado provável antes de fechar o tratamento.</p>
                 </div>
               </div>
               <p className="corpo-apoio" style={{ marginTop: 'var(--s3)' }}>
-                Cada um nasceu de uma dor real de operação. O próximo pode ser o
-                do seu negócio.
+                O próximo pode ser o do seu negócio.{' '}
+                <a className="link-mostarda" href="/sistemas-sob-medida/">Ver sistemas sob medida →</a>
               </p>
             </div>
 
@@ -738,6 +776,60 @@ export default function App() {
                 <CarrosselTelas itens={telas} />
               </div>
             )}
+          </div>
+        </section>
+
+        {/* ============ CENA 4 · MARKETING ============ */}
+        <section className="cena" id="marketing">
+          <span className="num-fantasma serif" aria-hidden="true">03</span>
+          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+            <Regua esquerda="03 · Marketing que traz cliente" direita="Conteúdo · vídeo · anúncio" />
+            <div className="cena-grid">
+              <div>
+                <h2 className="titulo-cena serif" data-palavras>
+                  <Palavras texto="Ser encontrado dá trabalho. A gente faz." destaque={[4, 5]} />
+                </h2>
+                <p className="corpo-apoio" data-reveal>
+                  Site pronto não chama cliente sozinho. Conteúdo no padrão da sua
+                  marca, vídeo que mostra o seu produto de verdade e anúncio que
+                  leva para uma página feita para virar conversa.
+                </p>
+                <figure className="painel-foto" style={{ marginTop: 'var(--s4)' }} data-reveal>
+                  <img
+                    src="/midia/fotos/estudio-conteudo-640.webp"
+                    srcSet="/midia/fotos/estudio-conteudo-640.webp 640w, /midia/fotos/estudio-conteudo-960.webp 960w"
+                    sizes="(max-width: 900px) 92vw, 600px"
+                    alt="Estúdio de conteúdo com celular no tripé e luz de anel gravando tênis e roupas coloridas"
+                    width="640" height="482" loading="lazy" decoding="async"
+                  />
+                </figure>
+              </div>
+              <div className="servicos-lista marketing-lista" data-reveal>
+                <h3 className="micro servicos-titulo">O que entra no marketing</h3>
+                <ul>
+                  <li><a href="/marketing-e-redes/"><b>Conteúdo e redes</b><span>posts no padrão da sua marca, no ritmo do seu dia</span></a></li>
+                  <li><a href="/videos-personalizados/"><b>Vídeos personalizados</b><span>Reels, comercial do produto e depoimento de cliente</span></a></li>
+                  <li><a href="/trafego-pago/"><b>Tráfego pago</b><span>Google e Instagram, com a verba na sua conta</span></a></li>
+                  <li><a href="/por-onde-comecar/"><b>Google e a ordem certa</b><span>perfil no Google, site e só depois o anúncio</span></a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============ CENA 5 · SOB MEDIDA: COMO A GENTE CONSTRÓI ============ */}
+        <section className="cena cena-curta" id="como">
+          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+            <Regua esquerda="04 · Totalmente sob medida" direita="Do problema à solução" />
+            <h2 className="titulo-cena serif" data-palavras>
+              <Palavras texto="Do seu problema à solução que é sua." destaque={[5, 6, 7]} />
+            </h2>
+            <div className="linhas" style={{ marginTop: 'var(--s4)' }} data-reveal>
+              <LinhaEd idx="01" rot="Conversa" val="você conta onde o dia trava — no seu negócio, em qualquer bairro de SP, ou por vídeo" />
+              <LinhaEd idx="02" rot="Proposta" val="escopo, prazo e preço por escrito; se uma ferramenta pronta resolver, a gente diz" />
+              <LinhaEd idx="03" rot="Construção" val="por etapas, com você vendo cada uma funcionando antes de seguir" />
+              <LinhaEd idx="04" rot="Entrega" val="treinamento, manual e tudo no seu nome: domínio, dados e código" />
+            </div>
           </div>
         </section>
 
@@ -808,10 +900,11 @@ export default function App() {
                 <li><a href="/loja-virtual/"><b>Loja virtual</b><span>catálogo, Pix, cartão, frete e painel do dono</span></a></li>
                 <li><a href="/sites/"><b>Site institucional</b><span>rápido no celular, com texto que vende</span></a></li>
                 <li><a href="/manutencao-mensal/"><b>Manutenção mensal</b><span>atualização, correção e acompanhamento</span></a></li>
-                <li><a href="/marketing-e-redes/"><b>Marketing e redes</b><span>conteúdo, publicação, SEO e vídeo</span></a></li>
+                <li><a href="/marketing-e-redes/"><b>Marketing e redes</b><span>conteúdo, publicação e SEO</span></a></li>
+                <li><a href="/videos-personalizados/"><b>Vídeos personalizados</b><span>Reels, comercial do produto, depoimento de cliente</span></a></li>
                 <li><a href="/trafego-pago/"><b>Tráfego pago</b><span>Google Ads e Meta, criativos e otimização</span></a></li>
                 <li><a href="/automacao-de-atendimento/"><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></a></li>
-                <li><a href="/sistemas-sob-medida/"><b>Sistemas sob medida</b><span>quando o template pronto não resolve</span></a></li>
+                <li><a href="/sistemas-sob-medida/"><b>Sistemas sob medida</b><span>gestão de RH, de manutenção e o que o seu processo pedir</span></a></li>
               </ul>
               {/* páginas por segmento: URL, título e texto próprios (SEO) */}
               <p className="servicos-nichos">

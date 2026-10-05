@@ -32,6 +32,7 @@ export default defineConfig({
         sistemas: aqui + 'sistemas-sob-medida/index.html',
         manutencao: aqui + 'manutencao-mensal/index.html',
         marketing: aqui + 'marketing-e-redes/index.html',
+        videos: aqui + 'videos-personalizados/index.html',
         trafego: aqui + 'trafego-pago/index.html',
         trilha: aqui + 'por-onde-comecar/index.html',
         guias: aqui + 'guias/index.html',

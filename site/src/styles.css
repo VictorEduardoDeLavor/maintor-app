@@ -963,3 +963,66 @@ footer {
   #cursor { display: none; }
   * { transition-duration: .01ms !important; }
 }
+
+/* ---- ponto de partida: o problema de quem visita (out/2026) ---- */
+/* cada cartão é uma dor na voz do dono + a solução que a gente constrói;
+   a foto mostra o mundo dele (ambiente, sem pessoa, sem tela falsa) */
+.problemas-grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(var(--s3), 2.4vw, var(--s4));
+  margin-top: var(--s5);
+}
+.problema {
+  display: flex;
+  flex-direction: column;
+  background: var(--profundo);
+  border: var(--hairline);
+  border-radius: 16px;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  transition: transform var(--t-rapido) ease-out, border-color var(--t-rapido);
+}
+a.problema:hover, a.problema:focus-visible { transform: translateY(-2px); border-color: rgba(212, 165, 116, .55); }
+.problema-foto { margin: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--abismo); }
+.problema-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 700ms ease-out; }
+a.problema:hover .problema-foto img { transform: scale(1.03); }
+.problema-corpo { display: flex; flex-direction: column; gap: 10px; padding: var(--s3); flex: 1; }
+.problema-corpo .micro { color: var(--mostarda); }
+.problema-dor { font-size: clamp(21px, 1.9vw, 25px); line-height: 1.22; color: var(--creme); font-style: italic; }
+.problema-solucao { color: var(--cinza-claro); font-size: 14.5px; line-height: 1.55; }
+.problema-solucao b { color: var(--creme); font-weight: 600; }
+.problema-link { margin-top: auto; padding-top: 8px; color: var(--mostarda); font-weight: 600; font-size: 14.5px; min-height: 44px; display: flex; align-items: flex-end; }
+.problema-outro { background: transparent; border-style: dashed; justify-content: center; }
+.problema-outro .btn { align-self: flex-start; margin-top: 8px; }
+@media (max-width: 1100px) { .problemas-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .problemas-grade { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  a.problema:hover, a.problema:focus-visible { transform: none; }
+  a.problema:hover .problema-foto img { transform: none; }
+}
+
+/* ---- sistemas em destaque (manutenção e RH) --------------------- */
+.sistemas-destaque {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--s3), 4vw, var(--s5));
+  margin-top: var(--s5);
+}
+.sistema { border-top: var(--hairline); padding-top: var(--s3); scroll-margin-top: 96px; }
+.sistema-foto { margin: 0 0 var(--s3); border-radius: 16px; overflow: hidden; border: var(--hairline); aspect-ratio: 4 / 3; background: var(--abismo); }
+.sistema-foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.sistema .micro { color: var(--mostarda); margin-bottom: 6px; }
+.sistema h3 { font-size: clamp(26px, 2.8vw, 38px); color: var(--creme); letter-spacing: -.3px; margin-bottom: 10px; }
+.sistema p { color: var(--cinza-claro); font-size: 15px; max-width: 52ch; }
+.sistema-links { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); margin-top: var(--s2); }
+.sistema-links a { min-height: 44px; display: inline-flex; align-items: center; }
+@media (max-width: 900px) { .sistemas-destaque { grid-template-columns: 1fr; } }
+
+/* ---- marketing: a lista de serviços reaproveita .servicos-lista --- */
+.marketing-lista { margin-top: 0; }
+.marketing-lista ul { grid-template-columns: 1fr; }
+.marketing-lista li { padding: 18px 0; }
+.marketing-lista li a { flex-direction: column; align-items: flex-start; position: relative; padding-right: 32px; }
+.marketing-lista li a::after { position: absolute; right: 0; top: 50%; transform: translateY(-50%); margin-left: 0; }
