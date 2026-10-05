@@ -710,7 +710,7 @@ export default function App() {
                 </p>
                 <div className="sistema-links">
                   <a className="link-mostarda" href="/sistemas-sob-medida/#manutencao">Como funciona →</a>
-                  <a className="link-mostarda" href="https://maintor.com.br" target="_blank" rel="noopener">maintor.com.br ↗</a>
+                  <a className="link-mostarda" href="https://maintor.com.br" target="_blank" rel="noopener">Acessar o Maintor CMMS ↗</a>
                 </div>
               </article>
               <article className="sistema" id="sistema-rh" data-reveal>
@@ -732,6 +732,7 @@ export default function App() {
                 </p>
                 <div className="sistema-links">
                   <a className="link-mostarda" href="/sistemas-sob-medida/#rh">Como funciona →</a>
+                  <a className="link-mostarda" href="https://maintor-rh.base44.app" target="_blank" rel="noopener">Acessar o Maintor RH ↗</a>
                 </div>
               </article>
             </div>
@@ -747,6 +748,7 @@ export default function App() {
                   <h3 className="serif">Task</h3>
                   <div className="micro">Operação e qualidade</div>
                   <p>POPs, checklists e tarefas por setor e responsável, com não conformidade e plano de ação no padrão ISO 9001.</p>
+                  <div className="sistema-links"><a className="link-mostarda" href="https://maintor-task.base44.app" target="_blank" rel="noopener">Acessar o Task ↗</a></div>
                 </div>
                 <div className="bancada-item">
                   <IconeFlutuante variante="vitrine" src="/midia/icones/chave.webp" largura="clamp(80px, 7vw, 110px)" profundidade={0.6} giro={5} />
