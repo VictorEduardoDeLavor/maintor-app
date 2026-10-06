@@ -45,6 +45,7 @@ Operado pela MAINTOR TECNOLOGIA LTDA (CNPJ 66.511.174/0001-27, São Paulo/SP).
 | Serviço | O que está incluído de verdade |
 |---|---|
 | Loja virtual | catálogo completo, Pix com desconto automático, cartão em até 12x, cálculo de frete, baixa de estoque automática e painel simples do dono |
+| Loja no Instagram | montagem da loja no Instagram e no Facebook: catálogo ligado à loja virtual, produtos marcados em posts, Reels e stories, pagamento no site do cliente; análise da Meta acompanhada; pagamento único — https://maintorflow.com.br/loja-no-instagram/ |
 | Site institucional | código leve, design limpo, rápido no celular, texto direto que vende |
 | Manutenção mensal | atualização, correção, hospedagem gerenciada e suporte direto |
 | Marketing e redes | planejamento de conteúdo, publicação, SEO, vídeo |
