@@ -119,6 +119,29 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-artigo p strong { color: var(--creme); font-weight: 600; }
 .pg-artigo a { color: var(--creme); text-decoration-color: rgba(212, 165, 116, .5); text-underline-offset: 4px; display: inline-block; padding: 9px 0; }
 .pg-artigo a:hover { color: var(--mostarda); }
+/* tabela de conta (guia loja própria × plataforma, 06/10): rola por dentro no celular, nunca a página */
+.pg-conta-rolagem { overflow-x: auto; margin: var(--s3) 0; -webkit-overflow-scrolling: touch; }
+.pg-conta { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 15px; }
+.pg-conta th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--cinza-claro); padding: 0 12px 10px 0; border-bottom: 1px solid rgba(230, 221, 208, .28); }
+.pg-conta td { padding: 12px 12px 12px 0; border-bottom: 1px solid rgba(230, 221, 208, .12); color: var(--cinza-claro); vertical-align: top; line-height: 1.45; }
+.pg-conta td:nth-child(2) { white-space: nowrap; color: var(--creme); font-weight: 600; }
+.pg-conta td small { display: block; font-size: 12.5px; color: #8FA5A1; }
+.pg-conta tr.nossa td { color: var(--creme); }
+.pg-conta tr.nossa td:first-child { border-left: 2px solid var(--mostarda); padding-left: 10px; }
+.pg-conta tr.nossa td:nth-child(2) { color: var(--mostarda); }
+@media (max-width: 600px) {
+  /* no celular, cada linha vira um bloco: caminho e valor em cima, a taxa embaixo */
+  .pg-conta { min-width: 0; }
+  .pg-conta thead { display: none; }
+  .pg-conta tbody { display: block; }
+  .pg-conta tr { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; padding: 12px 0; border-bottom: 1px solid rgba(230, 221, 208, .12); }
+  .pg-conta td { border: none; padding: 0; }
+  .pg-conta td:nth-child(3) { grid-column: 1 / -1; font-size: 13.5px; }
+  .pg-conta td:nth-child(3)::before { content: "Taxa da plataforma por venda: "; color: #8FA5A1; }
+  .pg-conta tr.nossa { border-left: 2px solid var(--mostarda); padding-left: 10px; }
+  .pg-conta tr.nossa td:first-child { border-left: none; padding-left: 0; }
+}
+.pg-artigo .pg-nota { font-size: 13.5px; line-height: 1.6; color: #8FA5A1; margin-top: var(--s2); }
 .pg-artigo ol { padding: 0; margin: var(--s3) 0 0; list-style: none; counter-reset: it; }
 .pg-artigo ol li { counter-increment: it; border-top: var(--hairline); padding: 16px 0 16px 56px; position: relative; color: var(--cinza-claro); font-size: 16.5px; line-height: 1.6; }
 .pg-artigo ol li:last-child { border-bottom: var(--hairline); }
