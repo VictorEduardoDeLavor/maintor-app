@@ -28,6 +28,7 @@ export default defineConfig({
         casoVoke: aqui + 'casos/voke-wear/index.html',
         automacao: aqui + 'automacao-de-atendimento/index.html',
         lojaVirtual: aqui + 'loja-virtual/index.html',
+        lojaInstagram: aqui + 'loja-no-instagram/index.html',
         sites: aqui + 'sites/index.html',
         sistemas: aqui + 'sistemas-sob-medida/index.html',
         manutencao: aqui + 'manutencao-mensal/index.html',

@@ -78,6 +78,7 @@ const PERGUNTAS = [
 
 const OBJETIVOS = [
   'Loja virtual',
+  'Loja no Instagram',
   'Site',
   'Sistema sob medida (RH, manutenção…)',
   'Automação de atendimento',
@@ -86,7 +87,7 @@ const OBJETIVOS = [
 ]
 
 const SERVICOS_MARQUEE = [
-  'loja virtual', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
+  'loja virtual', 'loja no instagram', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
   'gestão de RH', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago',
 ]
 
@@ -900,6 +901,7 @@ export default function App() {
               <h3 className="micro servicos-titulo">O que a Flow faz</h3>
               <ul>
                 <li><a href="/loja-virtual/"><b>Loja virtual</b><span>catálogo, Pix, cartão, frete e painel do dono</span></a></li>
+                <li><a href="/loja-no-instagram/"><b>Loja no Instagram</b><span>produtos marcados nos posts, pagamento no seu site</span></a></li>
                 <li><a href="/sites/"><b>Site institucional</b><span>rápido no celular, com texto que vende</span></a></li>
                 <li><a href="/manutencao-mensal/"><b>Manutenção mensal</b><span>atualização, correção e acompanhamento</span></a></li>
                 <li><a href="/marketing-e-redes/"><b>Marketing e redes</b><span>conteúdo, publicação e SEO</span></a></li>
