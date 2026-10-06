@@ -139,7 +139,7 @@ https://maintorflow.com.br/por-onde-comecar/
 
 ## Guias para decidir antes de gastar
 
-- Loja própria ou plataforma pronta? A resposta honesta (inclusive "fique onde está"): https://maintorflow.com.br/guias/loja-propria-ou-plataforma-pronta/
+- Loja própria ou plataforma pronta? A conta da compra única — dois anos de Nuvemshop e Vendizap contra a loja própria, sem mensalidade e sem taxa sobre as vendas: https://maintorflow.com.br/guias/loja-propria-ou-plataforma-pronta/
 - Quanto custa uma loja virtual, com a conta aberta (montar, rodar, alimentar, cuidar; o que fica de fora): https://maintorflow.com.br/guias/quanto-custa-uma-loja-virtual/
 - E se o desenvolvedor sumir? As sete chaves que precisam estar no seu nome: https://maintorflow.com.br/guias/se-o-desenvolvedor-sumir/
 - Índice: https://maintorflow.com.br/guias/
@@ -153,7 +153,7 @@ Loja virtual: R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças e
 De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo.
 
 **Por que não usar uma plataforma pronta?**
-Use, se o que te falta é ferramenta — elas são boas e mais baratas. A diferença aparece no dia em que a foto corta, o frete calcula errado ou você quer mudar a home antes do lançamento. Lá você abre chamado. Aqui você chama no WhatsApp e alguém resolve.
+Porque ela cobra todo mês — e, em vários planos, uma parte de cada venda. A loja própria é compra única: em cerca de dois anos sai mais barata, e depois disso não tem mensalidade nenhuma. E quando algo dá errado, lá você abre chamado; aqui você chama no WhatsApp e alguém resolve.
 
 **Vocês entregam e vão embora?**
 Entregamos, e a loja ou o site passa a ser seu: pagamento único, sem mensalidade, com treinamento e manual. Se você quiser alguém cuidando depois — conteúdo, campanha, ajustes —, é um serviço à parte, com valor próprio, e só se fizer sentido para você.
