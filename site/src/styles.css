@@ -1018,6 +1018,13 @@ a.problema:hover .problema-foto img { transform: scale(1.03); }
 .sistema p { color: var(--cinza-claro); font-size: 15px; max-width: 52ch; }
 .sistema-links { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); margin-top: var(--s2); }
 .sistema-links a { min-height: 44px; display: inline-flex; align-items: center; }
+/* narrativa "sistema para revender" (08/10): tracejado em mostarda, como o "não está aqui?" */
+.sistema-revenda { margin-top: var(--s5); padding: var(--s4); border: 1px dashed rgba(212, 165, 116, .55); border-radius: 16px; background: linear-gradient(180deg, rgba(212, 165, 116, .08), rgba(212, 165, 116, .02)); max-width: 72ch; }
+.sistema-revenda .micro { color: var(--mostarda); margin-bottom: 10px; }
+.sistema-revenda h3 { font-size: clamp(24px, 2.6vw, 34px); color: var(--creme); line-height: 1.12; letter-spacing: -.3px; margin-bottom: 12px; }
+.sistema-revenda h3 em { color: var(--mostarda); }
+.sistema-revenda p { color: var(--cinza-claro); font-size: 15.5px; max-width: 60ch; margin-bottom: 10px; }
+.sistema-revenda a { min-height: 44px; display: inline-flex; align-items: center; }
 @media (max-width: 900px) { .sistemas-destaque { grid-template-columns: 1fr; } }
 
 /* ---- marketing: a lista de serviços reaproveita .servicos-lista --- */

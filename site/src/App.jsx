@@ -81,6 +81,7 @@ const OBJETIVOS = [
   'Loja no Instagram',
   'Site',
   'Sistema sob medida (RH, manutenção…)',
+  'Sistema para revender (app do meu nicho)',
   'Automação de atendimento',
   'Vídeos personalizados',
   'Marketing e tráfego pago',
@@ -88,7 +89,7 @@ const OBJETIVOS = [
 
 const SERVICOS_MARQUEE = [
   'loja virtual', 'loja no instagram', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
-  'gestão de RH', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago',
+  'gestão de RH', 'sistema para revender', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago',
 ]
 
 /* Divide o texto em palavras com máscara — revelação palavra a palavra.
@@ -768,6 +769,12 @@ export default function App() {
                 O próximo pode ser o do seu negócio.{' '}
                 <a className="link-mostarda" href="/sistemas-sob-medida/">Ver sistemas sob medida →</a>
               </p>
+              <aside className="sistema-revenda" data-reveal>
+                <div className="micro">E se o sistema for o seu produto?</div>
+                <h3 className="serif">O que você sabe fazer vira um sistema — <em>e os seus colegas pagam para usar.</em></h3>
+                <p>O personal com o app de treino, a cabeleireira com a agenda do salão: a gente constrói o sistema do seu nicho, no seu nome. Você usa no seu negócio e vende para quem faz o mesmo que você — a mensalidade é sua.</p>
+                <a className="link-mostarda" href="/sistema-para-revender/">Ver como funciona →</a>
+              </aside>
             </div>
 
             {telas.length > 0 && (
@@ -909,6 +916,7 @@ export default function App() {
                 <li><a href="/trafego-pago/"><b>Tráfego pago</b><span>Google Ads e Meta, criativos e otimização</span></a></li>
                 <li><a href="/automacao-de-atendimento/"><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></a></li>
                 <li><a href="/sistemas-sob-medida/"><b>Sistemas sob medida</b><span>gestão de RH, de manutenção e o que o seu processo pedir</span></a></li>
+                <li><a href="/sistema-para-revender/"><b>Sistema para revender</b><span>o app do seu nicho, no seu nome; seus colegas pagam por mês</span></a></li>
               </ul>
               {/* páginas por segmento: URL, título e texto próprios (SEO) */}
               <p className="servicos-nichos">
