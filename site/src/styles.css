@@ -1033,3 +1033,27 @@ a.problema:hover .problema-foto img { transform: scale(1.03); }
 .marketing-lista li { padding: 18px 0; }
 .marketing-lista li a { flex-direction: column; align-items: flex-start; position: relative; padding-right: 32px; }
 .marketing-lista li a::after { position: absolute; right: 0; top: 50%; transform: translateY(-50%); margin-left: 0; }
+
+/* hero que se reescreve pelo problema (08/10) */
+.hero-escolha { margin-top: var(--s4); }
+.hero-escolha .micro { color: var(--cinza-claro); margin-bottom: 12px; }
+.hero-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.hero-chip {
+  background: transparent;
+  border: 1px solid rgba(230, 221, 208, .25);
+  color: var(--creme);
+  padding: 0 18px;
+  min-height: 44px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color var(--t-rapido), background var(--t-rapido), color var(--t-rapido), transform var(--t-rapido);
+}
+.hero-chip:hover { border-color: var(--mostarda); transform: translateY(-1px); }
+.hero-chip:focus-visible { outline: 2px solid var(--mostarda); outline-offset: 3px; }
+.hero-chip[aria-pressed="true"] { background: var(--mostarda); color: var(--profundo); border-color: var(--mostarda); font-weight: 700; }
+.hero-dor { font-style: italic; font-size: clamp(20px, 2vw, 26px); line-height: 1.25; color: var(--creme); }
+.hero-links { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); align-items: center; }
+.hero-links .link-mostarda { min-height: 44px; display: inline-flex; align-items: center; }
+@media (prefers-reduced-motion: reduce) { .hero-chip { transition: none; } .hero-chip:hover { transform: none; } }

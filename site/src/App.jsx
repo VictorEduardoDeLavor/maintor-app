@@ -66,6 +66,27 @@ const PROBLEMAS = [
   },
 ]
 
+/* Hero que se reescreve pelo problema do visitante (08/10): o chip troca a
+   manchete (na gramática da marca), mostra a dor na voz do dono, a solução
+   e manda o WhatsApp já com aquele problema. Sem chip, é a manchete de sempre. */
+const HERO_PROBLEMAS = [
+  { chip: 'Vendo pelo direct', manchete: ['sua loja', 'no ar,', 'vendendo.'], ...PROBLEMAS[0] },
+  { chip: 'Respondo o dia todo', manchete: ['seu WhatsApp', 'no ar,', 'respondendo.'], ...PROBLEMAS[1] },
+  { chip: 'Manutenção no caderno', manchete: ['sua manutenção', 'no ar,', 'planejada.'], ...PROBLEMAS[2] },
+  { chip: 'RH no papel', manchete: ['seu RH', 'no ar,', 'sem papel.'], ...PROBLEMAS[3] },
+  { chip: 'Posto e ninguém chega', manchete: ['seu conteúdo', 'no ar,', 'convertendo.'], ...PROBLEMAS[4] },
+  {
+    chip: 'Quero vender meu sistema', manchete: ['seu método', 'no ar,', 'rendendo.'],
+    area: 'Sistema para revender',
+    dor: 'Sei fazer, mas só ganho quando eu mesmo atendo.',
+    solucao: 'Um sistema do seu nicho, no seu nome, que os seus colegas pagam para usar — a mensalidade é sua.',
+    href: '/sistema-para-revender/', rotulo: 'Ver o sistema para revender',
+  },
+]
+const MANCHETE_PADRAO = ['seu negócio', 'no ar,', 'fluindo.']
+const whatsProblema = (dor) =>
+  `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow. Meu problema: ' + dor.charAt(0).toLowerCase() + dor.slice(1))}`
+
 const PERGUNTAS = [
   { p: "Quanto custa um site ou uma loja virtual?", r: "Loja virtual: R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças e se entra o estúdio de fotos. O site institucional sai fechado na proposta, pelo número de páginas. Nos dois casos, pagamento único, sem mensalidade.", href: "/loja-virtual/", rotulo: "Ver os formatos de loja →" },
   { p: "Quanto tempo leva?", r: "De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo." },
@@ -176,6 +197,9 @@ function Marquee() {
 }
 
 export default function App() {
+  const [escolha, setEscolha] = useState(null)
+  const atual = escolha == null ? null : HERO_PROBLEMAS[escolha]
+  const manchete = atual ? atual.manchete : MANCHETE_PADRAO
   const progressoRef = useRef(0)
   const velocidadeRef = useRef(0)
   const [reduzido] = useState(
@@ -526,27 +550,55 @@ export default function App() {
               Sites, sistemas e marketing sob medida — São Paulo
             </div>
             <h1 className="manchete serif" data-palavras>
-              <span className="linha"><Palavras texto="seu negócio" /></span>
-              <span className="linha recuo"><Palavras texto="no ar," /></span>
-              <span className="linha direita"><Palavras texto="fluindo." destaque={[0]} /></span>
+              <span className="linha"><Palavras texto={manchete[0]} /></span>
+              <span className="linha recuo"><Palavras texto={manchete[1]} /></span>
+              <span className="linha direita"><Palavras texto={manchete[2]} destaque={manchete[2].split(' ').map((_, i) => i)} /></span>
             </h1>
+            {/* a pergunta que a home inteira responde, já na primeira tela:
+                o chip reescreve a manchete e deixa o WhatsApp com o problema pronto */}
+            <div className="hero-escolha" role="group" aria-label="Qual é o seu problema?">
+              <div className="micro">Qual é o seu problema?</div>
+              <div className="hero-chips">
+                {HERO_PROBLEMAS.map((p, i) => (
+                  <button
+                    type="button" className="hero-chip" key={p.href}
+                    aria-pressed={escolha === i}
+                    onClick={() => setEscolha(escolha === i ? null : i)}
+                  >
+                    {p.chip}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="hero-base">
-              {/* a prova real na primeira tela: antes era "role para ver o fluxo",
-                  e a VOKE só aparecia a 888px de rolagem no celular */}
-              {/* sem data-reveal: fica a ~86% da altura da tela, abaixo do gatilho
-                  de 85%, e só apareceria depois de rolar */}
+              {/* sem data-reveal: fica abaixo do gatilho de 85% e só apareceria depois de rolar */}
               <a className="dica-scroll" href="/casos/voke-wear/">
                 Loja nossa no ar: VOKE WEAR
               </a>
-              <div className="lado-dir" data-reveal>
-                <p className="corpo-apoio">
-                  A gente começa pelo problema do seu negócio e constrói a
-                  solução: loja virtual a partir de R$ 1.500, sistema de RH ou
-                  de manutenção, automação, vídeo e anúncio — do seu jeito.
-                </p>
-                <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
-                  Contar meu problema no WhatsApp
-                </a>
+              <div className="lado-dir" data-reveal aria-live="polite">
+                {atual ? (
+                  <>
+                    <p className="hero-dor serif">“{atual.dor}”</p>
+                    <p className="corpo-apoio">{atual.solucao}</p>
+                    <div className="hero-links">
+                      <a className="btn" href={whatsProblema(atual.dor)} target="_blank" rel="noopener" onMouseEnter={blipHover}>
+                        Contar esse problema no WhatsApp
+                      </a>
+                      <a className="link-mostarda" href={atual.href}>{atual.rotulo} →</a>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="corpo-apoio">
+                      A gente começa pelo problema do seu negócio e constrói a
+                      solução: loja virtual a partir de R$ 1.500, sistema de RH ou
+                      de manutenção, automação, vídeo e anúncio — do seu jeito.
+                    </p>
+                    <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
+                      Contar meu problema no WhatsApp
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           </div>
