@@ -29,6 +29,7 @@ export default defineConfig({
         automacao: aqui + 'automacao-de-atendimento/index.html',
         lojaVirtual: aqui + 'loja-virtual/index.html',
         lojaInstagram: aqui + 'loja-no-instagram/index.html',
+        links: aqui + 'links/index.html', // link da bio do Instagram (noindex, fora do sitemap)
         sites: aqui + 'sites/index.html',
         sistemas: aqui + 'sistemas-sob-medida/index.html',
         manutencao: aqui + 'manutencao-mensal/index.html',
