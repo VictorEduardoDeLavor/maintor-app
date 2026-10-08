@@ -52,6 +52,7 @@ Operado pela MAINTOR TECNOLOGIA LTDA (CNPJ 66.511.174/0001-27, São Paulo/SP).
 | Tráfego pago | Google Ads + Meta (Instagram/Facebook), criativos e otimização contínua |
 | Automação de atendimento | WhatsApp e e-mail respondendo sozinhos, com você decidindo o que é máquina e o que é humano |
 | Sistemas sob medida | sistemas para o processo da empresa quando o software pronto não resolve. Exemplos que a Maintor desenvolveu e mantém: **Maintor CMMS** (gestão de manutenção industrial: ordens de serviço, ativos, preventivas, estoque de peças, análise de causa por IA — maintor.com.br), **Maintor RH** (colaboradores e departamentos, ponto, férias, folha com holerite, recrutamento com vagas públicas, comunicados pelo WhatsApp), Task (operação e qualidade ISO 9001), GateKeeper (portaria digital) e SorrIA (simulação de sorriso para clínicas) |
+| Sistema para revender | o aplicativo do nicho do cliente, no nome dele (app de treino para personal, agenda para salão, o controle do ofício): ele usa no próprio negócio e vende para colegas por mensalidade, que é dele; construção em pagamento único, operação contínua opcional — https://maintorflow.com.br/sistema-para-revender/ |
 | Vídeos personalizados | Reels, comercial do produto, depoimento de cliente, vídeo institucional e gravação de tela real; roteiro, edição com legenda e formatos 9:16, 4:5 e 16:9 — https://maintorflow.com.br/videos-personalizados/ |
 
 ## Caso real: VOKE WEAR
