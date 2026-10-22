@@ -65,7 +65,26 @@ const encerrar = () => {
 }
 process.on('exit', encerrar)
 
-await new Promise((r) => setTimeout(r, 4000))
+/* Espera a porta RESPONDER (até 60 s) em vez de um tempo fixo: com a máquina
+   carregada o preview levou mais de 4 s e o prerender falhava com
+   ERR_CONNECTION_REFUSED (22/10/2026). */
+const subiu = await (async () => {
+  for (let t = 0; t < 120; t++) {
+    const ok = await new Promise((r) => {
+      const s = net.connect(PORTA, 'localhost')
+      s.once('connect', () => { s.destroy(); r(true) })
+      s.once('error', () => r(false))
+    })
+    if (ok) return true
+    await new Promise((r) => setTimeout(r, 500))
+  }
+  return false
+})()
+if (!subiu) {
+  console.error(`prerender: o vite preview não subiu na porta ${PORTA} em 60 s.`)
+  encerrar()
+  process.exit(1)
+}
 
 let html = null
 try {
