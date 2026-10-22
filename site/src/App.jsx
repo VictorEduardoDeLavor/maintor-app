@@ -825,7 +825,12 @@ export default function App() {
                 <div className="micro">E se o sistema for o seu produto?</div>
                 <h3 className="serif">O que você sabe fazer vira um sistema — <em>e os seus colegas pagam para usar.</em></h3>
                 <p>O personal com o app de treino, a cabeleireira com a agenda do salão: a gente constrói o sistema do seu nicho, no seu nome. Você usa no seu negócio e vende para quem faz o mesmo que você — a mensalidade é sua.</p>
-                <a className="link-mostarda" href="/sistema-para-revender/">Ver como funciona →</a>
+                <p className="sistema-revenda-links">
+                  <a className="link-mostarda" href="/sistema-para-revender/">Ver como funciona →</a>
+                  <a className="link-mostarda" href="/sistema-para-revender/app-para-personal-trainer/">App para personal →</a>
+                  <a className="link-mostarda" href="/sistema-para-revender/sistema-para-salao-de-beleza/">Sistema para salão →</a>
+                  <a className="link-mostarda" href="/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/">Guia: a conta real →</a>
+                </p>
               </aside>
             </div>
 

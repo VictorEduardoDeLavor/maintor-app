@@ -82,7 +82,7 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-cta .pg-h2 { max-width: 18ch; }
 .pg-cta .pg-lead { margin-top: 0; }
 .pg-contatos { color: var(--cinza-claro); font-size: 14.5px; margin-top: var(--s2); }
-.pg-contatos a { text-decoration: none; display: inline-block; padding: 10px 0; }
+.pg-contatos a { text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0; }
 .pg-contatos a:hover { color: var(--mostarda); }
 
 @media (max-width: 900px) {
