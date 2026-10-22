@@ -95,7 +95,14 @@
   <ul class="lista">
     <li><a class="zap" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pelo%20Instagram.%20Quero%20conversar%20sobre%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener"><span class="txt"><b>Chamar no WhatsApp</b><small>Me manda o @ da sua loja: eu te digo o que faria no seu caso. Sem compromisso.</small></span><span class="seta">↗</span></a></li>
   </ul>
-  <p class="prazo">Black Friday é 27/11. Loja que começa em outubro chega pronta.</p>
+  <p class="prazo" id="prazo">Black Friday é 27/11. Loja que começa em outubro chega pronta.</p>
+  <script>
+    /* O aviso se troca sozinho: depois de 25/10 a loja não fica pronta para a Black Friday;
+       a conversa de Natal vai até 10/11; depois disso o aviso some. */
+    (function () { var p = document.getElementById("prazo"), h = new Date();
+      if (h >= new Date("2026-11-11T00:00:00-03:00")) p.remove();
+      else if (h >= new Date("2026-10-25T00:00:00-03:00")) p.textContent = "Para vender no Natal, a conversa é até 10/11."; })();
+  </script>
 
   <p class="sep">O que a gente faz</p>
   <ul class="lista">
