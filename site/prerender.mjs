@@ -97,7 +97,7 @@ try {
     const raiz = document.getElementById('root').cloneNode(true)
 
     // fora: só existem em runtime ou dependem de WebGL/áudio
-    raiz.querySelectorAll('#canvas-root, #cursor, #grao, #preloader').forEach((n) => n.remove())
+    raiz.querySelectorAll('#canvas-root, #cursor, #grao, #preloader, #abertura, svg.fio').forEach((n) => n.remove())
 
     // o GSAP deixa opacity/transform inline nos blocos ainda não revelados;
     // no HTML estático tudo precisa nascer visível e no lugar

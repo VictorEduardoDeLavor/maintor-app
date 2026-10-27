@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState, lazy, Suspense } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
@@ -6,8 +6,23 @@ import { blipHover, alternarAmbiente, modularPorScroll } from './audio.js'
 import { CarrosselDepoimentos, CarrosselTelas } from './Carrosseis.jsx'
 import { depoimentos, telas } from './dados.js'
 
-// Canvas 3D entra depois do primeiro paint — não segura o LCP
-const FlowCanvas = lazy(() => import('./FlowCanvas.jsx'))
+// three.js só baixa quando a abertura vai rodar — não pesa a home de quem já viu
+const Abertura = lazy(() => import('./Abertura.jsx'))
+const ABERTURA_CHAVE = 'flow.abertura' // o mesmo nome no index.html e no Abertura.jsx
+import Fio from './Fio.jsx'
+import Trabalhos from './Trabalhos.jsx'
+
+/* A abertura 3D roda uma vez por sessão. Fica de fora para quem pede
+   movimento reduzido, para robôs (navigator.webdriver: o prerender e os
+   testes) e quando o link aponta direto para uma seção (#contato etc.). */
+function deveAbrir() {
+  try {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return false
+    if (navigator.webdriver) return false
+    if (location.hash.length > 1) return false
+    return !sessionStorage.getItem(ABERTURA_CHAVE)
+  } catch { return false }
+}
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -18,7 +33,7 @@ const WHATS = `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Ma
 
 const SECOES = [
   { href: '#problemas', rotulo: 'Seu problema' },
-  { href: '#vitrine', rotulo: 'Lojas e sites' },
+  { href: '#trabalhos', rotulo: 'Trabalhos' },
   { href: '#sistemas', rotulo: 'Sistemas' },
   { href: '#marketing', rotulo: 'Marketing' },
   { href: '#contato', rotulo: 'Contato' },
@@ -130,40 +145,6 @@ function Palavras({ texto, destaque = [] }) {
   ))
 }
 
-/* Objeto 3D da marca flutuando na cena: o wrapper respira em CSS,
-   o miolo persegue o mouse com inércia (parallax por profundidade). */
-function IconeFlutuante({ src, largura, profundidade = 1, giro = 6, estilo, variante }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const temMouse = matchMedia('(pointer: fine)').matches && window.innerWidth >= 1024
-    const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!temMouse || reduzido) return
-    const qx = gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power2.out' })
-    const qy = gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power2.out' })
-    const qr = gsap.quickTo(el, 'rotation', { duration: 1.2, ease: 'power2.out' })
-    const mover = (e) => {
-      const nx = (e.clientX / window.innerWidth) * 2 - 1
-      const ny = (e.clientY / window.innerHeight) * 2 - 1
-      qx(nx * 26 * profundidade)
-      qy(ny * 18 * profundidade)
-      qr(nx * giro)
-    }
-    window.addEventListener('pointermove', mover, { passive: true })
-    return () => window.removeEventListener('pointermove', mover)
-  }, [profundidade, giro])
-  return (
-    <div
-      className={variante === 'vitrine' ? 'icone-vitrine' : 'icone-flutuante'}
-      style={{ width: largura, ...estilo }}
-      aria-hidden="true"
-    >
-      <img ref={ref} src={src} alt="" width="640" height="640" loading="lazy" />
-    </div>
-  )
-}
-
 function Regua({ esquerda, direita }) {
   return (
     <div className="regua" data-reveal>
@@ -205,7 +186,14 @@ export default function App() {
   const [reduzido] = useState(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
-  const [carregado, setCarregado] = useState(false)
+  const [abrindo, setAbrindo] = useState(deveAbrir)
+  const fimAbertura = useCallback(() => {
+    setAbrindo(false)
+    document.documentElement.classList.remove('com-abertura')
+    window.scrollTo(0, 0)
+    lenisRef.current?.start()
+    ScrollTrigger.refresh()
+  }, [])
   const [objetivo, setObjetivo] = useState(null)
   const [nome, setNome] = useState('')
   const [negocio, setNegocio] = useState('')
@@ -215,14 +203,8 @@ export default function App() {
   const painelMenuRef = useRef(null)
   const lenisRef = useRef(null)
 
-  /* preloader curto: assina a entrada e cobre o primeiro paint do canvas */
-  useEffect(() => {
-    if (reduzido) { setCarregado(true); return }
-    const tl = gsap.timeline({ onComplete: () => setCarregado(true) })
-    tl.to('#preloader .barra i', { scaleX: 1, duration: .85, ease: 'power2.inOut' })
-      .to('#preloader', { yPercent: -100, duration: .6, ease: 'power4.inOut' }, '+=.1')
-    return () => tl.kill()
-  }, [reduzido])
+  // sem abertura nesta visita: tira a capa creme que o index.html pôs antes do JS
+  useEffect(() => { if (!abrindo) document.documentElement.classList.remove('com-abertura') }, [abrindo])
 
   useEffect(() => {
     let lenis = null
@@ -230,6 +212,8 @@ export default function App() {
       // toque já rola nativo por padrão no Lenis (syncTouch off) — mobile intacto
       lenis = new Lenis({ lerp: 0.09 })
       lenisRef.current = lenis
+      // durante a abertura a página não rola por baixo (volta no fimAbertura)
+      if (document.documentElement.classList.contains('com-abertura')) lenis.stop()
       lenis.on('scroll', (e) => {
         ScrollTrigger.update()
         velocidadeRef.current = e.velocity // alimenta a deformação das partículas
@@ -428,31 +412,15 @@ export default function App() {
 
   return (
     <>
-      {!reduzido && !carregado && (
-        <div id="preloader" aria-hidden="true">
-          <div className="marca-load serif">
-            <b style={{ fontStyle: 'normal', fontWeight: 700 }}>maintor</b>{' '}
-            <span className="fio-marca">flow</span>
-          </div>
-          <div className="barra"><i /></div>
-        </div>
-      )}
+      {abrindo && <Suspense fallback={null}><Abertura aoTerminar={fimAbertura} /></Suspense>}
 
       <div id="cursor" aria-hidden="true" />
       <div id="grao" aria-hidden="true" />
 
-      <Suspense fallback={null}>
-        <FlowCanvas
-          progressoRef={progressoRef}
-          velocidadeRef={velocidadeRef}
-          reduzido={reduzido}
-        />
-      </Suspense>
-
       <header>
         <div className="wrap navrow">
-          <a className="marca serif" href="#topo">
-            <b>maintor</b> <span className="fio-marca">flow</span>
+          <a className="marca marca-lockup" href="#topo" aria-label="Maintor Flow — início">
+            <img src="/midia/marca/maintor-lockup-claro.svg" alt="Maintor Flow" width="132" height="42" />
           </a>
           <nav className="navlinks">
             {SECOES.map((s) => (
@@ -528,6 +496,7 @@ export default function App() {
       </div>
 
       <main id="conteudo">
+        <Fio reduzido={reduzido} />
         {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
             navega por teclado, era um link invisível roubando o foco */}
         <p className="sr-only">
@@ -538,13 +507,6 @@ export default function App() {
 
         {/* ============ CENA 1 · HERO — manchete full-bleed ============ */}
         <section className="cena" id="topo">
-          <IconeFlutuante
-            src="/midia/icones/fluxo.webp"
-            largura="clamp(140px, 15vw, 230px)"
-            profundidade={1.4}
-            giro={9}
-            estilo={{ top: '13%', right: '7%' }}
-          />
           <div className="wrap">
             <div className="micro" data-reveal style={{ color: 'var(--mostarda)', marginBottom: 'var(--s3)' }}>
               Sites, sistemas e marketing sob medida — São Paulo
@@ -572,8 +534,8 @@ export default function App() {
             </div>
             <div className="hero-base">
               {/* sem data-reveal: fica abaixo do gatilho de 85% e só apareceria depois de rolar */}
-              <a className="dica-scroll" href="/casos/voke-wear/">
-                Loja nossa no ar: VOKE WEAR
+              <a className="dica-scroll" href="#trabalhos">
+                Trabalhos no ar ↓
               </a>
               <div className="lado-dir" data-reveal aria-live="polite">
                 {atual ? (
@@ -605,6 +567,22 @@ export default function App() {
         </section>
 
         <Marquee />
+
+        {/* ============ TRABALHOS NO AR — o site é o portfólio ============ */}
+        <section className="cena" id="trabalhos">
+          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+            <Regua esquerda="Trabalhos no ar" direita="Abra, clique, compre — é tudo real" />
+            <h2 className="titulo-cena serif" data-palavras>
+              <Palavras texto="Não precisa acreditar. Dá para abrir." destaque={[3, 4, 5]} />
+            </h2>
+            <p className="corpo-apoio" data-reveal>
+              Lojas de clientes vendendo de verdade e sistemas nossos rodando
+              por assinatura. Os prints são de hoje; o botão leva ao que está
+              no ar.
+            </p>
+            <Trabalhos />
+          </div>
+        </section>
 
         {/* ============ PONTO DE PARTIDA · O PROBLEMA DE QUEM VISITA ============ */}
         <section className="cena" id="problemas">
@@ -656,82 +634,8 @@ export default function App() {
           </div>
         </section>
 
-        {/* ============ CENA 2 · LOJAS E SITES (VOKE) ============ */}
-        <section className="cena" id="vitrine">
-          <span className="num-fantasma serif" aria-hidden="true">01</span>
-          <IconeFlutuante
-            src="/midia/icones/sacola.webp"
-            largura="clamp(110px, 10vw, 160px)"
-            profundidade={0.9}
-            giro={6}
-            estilo={{ top: '15%', right: '9%' }}
-          />
-          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="01 · Lojas e sites" direita="Case — VOKE WEAR" />
-            <h2 className="titulo-cena serif" data-palavras>
-              <Palavras texto="Loja no ar, vendendo de verdade." destaque={[4]} />
-            </h2>
-            <p className="corpo-apoio" data-reveal>
-              A VOKE WEAR é <strong style={{ color: 'var(--creme)' }}>cliente da Flow</strong>:
-              loja de moda fitness feminina que a gente construiu, colocou no ar
-              e mantém. A marca e o produto são dela — a engenharia é nossa. A
-              dona opera tudo por um painel próprio, sem depender de ninguém.
-            </p>
-
-            <div className="case-palco">
-              <p className="fronteira" data-reveal>
-                A VOKE vende a roupa. <em>A Flow assina a engenharia.</em>
-              </p>
-              <div className="case-frame">
-                <div className="browser-bar">
-                  <span className="bolinha" /><span className="bolinha" /><span className="bolinha" />
-                  <span className="url">vokewear.com.br</span>
-                </div>
-                <img
-                  src="/midia/voke-home.webp"
-                  srcSet="/midia/voke-home-640.webp 640w, /midia/voke-home-800.webp 800w, /midia/voke-home.webp 1280w"
-                  sizes="(max-width: 900px) 92vw, 1140px"
-                  alt="Loja da VOKE WEAR no ar — página inicial"
-                  loading="lazy"
-                  width="1280"
-                  height="800"
-                />
-              </div>
-              <div className="case-rodape">
-                <p className="legenda-case">
-                  Loja da VOKE WEAR, cliente da Flow — projeto, publicação e
-                  manutenção são nossos; marca, produto e identidade são dela.
-                </p>
-                <span className="selo-case">Case real · no ar</span>
-              </div>
-              {/* SLOT RESERVADO — depoimento real da Poliana (dona da VOKE).
-                  NÃO publicar antes de ter o texto assinado por ela.
-                  Quando chegar, colar aqui:
-                  <blockquote className="citacao serif" data-reveal>
-                    “...” — Poliana, VOKE WEAR
-                  </blockquote> */}
-            </div>
-
-            <div className="linhas" style={{ marginTop: 'var(--s5)' }} data-reveal>
-              <LinhaEd idx="—" rot="Pagamento" val="Pix com 5% de desconto automático · cartão em até 12x" />
-              <LinhaEd idx="—" rot="Frete" val="Grátis acima de R$ 300" />
-              <LinhaEd idx="—" rot="Estoque" val="Baixa sozinho · fila de espera por tamanho" />
-              <LinhaEd idx="—" rot="Pós-venda" val="Troca em até 7 dias" />
-            </div>
-            <div style={{ marginTop: 'var(--s3)', display: 'flex', flexWrap: 'wrap', gap: 'var(--s2) var(--s4)' }} data-reveal>
-              <a className="link-mostarda" href="https://vokewear.com.br" target="_blank" rel="noopener">
-                Visitar a loja ao vivo →
-              </a>
-              <a className="link-mostarda" href="/casos/voke-wear/">
-                Ver o case completo →
-              </a>
-            </div>
-          </div>
-        </section>
-
         {/* ============ CENA 3 · SISTEMAS SOB MEDIDA ============ */}
         <section className="cena" id="sistemas">
-          <span className="num-fantasma serif" aria-hidden="true">02</span>
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="02 · Sistemas sob medida" direita="Feitos por nós, rodando hoje" />
             <h2 className="titulo-cena serif" data-palavras>
@@ -798,20 +702,17 @@ export default function App() {
               </div>
               <div className="bancada-grade">
                 <div className="bancada-item">
-                  <IconeFlutuante variante="vitrine" src="/midia/icones/prancheta.webp" largura="clamp(80px, 7vw, 110px)" profundidade={0.5} giro={4} />
                   <h3 className="serif">Task</h3>
                   <div className="micro">Operação e qualidade</div>
                   <p>POPs, checklists e tarefas por setor e responsável, com não conformidade e plano de ação no padrão ISO 9001.</p>
                   <div className="sistema-links"><a className="link-mostarda" href="https://maintor-task.base44.app" target="_blank" rel="noopener">Acessar o Task ↗</a></div>
                 </div>
                 <div className="bancada-item">
-                  <IconeFlutuante variante="vitrine" src="/midia/icones/chave.webp" largura="clamp(80px, 7vw, 110px)" profundidade={0.6} giro={5} />
                   <h3 className="serif">GateKeeper</h3>
                   <div className="micro">Portaria digital</div>
                   <p>Visitante, prestador e fornecedor do agendamento à saída, com operação de doca e pontualidade de fornecedor medida.</p>
                 </div>
                 <div className="bancada-item">
-                  <IconeFlutuante variante="vitrine" src="/midia/icones/dente.webp" largura="clamp(80px, 7vw, 110px)" profundidade={0.4} giro={4} />
                   <h3 className="serif">SorrIA</h3>
                   <div className="micro">Clínicas odontológicas</div>
                   <p>Simulação estética de sorriso com inteligência artificial: o paciente vê o resultado provável antes de fechar o tratamento.</p>
@@ -848,7 +749,6 @@ export default function App() {
 
         {/* ============ CENA 4 · MARKETING ============ */}
         <section className="cena" id="marketing">
-          <span className="num-fantasma serif" aria-hidden="true">03</span>
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <Regua esquerda="03 · Marketing que traz cliente" direita="Conteúdo · vídeo · anúncio" />
             <div className="cena-grid">

@@ -158,7 +158,7 @@ header {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 30;
-  background: linear-gradient(180deg, rgba(13, 38, 38, .82), rgba(13, 38, 38, 0));
+  background: linear-gradient(180deg, rgba(13, 38, 38, .94) 0%, rgba(13, 38, 38, .7) 60%, rgba(13, 38, 38, 0));
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
@@ -1059,3 +1059,119 @@ a.problema:hover .problema-foto img { transform: scale(1.03); }
 @media (prefers-reduced-motion: reduce) { .hero-chip { transition: none; } .hero-chip:hover { transform: none; } }
 .sistema-revenda-links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 0; }
 .sistema-revenda-links a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* ================================================================
+   REFORMULAÇÃO 27/10 — abertura 3D, o fio e o portfólio
+   ================================================================ */
+
+/* ---- logo oficial no cabeçalho ---- */
+.marca-lockup { display: inline-flex; align-items: center; min-height: 44px; }
+.marca-lockup img { display: block; height: 40px; width: auto; }
+@media (max-width: 520px) { .marca-lockup img { height: 34px; } }
+
+/* ---- abertura ---- */
+#abertura {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--creme);
+  display: grid; place-items: center;
+  will-change: transform;
+}
+#abertura canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#abertura .pular {
+  position: absolute; top: 18px; right: 18px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px;
+  background: transparent; border: 0; cursor: pointer;
+  font: 700 11px/1 'Inter', system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--petroleo); opacity: .7;
+}
+#abertura .pular:hover, #abertura .pular:focus-visible { opacity: 1; }
+#abertura .pular:focus-visible, #abertura .abertura-entrar:focus-visible { outline: 2px solid var(--petroleo); outline-offset: 3px; }
+#abertura .abertura-frase {
+  position: absolute; left: 0; right: 0; bottom: 13vh; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 0 16px; text-align: center;
+}
+#abertura .abertura-frase p { color: var(--petroleo); font-size: clamp(15px, 1.6vw, 18px); font-weight: 500; }
+#abertura .abertura-entrar {
+  min-height: 48px; padding: 0 26px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(31, 71, 71, .18);
+  font: 700 12px/1 'Inter', system-ui, sans-serif; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--petroleo);
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(240,234,224,.9));
+  box-shadow: 0 1px 0 #fff inset, 0 10px 28px rgba(31, 71, 71, .14);
+  transition: transform var(--t-rapido), box-shadow var(--t-rapido);
+}
+#abertura .abertura-entrar:hover { transform: translateY(-2px); box-shadow: 0 1px 0 #fff inset, 0 14px 34px rgba(31, 71, 71, .2); }
+
+/* ---- o fio: uma linha só, do logo, que se desenha com a rolagem ---- */
+main#conteudo { position: relative; }
+svg.fio {
+  position: absolute; left: 0; top: 0; width: 100%; z-index: 0;
+  pointer-events: none; overflow: visible;
+}
+.fio-linha { stroke: var(--mostarda); stroke-width: 2.2; stroke-linecap: round; opacity: .55; }
+.fio-eco { stroke: var(--mostarda); stroke-width: 1; opacity: .08; }
+.fio-ponto { fill: var(--mostarda); filter: drop-shadow(0 0 10px rgba(212, 165, 116, .7)); }
+main#conteudo > section, main#conteudo > .marquee { position: relative; z-index: 1; }
+.fio-linha { opacity: .7; }
+@media (max-width: 700px) { .fio-linha { opacity: .45; stroke-width: 1.6; } .fio-ponto { r: 4.5; } }
+
+/* ---- trabalhos no ar ---- */
+.trabalhos-lista { display: grid; gap: clamp(72px, 10vw, 140px); margin-top: var(--s5); }
+.trabalho {
+  display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px); align-items: center;
+}
+.trabalho.inverso { grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); }
+.trabalho.inverso .trabalho-palco { order: 2; }
+.trabalho-palco { position: relative; padding: 0 0 56px 0; }
+.trabalho.inverso .trabalho-palco { padding: 0 0 56px 0; }
+.tela-desktop {
+  border-radius: 14px; overflow: hidden; background: var(--profundo);
+  border: 1px solid rgba(230, 221, 208, .18);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, .5);
+  transition: transform .6s cubic-bezier(.2,.7,.2,1);
+}
+.tela-desktop .browser-bar {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+  background: rgba(13, 38, 38, .95); border-bottom: var(--hairline);
+  font-size: 12px; color: var(--cinza-claro);
+}
+.tela-janela { position: relative; aspect-ratio: 16 / 10; background: #fff; }
+.tela-janela img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center;
+  opacity: 0; transition: opacity .9s ease;
+}
+.tela-janela img.ativa { opacity: 1; }
+.tela-celular {
+  position: absolute; right: -14px; bottom: 0; width: clamp(110px, 22%, 190px);
+  border-radius: 26px; padding: 7px; background: #0b1f1f;
+  border: 1px solid rgba(230, 221, 208, .22);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .6);
+  transition: transform .6s cubic-bezier(.2,.7,.2,1);
+}
+.trabalho.inverso .tela-celular { right: auto; left: -14px; }
+.tela-celular .tela-janela { aspect-ratio: 390 / 844; border-radius: 20px; overflow: hidden; }
+.trabalho:hover .tela-desktop { transform: translateY(-6px); }
+.trabalho:hover .tela-celular { transform: translateY(-14px) rotate(-1.5deg); }
+.trabalho-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.trabalho-tags .micro { color: var(--mostarda); }
+.trabalho-de {
+  font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--cinza-claro); border: 1px solid rgba(230, 221, 208, .2); border-radius: 999px; padding: 4px 10px;
+}
+.trabalho-texto h3 { font-size: clamp(34px, 4vw, 56px); line-height: 1.05; margin-top: 12px; }
+.trabalho-nicho { color: var(--mostarda); margin-top: 4px; font-size: 15px; }
+.trabalho-texto > p:not(.trabalho-nicho) { color: var(--cinza-claro); margin-top: 14px; max-width: 46ch; }
+.trabalho-links { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 22px; }
+.trabalho-links .link-mostarda { display: inline-flex; align-items: center; min-height: 44px; }
+.btn-fino { padding: 12px 24px; font-size: 14px; display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 900px) {
+  .trabalho, .trabalho.inverso { grid-template-columns: 1fr; }
+  .trabalho.inverso .trabalho-palco { order: 0; }
+  .tela-celular { right: 6px; width: 30%; }
+  .trabalho.inverso .tela-celular { left: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tela-desktop, .tela-celular, .tela-janela img { transition: none; }
+  .trabalho:hover .tela-desktop, .trabalho:hover .tela-celular { transform: none; }
+}
