@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Maintor Flow — links | Loja virtual, sites e sistemas sob medida</title>
-<meta name="description" content="Os caminhos da Maintor Flow: loja virtual em compra única, loja no Instagram, uma loja nossa no ar para você abrir, a conta contra a plataforma pronta e o sistema do seu nicho.">
+<title>Maintor Flow — links | Lojas, sites e sistemas no seu nome</title>
+<meta name="description" content="Os caminhos da Maintor Flow: o que a gente faz, provas no ar por nicho (moda, acessórios, indústria, fitness) e o sistema do seu nicho para revender.">
 <!-- Link da bio do Instagram: atalho, não página de busca. -->
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://maintorflow.com.br/links/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Maintor Flow — links">
-<meta property="og:description" content="Loja virtual sem mensalidade, sites, sistemas e marketing — do jeito do seu negócio.">
+<meta property="og:description" content="Lojas, sites e sistemas no seu nome — e o sistema do seu nicho para revender.">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://maintorflow.com.br/links/">
 <meta property="og:image" content="https://maintorflow.com.br/midia/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Maintor Flow — links">
-<meta name="twitter:description" content="Loja virtual sem mensalidade, sites, sistemas e marketing — do jeito do seu negócio.">
+<meta name="twitter:description" content="Lojas, sites e sistemas no seu nome — e o sistema do seu nicho para revender.">
 <meta name="twitter:image" content="https://maintorflow.com.br/midia/og-image.jpg">
 <meta name="theme-color" content="#0D2626">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -42,8 +42,8 @@
   html,body{background:#0D2626}
   body{min-height:100vh;color:#FAF7F2;font-family:'Inter',system-ui,sans-serif;
        background-image:radial-gradient(90% 50% at 50% 0%, #1A4040 0%, #0D2626 60%);
-       -webkit-font-smoothing:antialiased}
-  .coluna{max-width:480px;margin:0 auto;padding:40px 20px 36px}
+       -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .coluna{max-width:480px;margin:0 auto;padding:40px 20px 36px;position:relative}
   .marca{font-family:'DM Serif Display',Georgia,serif;font-size:38px;line-height:1;text-align:center;color:#FAF7F2;text-decoration:none;display:block;min-height:44px;padding:3px 0}
   .marca b{font-weight:400}
   .marca i{font-style:italic;color:#D4A574}
@@ -52,37 +52,99 @@
   h1 em{color:#D4A574}
   .sub{margin:12px auto 0;text-align:center;font-size:14.5px;line-height:1.5;color:#A9BCB8;max-width:34ch}
   .sub b{color:#FAF7F2;font-weight:600}
-  .lista{list-style:none;margin-top:22px;display:grid;gap:12px;padding:0}
-  .lista a{display:flex;align-items:center;gap:14px;min-height:64px;padding:14px 18px;border-radius:14px;text-decoration:none;color:#FAF7F2;
+
+  /* ---------- botão principal em vidro líquido ----------
+     Atrás dele, duas manchas de luz se movem devagar: é o que o vidro
+     "refrata" (backdrop-filter). Sem movimento quando o sistema pede. */
+  .palco{position:relative;margin-top:24px;padding:6px 0}
+  .palco .luz{position:absolute;border-radius:50%;filter:blur(26px);opacity:.75;pointer-events:none}
+  .palco .luz.a{width:170px;height:110px;left:4%;top:-4px;background:#D4A574;animation:deriva-a 9s ease-in-out infinite alternate}
+  .palco .luz.b{width:190px;height:120px;right:2%;bottom:-10px;background:#2F8F7F;animation:deriva-b 11s ease-in-out infinite alternate}
+  @keyframes deriva-a{to{transform:translate(120px,18px) scale(1.15)}}
+  @keyframes deriva-b{to{transform:translate(-130px,-14px) scale(.9)}}
+  a.vidro{position:relative;z-index:1;display:flex;align-items:center;gap:14px;min-height:76px;padding:16px 20px;border-radius:22px;
+          text-decoration:none;color:#FAF7F2;overflow:hidden;isolation:isolate;
+          background:linear-gradient(135deg,rgba(250,247,242,.20),rgba(250,247,242,.06) 45%,rgba(212,165,116,.14));
+          -webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);
+          border:1px solid rgba(250,247,242,.32);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.08),
+                     inset 0 -14px 26px rgba(212,165,116,.18),0 14px 34px rgba(0,0,0,.38),0 0 0 1px rgba(13,38,38,.4);
+          transition:transform .25s ease,box-shadow .25s ease}
+  /* reflexo de cima: a "lente" */
+  a.vidro::before{content:"";position:absolute;inset:1px 1px 52% 1px;border-radius:21px 21px 50% 50% / 21px 21px 18px 18px;
+                  background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,0));z-index:-1;pointer-events:none}
+  /* brilho que atravessa o vidro de tempos em tempos */
+  a.vidro::after{content:"";position:absolute;top:-30%;bottom:-30%;width:38%;left:-60%;z-index:-1;pointer-events:none;
+                 background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-18deg);
+                 animation:brilho 5.5s ease-in-out infinite}
+  @keyframes brilho{0%,62%{left:-60%}100%{left:130%}}
+  a.vidro:hover,a.vidro:focus-visible{transform:translateY(-2px) scale(1.01);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -14px 30px rgba(212,165,116,.28),0 18px 40px rgba(0,0,0,.42),0 0 28px rgba(212,165,116,.35)}
+  a.vidro:focus-visible{outline:2px solid #D4A574;outline-offset:4px}
+  a.vidro .ico{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+               background:radial-gradient(circle at 35% 30%,#F0CFA6,#D4A574 55%,#B98A58);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 4px 12px rgba(0,0,0,.3)}
+  a.vidro .ico svg{width:24px;height:24px;fill:#0D2626}
+  a.vidro .txt{flex:1;display:flex;flex-direction:column;gap:3px}
+  a.vidro b{font-size:17px;font-weight:700;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+  a.vidro small{font-size:13px;line-height:1.4;color:#E6DDD0}
+  a.vidro .seta{flex:none;color:#F0CFA6;font-size:20px}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){a.vidro{background:rgba(31,71,71,.92)}}
+
+  .prazo{margin:12px auto 0;text-align:center;font-size:13px;line-height:1.5;color:#D4A574;max-width:34ch}
+  .sep{margin:30px 0 12px;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#7f9490;text-align:center}
+
+  /* ---------- o que a gente faz: frentes, sem preço ---------- */
+  .frentes{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .frentes a{display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:74px;height:100%;padding:12px 14px;border-radius:14px;text-decoration:none;color:#FAF7F2;
+             border:1px solid rgba(230,221,208,.16);background:rgba(250,247,242,.035);transition:border-color .2s,background .2s}
+  .frentes a:hover,.frentes a:focus-visible{border-color:#D4A574;background:rgba(212,165,116,.08)}
+  .frentes a:focus-visible{outline:2px solid #D4A574;outline-offset:3px}
+  .frentes b{font-size:14.5px;font-weight:600;line-height:1.25}
+  .frentes small{font-size:12px;line-height:1.35;color:#A9BCB8}
+  .frentes li.larga{grid-column:1 / -1}
+
+  /* ---------- provas por nicho ---------- */
+  .lista{list-style:none;display:grid;gap:10px;padding:0}
+  .lista a{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px;border-radius:14px;text-decoration:none;color:#FAF7F2;
            border:1px solid rgba(230,221,208,.18);background:rgba(250,247,242,.035);transition:border-color .2s,background .2s,transform .2s}
   .lista a:hover,.lista a:focus-visible{border-color:#D4A574;background:rgba(212,165,116,.08);transform:translateY(-1px)}
   .lista a:focus-visible{outline:2px solid #D4A574;outline-offset:3px}
+  .lista .nicho{flex:none;width:86px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#D4A574;line-height:1.35}
   .lista .txt{flex:1;display:flex;flex-direction:column;gap:3px}
-  .lista b{font-size:16px;font-weight:600;line-height:1.3}
-  .lista small{font-size:13px;line-height:1.4;color:#A9BCB8}
+  .lista b{font-size:15.5px;font-weight:600;line-height:1.3}
+  .lista small{font-size:12.5px;line-height:1.4;color:#A9BCB8}
   .lista .seta{color:#D4A574;font-size:18px;flex:none}
-  .lista a.zap{background:#D4A574;border-color:#D4A574;color:#0D2626}
-  .lista a.zap small{color:#1F4747}
-  .lista a.zap .seta{color:#0D2626}
-  .lista a.zap:hover,.lista a.zap:focus-visible{background:#E0B98E}
-  .prazo{margin:12px auto 0;text-align:center;font-size:13px;line-height:1.5;color:#D4A574;max-width:34ch}
-  .sep{margin:24px 0 2px;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#7f9490;text-align:center}
-  /* o bloco da narrativa nova: tracejado em mostarda, como o "não está aqui?" da home */
-  .novo{margin-top:26px;border:1px dashed rgba(212,165,116,.6);border-radius:14px;padding:18px 18px 8px;
+  .duvida{margin-top:12px;text-align:center;font-size:13px}
+  .duvida a{color:#A9BCB8;text-decoration:underline;text-underline-offset:3px;display:inline-flex;align-items:center;min-height:44px}
+  .duvida a:hover{color:#D4A574}
+
+  /* ---------- o novo: sistema para revender ---------- */
+  .novo{margin-top:30px;border:1px dashed rgba(212,165,116,.6);border-radius:14px;padding:18px 18px 8px;
         background:linear-gradient(180deg,rgba(212,165,116,.09),rgba(212,165,116,.02))}
+  .novo .tag{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#D4A574}
   .novo .novo-foto{margin:12px 0 14px;border-radius:10px;overflow:hidden;aspect-ratio:16/9;border:1px solid rgba(230,221,208,.16);background:#0D2626}
   .novo .novo-foto img{display:block;width:100%;height:100%;object-fit:cover}
-  .novo .tag{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#D4A574}
   .novo h2{font-family:'DM Serif Display',Georgia,serif;font-style:italic;font-weight:400;font-size:22px;line-height:1.2;margin:8px 0 8px}
   .novo h2 em{color:#D4A574}
   .novo p{font-size:14px;line-height:1.5;color:#A9BCB8}
-  .novo a{display:inline-flex;align-items:center;min-height:44px;color:#D4A574;text-decoration:none;font-weight:600;font-size:15px}
+  .novo ul{list-style:none;padding:0;margin-top:6px}
+  .novo li{border-top:1px solid rgba(230,221,208,.12)}
+  .novo li:first-child{border-top:0}
+  .novo a{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:46px;color:#D4A574;text-decoration:none;font-weight:600;font-size:14.5px}
+  .novo a span{color:#A9BCB8;font-weight:400;font-size:12.5px}
   .novo a:hover,.novo a:focus-visible{text-decoration:underline;text-underline-offset:4px}
   .novo a:focus-visible{outline:2px solid #D4A574;outline-offset:3px}
+
+  .site{margin-top:20px}
   footer{margin-top:28px;text-align:center;font-size:12.5px;line-height:1.7;color:#7f9490}
   footer a{color:#A9BCB8;text-decoration:none;display:inline-block;padding:10px 4px;min-height:44px}
   footer a:hover{color:#D4A574}
-  @media (prefers-reduced-motion: reduce){.lista a{transition:none}.lista a:hover{transform:none}}
+  @media (prefers-reduced-motion: reduce){
+    .palco .luz,a.vidro::after{animation:none}
+    a.vidro,.lista a{transition:none}
+    a.vidro:hover,.lista a:hover{transform:none}
+  }
+  @media (max-width:360px){.frentes{grid-template-columns:1fr}.lista .nicho{width:70px}}
 </style>
   <script>(function () {
   var ROT = { gbp: 'Te achei no Google.', google: 'Te achei no Google.',
@@ -116,13 +178,18 @@
 <body>
 <main class="coluna" id="conteudo">
   <a class="marca" href="/"><b>maintor</b> <i>flow</i></a>
-  <p class="linha">Sites, lojas e sistemas sob medida · São Paulo</p>
-  <h1>Sua loja vendendo <em>sem você responder mensagem.</em></h1>
-  <p class="sub">Loja virtual, site e sistema do seu jeito. <b>Compra única:</b> sem mensalidade e sem taxa sobre as suas vendas.</p>
+  <p class="linha">Lojas, sites e sistemas · São Paulo</p>
+  <h1>Sua loja, seu site, seu sistema — <em>no seu nome.</em></h1>
+  <p class="sub">A gente constrói, você é dono. <b>Compra única:</b> sem mensalidade e sem taxa sobre as suas vendas.</p>
 
-  <ul class="lista">
-    <li><a class="zap" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pelo%20Instagram.%20Quero%20conversar%20sobre%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener"><span class="txt"><b>Chamar no WhatsApp</b><small>Me manda o @ da sua loja: eu te digo o que faria no seu caso. Sem compromisso.</small></span><span class="seta">↗</span></a></li>
-  </ul>
+  <div class="palco">
+    <span class="luz a" aria-hidden="true"></span><span class="luz b" aria-hidden="true"></span>
+    <a class="vidro zap" href="https://wa.me/5511946610634?text=Ol%C3%A1!%20Vim%20pelo%20Instagram.%20Quero%20conversar%20sobre%20o%20meu%20neg%C3%B3cio." target="_blank" rel="noopener">
+      <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 2s.8 2.3.9 2.5c.1.2 1.6 2.5 4 3.5 1.5.6 2.1.7 2.8.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.5-.3z"/></svg></span>
+      <span class="txt"><b>Chamar no WhatsApp</b><small>Me conta o seu negócio: eu te digo o que faria no seu caso. Sem compromisso.</small></span>
+      <span class="seta" aria-hidden="true">↗</span>
+    </a>
+  </div>
   <p class="prazo" id="prazo">Black Friday é 27/11. Loja que começa em outubro chega pronta.</p>
   <script>
     /* O aviso se troca sozinho: depois de 25/10 a loja não fica pronta para a Black Friday;
@@ -133,27 +200,42 @@
   </script>
 
   <p class="sep">O que a gente faz</p>
-  <ul class="lista">
-    <li><a href="/loja-virtual/"><span class="txt"><b>Loja virtual · a partir de R$ 1.500</b><small>Compra única: catálogo, Pix, frete e um painel que é seu</small></span><span class="seta">→</span></a></li>
-    <li><a href="/loja-no-instagram/"><span class="txt"><b>Loja no Instagram</b><small>Seus produtos marcados nos posts, a venda no seu site</small></span><span class="seta">→</span></a></li>
+  <ul class="frentes">
+    <li><a href="/loja-virtual/"><b>Loja virtual</b><small>Catálogo, Pix, frete e estoque</small></a></li>
+    <li><a href="/loja-no-instagram/"><b>Loja no Instagram</b><small>Produto marcado no post</small></a></li>
+    <li><a href="/sites/"><b>Sites</b><small>Rápidos e achados no Google</small></a></li>
+    <li><a href="/sistemas-sob-medida/"><b>Sistemas sob medida</b><small>O controle que vive no caderno</small></a></li>
+    <li><a href="/automacao-de-atendimento/"><b>Automação no WhatsApp</b><small>Responde o que se repete</small></a></li>
+    <li><a href="/marketing-e-redes/"><b>Marketing e redes</b><small>Conteúdo que vira conversa</small></a></li>
+    <li><a href="/trafego-pago/"><b>Tráfego pago</b><small>Anúncio com destino certo</small></a></li>
+    <li><a href="/videos-personalizados/"><b>Vídeos</b><small>Feitos para o seu negócio</small></a></li>
+    <li class="larga"><a href="/site-para-clinica-odontologica/"><b>Site para clínica odontológica</b><small>Tratamentos, doutora e agendamento num lugar só</small></a></li>
   </ul>
 
-  <p class="sep">Não precisa acreditar</p>
+  <p class="sep">Não precisa acreditar · está no ar</p>
   <ul class="lista">
-    <li><a href="https://vokewear.com.br" target="_blank" rel="noopener"><span class="txt"><b>VOKE WEAR — uma loja nossa, no ar</b><small>Abra, escolha um tamanho e vá até o pagamento</small></span><span class="seta">↗</span></a></li>
-    <li><a href="/guias/loja-propria-ou-plataforma-pronta/"><span class="txt"><b>Loja própria ou Nuvemshop?</b><small>A conta de dois anos — e por que a compra única sai na frente</small></span><span class="seta">→</span></a></li>
+    <li><a href="https://vokewear.com.br" target="_blank" rel="noopener"><span class="nicho">Moda fitness</span><span class="txt"><b>VOKE WEAR</b><small>Loja virtual de cliente — vá até o pagamento</small></span><span class="seta">↗</span></a></li>
+    <li><a href="https://benditaacessorios.com" target="_blank" rel="noopener"><span class="nicho">Acessórios</span><span class="txt"><b>Bendita Acessórios</b><small>Loja virtual de cliente, com guia de medida do aro</small></span><span class="seta">↗</span></a></li>
+    <li><a href="https://maintor.com.br" target="_blank" rel="noopener"><span class="nicho">Indústria</span><span class="txt"><b>Maintor CMMS</b><small>Nosso sistema de manutenção, por assinatura</small></span><span class="seta">↗</span></a></li>
+    <li><a href="https://maintorfit.com" target="_blank" rel="noopener"><span class="nicho">Personal e nutrição</span><span class="txt"><b>Maintor FIT</b><small>Nosso app de treino, com a marca do profissional</small></span><span class="seta">↗</span></a></li>
   </ul>
+  <p class="duvida"><a href="/guias/loja-propria-ou-plataforma-pronta/">Loja própria ou plataforma pronta? A conta de dois anos →</a></p>
 
   <section class="novo">
-    <p class="tag">Novo</p>
+    <p class="tag">Novo · sistema para revender</p>
     <figure class="novo-foto"><img src="/midia/fotos/personal-app-640.webp" srcset="/midia/fotos/personal-app-640.webp 640w, /midia/fotos/personal-app-960.webp 960w" sizes="(max-width: 520px) calc(100vw - 76px), 404px" width="960" height="723" alt="Personal trainer de costas, numa academia de bairro ao amanhecer, olhando o celular" loading="lazy" decoding="async"></figure>
     <h2>O que você sabe fazer vira um sistema — <em>e os seus colegas pagam para usar.</em></h2>
-    <p>App de treino para o personal, agenda para o salão, o controle do seu ofício: a gente constrói no seu nome, e a mensalidade que os seus colegas pagam é sua.</p>
-    <a href="/sistema-para-revender/">Ver como funciona →</a>
+    <p>A gente constrói o app do seu nicho, no seu nome. Você usa no seu negócio e vende para quem faz o mesmo que você — a mensalidade é sua.</p>
+    <ul>
+      <li><a href="/sistema-para-revender/">Como funciona <span>visão geral</span></a></li>
+      <li><a href="/sistema-para-revender/app-para-personal-trainer/">App de treino para personal <span>→</span></a></li>
+      <li><a href="/sistema-para-revender/sistema-para-salao-de-beleza/">Agenda e caixa para salão <span>→</span></a></li>
+      <li><a href="/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/">Guia: a conta real <span>→</span></a></li>
+    </ul>
   </section>
 
-  <ul class="lista">
-    <li><a href="/"><span class="txt"><b>Conhecer a Maintor Flow</b><small>Sites, clínicas, indústria, marketing — o site completo</small></span><span class="seta">→</span></a></li>
+  <ul class="lista site">
+    <li><a href="/"><span class="txt"><b>Conhecer a Maintor Flow</b><small>O site completo</small></span><span class="seta">→</span></a></li>
   </ul>
 
   <footer>
