@@ -47,7 +47,7 @@ const PROBLEMAS = [
   {
     area: 'Lojas de moda e varejo',
     dor: 'Vendo pelo direct e não dou conta de responder todo mundo.',
-    solucao: 'Uma loja virtual que mostra o tamanho, cobra no Pix e calcula o frete sozinha. A partir de R$ 1.500, pagamento único.',
+    solucao: 'Uma loja virtual que mostra o tamanho, cobra no Pix e calcula o frete sozinha. Pagamento único, sem mensalidade.',
     href: '/loja-virtual/', rotulo: 'Ver a loja virtual',
     foto: 'loja-moda', alt: 'Loja de moda com arara de roupas coloridas e sacolas de papel no balcão, ao fim da tarde',
   },
@@ -103,9 +103,9 @@ const whatsProblema = (dor) =>
   `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow. Meu problema: ' + dor.charAt(0).toLowerCase() + dor.slice(1))}`
 
 const PERGUNTAS = [
-  { p: "Quanto custa um site ou uma loja virtual?", r: "Loja virtual: R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças e se entra o estúdio de fotos. O site institucional sai fechado na proposta, pelo número de páginas. Nos dois casos, pagamento único, sem mensalidade.", href: "/loja-virtual/", rotulo: "Ver os formatos de loja →" },
+  { p: "Quanto custa um site ou uma loja virtual?", r: "Depende do que o seu negócio precisa: o formato da loja, quem cadastra o catálogo, o número de páginas do site. O valor sai fechado na proposta, por escrito, depois de uma conversa. Site e loja são pagamento único, sem mensalidade.", href: "/loja-virtual/", rotulo: "Ver os formatos de loja →" },
   { p: "Quanto tempo leva?", r: "De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo." },
-  { p: "Por que não usar uma plataforma pronta?", r: "Porque ela cobra todo mês — e, em vários planos, uma parte de cada venda. A loja própria é compra única: em cerca de dois anos sai mais barata, e depois disso não tem mensalidade nenhuma. E quando algo dá errado, lá você abre chamado; aqui você chama no WhatsApp e alguém resolve.", href: "/guias/loja-propria-ou-plataforma-pronta/", rotulo: "Ver a conta de dois anos →" },
+  { p: "Por que não usar uma plataforma pronta?", r: "Porque ela cobra todo mês — e, em vários planos, uma parte de cada venda. A loja própria é compra única: você paga uma vez, e depois disso não tem mensalidade nenhuma. E quando algo dá errado, lá você abre chamado; aqui você chama no WhatsApp e alguém resolve.", href: "/guias/loja-propria-ou-plataforma-pronta/", rotulo: "Ver a conta de dois anos →" },
   { p: "Vocês entregam e vão embora?", r: "Entregamos, e a loja ou o site passa a ser seu: pagamento único, sem mensalidade, com treinamento e manual. Se você quiser alguém cuidando depois — conteúdo, campanha, ajustes —, é um serviço à parte, com valor próprio, e só se fizer sentido para você.", href: "/manutencao-mensal/", rotulo: "Como funciona a manutenção →" },
   { p: "E se eu quiser sair?", r: "Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Nos serviços mensais, como conteúdo e campanha, sem fidelidade e sem multa: trinta dias de aviso e acabou." },
   { p: "Por onde eu começo?", r: "Pela base: site ou loja que converte, depois o Google, os cadastros, o atendimento, o conteúdo — e só então o anúncio. Na ordem certa, cada real trabalha para o próximo.", href: "/por-onde-comecar/", rotulo: "Ver a trilha completa →" },
@@ -553,7 +553,7 @@ export default function App() {
                   <>
                     <p className="corpo-apoio">
                       A gente começa pelo problema do seu negócio e constrói a
-                      solução: loja virtual a partir de R$ 1.500, sistema de RH ou
+                      solução: loja virtual sem mensalidade, sistema de RH ou
                       de manutenção, automação, vídeo e anúncio — do seu jeito.
                     </p>
                     <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>

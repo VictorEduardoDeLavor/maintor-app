@@ -35,8 +35,8 @@ Montamos, colocamos no ar e cuidamos da operação digital de pequenos negócios
 alugado: pagamento único, sem mensalidade. Quem quiser alguém cuidando depois
 contrata à parte manutenção, conteúdo ou campanhas.
 
-O modelo de trabalho é pagamento único para site e loja (loja virtual por
-R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças). Mensalidade
+O modelo de trabalho é pagamento único para site e loja, com o valor fechado na proposta
+(conforme o formato, quem cadastra as peças e o número de páginas). Mensalidade
 só existe quando há serviço contínuo contratado, como conteúdo ou campanha.
 Operado pela MAINTOR TECNOLOGIA LTDA (CNPJ 66.511.174/0001-27, São Paulo/SP).
 
@@ -151,13 +151,13 @@ https://maintorflow.com.br/por-onde-comecar/
 ## Perguntas frequentes
 
 **Quanto custa um site ou uma loja virtual?**
-Loja virtual: R$ 1.500, R$ 2.200 ou R$ 3.500, conforme quem cadastra as peças e se entra o estúdio de fotos. O site institucional sai fechado na proposta, pelo número de páginas. Nos dois casos, pagamento único, sem mensalidade.
+Depende do que o negócio precisa: o formato da loja, quem cadastra o catálogo, o número de páginas do site. O valor sai fechado na proposta, por escrito, depois de uma conversa. Site e loja são pagamento único, sem mensalidade.
 
 **Quanto tempo leva?**
 De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo.
 
 **Por que não usar uma plataforma pronta?**
-Porque ela cobra todo mês — e, em vários planos, uma parte de cada venda. A loja própria é compra única: em cerca de dois anos sai mais barata, e depois disso não tem mensalidade nenhuma. E quando algo dá errado, lá você abre chamado; aqui você chama no WhatsApp e alguém resolve.
+Porque ela cobra todo mês — e, em vários planos, uma parte de cada venda. A loja própria é compra única: paga uma vez, e depois disso não tem mensalidade nenhuma. E quando algo dá errado, lá você abre chamado; aqui você chama no WhatsApp e alguém resolve.
 
 **Vocês entregam e vão embora?**
 Entregamos, e a loja ou o site passa a ser seu: pagamento único, sem mensalidade, com treinamento e manual. Se você quiser alguém cuidando depois — conteúdo, campanha, ajustes —, é um serviço à parte, com valor próprio, e só se fizer sentido para você.

@@ -104,6 +104,16 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(links.length === 0, `375px: links dos trabalhos com toque ≥ 44px ${links.join(' / ')}`);
   await ctx.close();
 }
+// decisão de 28/10: nenhum preço da Flow no site (o valor sai fechado na proposta)
+{
+  const { readdirSync, statSync } = await import('node:fs');
+  const raiz = new URL('../dist/', import.meta.url);
+  const arqs = [];
+  const andar = (u) => { for (const n of readdirSync(u)) { const f = new URL(n, u); if (statSync(f).isDirectory()) andar(new URL(n + '/', u)); else if (/\.(html|md)$/.test(n)) arqs.push(f); } };
+  andar(raiz);
+  const achados = arqs.filter((f) => /R\$ ?(1\.500|2\.200|3\.500)|a partir de R\$|sai mais barata/i.test(readFileSync(f, 'utf8'))).map((f) => f.pathname.split('/dist/')[1]);
+  ok(achados.length === 0, `nenhum preço da Flow no site (${arqs.length} páginas lidas${achados.length ? ': ' + achados.join(', ') : ''})`);
+}
 await b.close();
 console.log(R.join('\n'));
 console.log(`\nRESUMO: ${R.length - falhas} ok · ${falhas} falhas`);
