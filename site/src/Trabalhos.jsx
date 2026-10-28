@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react'
      Metalúrgica Aurora; FIT: profissional e alunos fictícios) — nada de
      dado de cliente real.
    Cliente só aparece com autorização (VOKE: case público; Bendita: pedido
-   do Victor em 22/10; Besten: pedido do Victor em 27/10). Maktub e A&O só
+   do Victor em 22/10; Besten: pedido do Victor em 27/10; Horaqui: produto nosso, 28/10). Maktub e A&O só
    depois do "pode" por escrito.
    Indicadores em primeiro (pedido do Victor, 27/10). Nomes de pessoas e de
    clientes que aparecem nas telas reais foram desfocados antes de salvar;
@@ -84,6 +84,20 @@ export const TRABALHOS = [
     desktop: 'fit-site-desktop',
     celulares: ['fit-painel', 'fit-financeiro', 'fit-treino', 'fit-dieta'],
     extra: { href: '/sistema-para-revender/app-para-personal-trainer/', rotulo: 'Quero um app assim no meu nome' },
+  },
+  {
+    id: 'horaqui',
+    nome: 'Horaqui',
+    tipo: 'App por assinatura',
+    nicho: 'Quem atende com hora marcada',
+    de: 'Produto nosso',
+    texto: 'Agenda online com link da bio: o cliente escolhe serviço, profissional e horário, paga na hora e recebe lembrete. Barbearia, salão, clínica, pet shop, pilates. As páginas de exemplo dá para testar agendando.',
+    url: 'https://www.horaqui.com.br',
+    dominio: 'horaqui.com.br',
+    desktop: 'horaqui-site',
+    desktops: ['horaqui-site', 'horaqui-recursos'],
+    celulares: ['horaqui-vila-navalha', 'horaqui-salao', 'horaqui-clinica'],
+    extra: { href: 'https://www.horaqui.com.br/demo', rotulo: 'Agendar na demonstração', externo: true },
   },
   {
     id: 'rh',
@@ -194,7 +208,9 @@ function Projeto({ t, idx }) {
         <p>{t.texto}</p>
         <div className="trabalho-links">
           <a className="btn btn-fino" href={t.url} target="_blank" rel="noopener">Abrir no ar ↗</a>
-          {t.extra && <a className="link-mostarda" href={t.extra.href}>{t.extra.rotulo} →</a>}
+          {t.extra && (t.extra.externo
+            ? <a className="link-mostarda" href={t.extra.href} target="_blank" rel="noopener">{t.extra.rotulo} ↗</a>
+            : <a className="link-mostarda" href={t.extra.href}>{t.extra.rotulo} →</a>)}
         </div>
       </div>
     </article>
