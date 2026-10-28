@@ -9,7 +9,11 @@ import { useEffect, useRef, useState } from 'react'
      Metalúrgica Aurora; FIT: profissional e alunos fictícios) — nada de
      dado de cliente real.
    Cliente só aparece com autorização (VOKE: case público; Bendita: pedido
-   do Victor em 22/10). Maktub e A&O só depois do "pode" por escrito.
+   do Victor em 22/10; Besten: pedido do Victor em 27/10). Maktub e A&O só
+   depois do "pode" por escrito.
+   Indicadores em primeiro (pedido do Victor, 27/10). Nomes de pessoas e de
+   clientes que aparecem nas telas reais foram desfocados antes de salvar;
+   RH e Task: empresa de demonstração / colaboradores desfocados.
    ================================================================ */
 
 const P = '/midia/portfolio/'
@@ -41,16 +45,30 @@ export const TRABALHOS = [
     celulares: ['bendita-celular'],
   },
   {
+    id: 'besten',
+    nome: 'Besten Consultoria',
+    tipo: 'Site + portal interno',
+    nicho: 'Consultoria de reestruturação',
+    de: 'Cliente',
+    texto: 'Site institucional e o portal dos consultores: KPIs de todos os projetos em tempo real, tarefas do dia, biblioteca e trilha de onboarding. Nomes de clientes e pessoas desfocados.',
+    url: 'https://besten-site.vercel.app',
+    dominio: 'portal dos consultores',
+    app: true,
+    desktop: 'besten-kpis',
+    desktops: ['besten-kpis', 'besten-biblioteca', 'besten-onboarding'],
+    celulares: ['besten-site-celular'],
+  },
+  {
     id: 'cmms',
     nome: 'Maintor CMMS',
     tipo: 'Sistema por assinatura',
     nicho: 'Indústria · manutenção',
     de: 'Produto nosso',
-    texto: 'Ordens de serviço, histórico de cada máquina, estoque de peças e um copiloto de manutenção com inteligência artificial. Telas da conta de demonstração.',
+    texto: 'Painel com OS abertas, horas de parada e criticidade; ordens de serviço, histórico de cada máquina, estoque de peças e um copiloto de manutenção com inteligência artificial. Telas da conta de demonstração.',
     url: 'https://maintor.com.br',
     dominio: 'maintor.com.br',
-    desktop: 'cmms-os',
-    desktops: ['cmms-os', 'cmms-ativo', 'cmms-copiloto', 'cmms-estoque'],
+    desktop: 'cmms-painel',
+    desktops: ['cmms-painel', 'cmms-os', 'cmms-copiloto', 'cmms-ativo', 'cmms-estoque'],
     celulares: ['cmms-site-celular'],
     app: true,
   },
@@ -64,8 +82,37 @@ export const TRABALHOS = [
     url: 'https://maintorfit.com',
     dominio: 'maintorfit.com',
     desktop: 'fit-site-desktop',
-    celulares: ['fit-painel', 'fit-treino', 'fit-dieta'],
+    celulares: ['fit-painel', 'fit-financeiro', 'fit-treino', 'fit-dieta'],
     extra: { href: '/sistema-para-revender/app-para-personal-trainer/', rotulo: 'Quero um app assim no meu nome' },
+  },
+  {
+    id: 'rh',
+    nome: 'Maintor RH',
+    tipo: 'Sistema por assinatura',
+    nicho: 'Gestão de pessoas',
+    de: 'Produto nosso',
+    texto: 'Relatórios de headcount, folha, recrutamento e demografia; documentos e conformidade, ponto, férias e trilhas. Telas da empresa de demonstração.',
+    url: 'https://maintor-rh.base44.app',
+    dominio: 'maintor rh',
+    app: true,
+    desktop: 'rh-relatorios',
+    desktops: ['rh-relatorios', 'rh-painel'],
+    celulares: [],
+    extra: { href: '/sistemas-sob-medida/#rh', rotulo: 'Como funciona' },
+  },
+  {
+    id: 'task',
+    nome: 'Maintor Task',
+    tipo: 'Sistema por assinatura',
+    nicho: 'Processos e qualidade',
+    de: 'Produto nosso',
+    texto: 'Indicadores de processo: planejado × executado, cumprimento no prazo, evidências, não conformidades por origem e causa raiz. Nomes de colaboradores desfocados.',
+    url: 'https://maintor-task.base44.app',
+    dominio: 'maintor task',
+    app: true,
+    desktop: 'task-indicadores',
+    desktops: ['task-indicadores', 'task-relatorios'],
+    celulares: [],
   },
 ]
 
@@ -121,19 +168,21 @@ function Projeto({ t, idx }) {
         <div className="tela-desktop">
           <div className="browser-bar">
             <span className="bolinha" /><span className="bolinha" /><span className="bolinha" />
-            <span className="url">{t.app ? 'app · ' + t.dominio : t.dominio}</span>
+            <span className="url">{t.app && t.dominio.includes('.') ? 'app · ' + t.dominio : t.dominio}</span>
           </div>
           <div className="tela-janela">
             <Telas nomes={desks} largura={720} altura={t.app ? 800 : 800} sizes="(max-width: 900px) 92vw, 760px"
               alt={`${t.nome} — ${t.app ? 'tela do sistema (conta de demonstração)' : 'página inicial no ar'}`} visivel={visivel} />
           </div>
         </div>
-        <div className="tela-celular">
-          <div className="tela-janela">
-            <Telas nomes={t.celulares} largura={390} altura={844} sizes="180px"
-              alt={`${t.nome} no celular`} visivel={visivel} />
+        {t.celulares.length > 0 && (
+          <div className="tela-celular">
+            <div className="tela-janela">
+              <Telas nomes={t.celulares} largura={390} altura={844} sizes="180px"
+                alt={`${t.nome} no celular`} visivel={visivel} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <div className="trabalho-texto">
         <div className="trabalho-tags">

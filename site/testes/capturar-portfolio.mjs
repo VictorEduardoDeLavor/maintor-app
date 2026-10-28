@@ -12,6 +12,7 @@ const SITES = [
   ['bendita', 'https://benditaacessorios.com'],
   ['cmms-site', 'https://maintor.com.br'],
   ['fit-site', 'https://maintorfit.com'],
+  ['besten-site', 'https://besten-site.vercel.app'],
 ];
 const b = await chromium.launch({ executablePath: 'C:/Users/victo/AppData/Local/ms-playwright/chromium-1234/chrome-win64/chrome.exe' });
 for (const [nome, url] of SITES.filter(([n]) => !SO || n === SO)) {

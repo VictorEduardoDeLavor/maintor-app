@@ -13,7 +13,7 @@ const humano = (ctx) => ctx.addInitScript(() => Object.defineProperty(Navigator.
 // HTML pré-renderizado: sem abertura nem fio, com os trabalhos
 const estatico = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
 ok(!estatico.includes('id="abertura"') && !/<svg[^>]*class="fio"/.test(estatico), 'prerender sem a abertura e sem o fio');
-ok((estatico.match(/class="trabalho( inverso)?"/g) || []).length === 4, 'prerender com os 4 trabalhos');
+ok((estatico.match(/class="trabalho( inverso)?"/g) || []).length === 7, 'prerender com os 7 trabalhos');
 ok(estatico.includes("classList.add('com-abertura')"), 'index.html tem a capa creme antes do primeiro quadro');
 
 // 1ª visita: a abertura roda e termina sozinha
@@ -71,10 +71,11 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   }));
   ok(d.icones === 0, 'sem ícones flutuantes, partículas nem números-fantasma');
   ok(d.fio, 'o fio está desenhado');
-  ok(d.trabalhos.length === 4 && d.trabalhos.every((t) => t.url && t.imgs >= 2), `4 trabalhos com link e prints (${d.trabalhos.map((t) => t.nome).join(', ')})`);
+  ok(d.trabalhos.length === 7 && d.trabalhos.every((t) => t.url && t.imgs >= 2), `7 trabalhos com link e prints (${d.trabalhos.map((t) => t.nome).join(', ')})`);
   ok(d.nav.includes('#trabalhos') && !d.nav.includes('#vitrine'), 'menu leva a "Trabalhos"');
+  ok(!/base44/i.test(await p.evaluate(() => document.querySelector('#trabalhos').innerText)), 'trabalhos: a plataforma não aparece em texto')
   ok(d.logo === '/midia/marca/maintor-lockup-claro.svg', 'cabeçalho com o lockup oficial');
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 7; i++) {
     const t = p.locator('#trabalhos .trabalho').nth(i);
     await t.scrollIntoViewIfNeeded(); await p.waitForTimeout(500);
     const w = await t.evaluate((el) => [...el.querySelectorAll('img.ativa, .tela-celular img:first-child, .tela-desktop img:first-child')].map((i) => { i.loading = 'eager'; return i.naturalWidth; }));
