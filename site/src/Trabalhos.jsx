@@ -20,19 +20,6 @@ const P = '/midia/portfolio/'
 
 export const TRABALHOS = [
   {
-    id: 'voke',
-    nome: 'VOKE WEAR',
-    tipo: 'Loja virtual',
-    nicho: 'Moda fitness feminina',
-    de: 'Cliente',
-    texto: 'Loja própria com Pix com desconto, cartão em 12x, frete pelo CEP, estoque por tamanho e fila de espera. A dona opera tudo por um painel dela.',
-    url: 'https://vokewear.com.br',
-    dominio: 'vokewear.com.br',
-    desktop: 'voke-desktop',
-    celulares: ['voke-celular'],
-    extra: { href: '/casos/voke-wear/', rotulo: 'Ver o case' },
-  },
-  {
     id: 'bendita',
     nome: 'Bendita Acessórios',
     tipo: 'Loja virtual',
@@ -82,6 +69,7 @@ export const TRABALHOS = [
     url: 'https://maintorfit.com',
     dominio: 'maintorfit.com',
     desktop: 'fit-site-desktop',
+    rolagem: 'fit-rolagem', // a landing inteira rolando na moldura (28/10)
     celulares: ['fit-painel', 'fit-financeiro', 'fit-treino', 'fit-dieta'],
     extra: { href: '/sistema-para-revender/app-para-personal-trainer/', rotulo: 'Quero um app assim no meu nome' },
   },
@@ -95,7 +83,7 @@ export const TRABALHOS = [
     url: 'https://www.horaqui.com.br',
     dominio: 'horaqui.com.br',
     desktop: 'horaqui-site',
-    desktops: ['horaqui-site', 'horaqui-recursos'],
+    rolagem: 'horaqui-rolagem',
     celulares: ['horaqui-vila-navalha', 'horaqui-salao', 'horaqui-clinica'],
     extra: { href: 'https://www.horaqui.com.br/demo', rotulo: 'Agendar na demonstração', externo: true },
   },
@@ -113,6 +101,19 @@ export const TRABALHOS = [
     desktops: ['rh-relatorios', 'rh-painel'],
     celulares: [],
     extra: { href: '/sistemas-sob-medida/#rh', rotulo: 'Como funciona' },
+  },
+  {
+    id: 'voke',
+    nome: 'VOKE WEAR',
+    tipo: 'Loja virtual',
+    nicho: 'Moda fitness feminina',
+    de: 'Cliente',
+    texto: 'Loja própria com Pix com desconto, cartão em 12x, frete pelo CEP, estoque por tamanho e fila de espera. A dona opera tudo por um painel dela.',
+    url: 'https://vokewear.com.br',
+    dominio: 'vokewear.com.br',
+    desktop: 'voke-desktop',
+    celulares: ['voke-celular'],
+    extra: { href: '/casos/voke-wear/', rotulo: 'Ver o case' },
   },
   {
     id: 'task',
@@ -172,6 +173,39 @@ function Telas({ nomes, largura, altura, sizes, alt, visivel }) {
   ))
 }
 
+/* A landing do projeto rolando sozinha dentro da moldura, como se alguém
+   estivesse navegando: desce devagar, segura no fim e volta ao topo.
+   Para quando o mouse está em cima (dá para ler) e quando sai da tela;
+   sem movimento para quem pede movimento reduzido (fica no topo). */
+function Rolagem({ nome, alt, visivel }) {
+  const janela = useRef(null)
+  const img = useRef(null)
+  useEffect(() => {
+    const j = janela.current, im = img.current
+    if (!j || !im) return
+    const medir = () => {
+      const d = Math.max(0, im.getBoundingClientRect().height - j.getBoundingClientRect().height)
+      j.style.setProperty('--desloc', `-${Math.round(d)}px`)
+      // ~110 px por segundo, nunca menos de 18 s
+      j.style.setProperty('--dur', `${Math.max(18, Math.round(d / 110))}s`)
+    }
+    if (im.complete) medir(); else im.addEventListener('load', medir, { once: true })
+    const ro = new ResizeObserver(medir); ro.observe(j)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div className={`tela-rolagem${visivel ? ' rodando' : ''}`} ref={janela}>
+      <img
+        ref={img}
+        src={`${P}${nome}-960.webp`}
+        srcSet={`${P}${nome}-640.webp 640w, ${P}${nome}-960.webp 960w`}
+        sizes="(max-width: 900px) 92vw, 760px"
+        width="960" height="5400" alt={alt} loading="lazy" decoding="async"
+      />
+    </div>
+  )
+}
+
 function Projeto({ t, idx }) {
   const ref = useRef(null)
   const visivel = useVisivel(ref)
@@ -185,8 +219,10 @@ function Projeto({ t, idx }) {
             <span className="url">{t.app && t.dominio.includes('.') ? 'app · ' + t.dominio : t.dominio}</span>
           </div>
           <div className="tela-janela">
-            <Telas nomes={desks} largura={720} altura={t.app ? 800 : 800} sizes="(max-width: 900px) 92vw, 760px"
-              alt={`${t.nome} — ${t.app ? 'tela do sistema (conta de demonstração)' : 'página inicial no ar'}`} visivel={visivel} />
+            {t.rolagem
+              ? <Rolagem nome={t.rolagem} alt={`${t.nome} — o site no ar, rolando`} visivel={visivel} />
+              : <Telas nomes={desks} largura={720} altura={t.app ? 800 : 800} sizes="(max-width: 900px) 92vw, 760px"
+                  alt={`${t.nome} — ${t.app ? 'tela do sistema (conta de demonstração)' : 'página inicial no ar'}`} visivel={visivel} />}
           </div>
         </div>
         {t.celulares.length > 0 && (

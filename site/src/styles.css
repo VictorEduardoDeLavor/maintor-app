@@ -1175,3 +1175,16 @@ main#conteudo > section, main#conteudo > .marquee { position: relative; z-index:
   .tela-desktop, .tela-celular, .tela-janela img { transition: none; }
   .trabalho:hover .tela-desktop, .trabalho:hover .tela-celular { transform: none; }
 }
+
+/* ---- a landing rolando dentro da moldura (FIT, Horaqui) ---- */
+.tela-rolagem { position: absolute; inset: 0; overflow: hidden; background: #0b0f14; }
+.tela-rolagem img { display: block; width: 100%; height: auto; opacity: 1; position: static; transform: translateY(0); will-change: transform; }
+.tela-rolagem.rodando img { animation: rolar-landing var(--dur, 40s) linear .6s infinite; }
+.tela-rolagem:hover img { animation-play-state: paused; }
+@keyframes rolar-landing {
+  0%, 6% { transform: translateY(0); }
+  88%, 94% { transform: translateY(var(--desloc, 0)); }
+  100% { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) { .tela-rolagem.rodando img { animation: none; } }
+
