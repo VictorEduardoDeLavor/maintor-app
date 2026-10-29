@@ -1188,3 +1188,10 @@ main#conteudo > section, main#conteudo > .marquee { position: relative; z-index:
 }
 @media (prefers-reduced-motion: reduce) { .tela-rolagem.rodando img { animation: none; } }
 
+
+/* 29/10: com o 6º problema (consultorias) a grade fecha 3×2; o "não está aqui?" vira faixa */
+.problemas-grade .problema-outro { grid-column: 1 / -1; }
+.problemas-grade .problema-outro .problema-corpo { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 32px; }
+.problemas-grade .problema-outro .problema-dor { flex: 1 1 260px; margin: 0; }
+.problemas-grade .problema-outro .problema-solucao { flex: 2 1 340px; margin: 0; }
+@media (max-width: 700px) { .problemas-grade .problema-outro .problema-corpo { flex-direction: column; align-items: flex-start; } }

@@ -104,6 +104,37 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(links.length === 0, `375px: links dos trabalhos com toque ≥ 44px ${links.join(' / ')}`);
   await ctx.close();
 }
+// 29/10: consultorias — página própria, cartão no "problema" e chip no hero
+{
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  const p = await ctx.newPage();
+  const r = await p.goto(BASE + '/para-consultorias/', { waitUntil: 'networkidle' });
+  const d = await p.evaluate(() => ({
+    h1: document.querySelector('h1')?.innerText.replace(/\s+/g, ' ').trim(),
+    canon: document.querySelector('link[rel=canonical]')?.href,
+    faqLd: (() => { for (const s of document.querySelectorAll('script[type="application/ld+json"]')) { const j = JSON.parse(s.textContent); if (j['@type'] === 'FAQPage') return j.mainEntity.length; } return -1; })(),
+    faq: document.querySelectorAll('.pg-faq details').length,
+    wa: decodeURIComponent((document.querySelector('a.btn[href^="https://wa.me/"]')?.href || '').split('text=')[1] || ''),
+    promessa: /não é promessa/i.test(document.body.innerText),
+    imgs: [...document.querySelectorAll('main img')].length,
+  }));
+  ok(r.status() === 200 && d.h1 === 'Sua consultoria vende tecnologia — e a gente constrói nos bastidores.', `/para-consultorias/ no ar com o h1 certo (${d.h1})`);
+  ok(d.canon === 'https://maintorflow.com.br/para-consultorias/' && d.faq === 5 && d.faqLd === 5, '/para-consultorias/: canonical e FAQ (5 visíveis = 5 no JSON-LD)');
+  ok(/consultoria/i.test(d.wa) && d.promessa, '/para-consultorias/: WhatsApp próprio e exemplo marcado "não é promessa"');
+  await p.goto(BASE + '/', { waitUntil: 'networkidle' });
+  const h = await p.evaluate(() => ({
+    card: !!document.querySelector('#problemas a.problema[href="/para-consultorias/"]'),
+    chips: [...document.querySelectorAll('#topo .hero-chip')].map((c) => c.innerText),
+    contato: !!document.querySelector('#contato a[href="/para-consultorias/"]'),
+  }));
+  ok(h.card && h.contato && h.chips.includes('Sou consultoria') && h.chips.length === 7, `home: cartão, chip "Sou consultoria" e serviço no contato (${h.chips.length} chips)`);
+  await p.locator('#topo .hero-chip', { hasText: 'Sou consultoria' }).click();
+  await p.waitForTimeout(300);
+  ok((await p.locator('#topo h1').innerText()).replace(/\s+/g, ' ').includes('sua consultoria') && (await p.locator('#topo .hero-links a[href="/para-consultorias/"]').count()) === 1, 'chip "Sou consultoria" reescreve a manchete e leva à página');
+  const sm = await (await fetch(BASE + '/sitemap.xml')).text();
+  ok(sm.includes('/para-consultorias/'), 'sitemap com /para-consultorias/');
+  await ctx.close();
+}
 // decisão de 28/10: nenhum preço da Flow no site (o valor sai fechado na proposta)
 {
   const { readdirSync, statSync } = await import('node:fs');

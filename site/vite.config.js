@@ -34,6 +34,7 @@ export default defineConfig({
         revenderPersonal: aqui + 'sistema-para-revender/app-para-personal-trainer/index.html',
         revenderSalao: aqui + 'sistema-para-revender/sistema-para-salao-de-beleza/index.html',
         guiaNicho: aqui + 'guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/index.html',
+        consultorias: aqui + 'para-consultorias/index.html',
         sites: aqui + 'sites/index.html',
         sistemas: aqui + 'sistemas-sob-medida/index.html',
         manutencao: aqui + 'manutencao-mensal/index.html',

@@ -79,6 +79,13 @@ const PROBLEMAS = [
     href: '/marketing-e-redes/', rotulo: 'Ver o marketing',
     foto: 'estudio-conteudo', alt: 'Estúdio de conteúdo com celular no tripé e luz de anel gravando tênis e roupas coloridas',
   },
+  {
+    area: 'Consultorias',
+    dor: 'Meu método vale muito, mas a receita acaba quando o projeto acaba.',
+    solucao: 'Um sistema no nome da sua consultoria: você implanta nos clientes e cobra implementação e mensalidade — a gente constrói nos bastidores.',
+    href: '/para-consultorias/', rotulo: 'Ver para consultorias',
+    foto: 'consultoria-portal', alt: 'Portal de uma consultoria parceira com os indicadores de todos os projetos dos clientes, nomes desfocados',
+  },
 ]
 
 /* Hero que se reescreve pelo problema do visitante (08/10): o chip troca a
@@ -90,6 +97,7 @@ const HERO_PROBLEMAS = [
   { chip: 'Manutenção no caderno', manchete: ['sua manutenção', 'no ar,', 'planejada.'], ...PROBLEMAS[2] },
   { chip: 'RH no papel', manchete: ['seu RH', 'no ar,', 'sem papel.'], ...PROBLEMAS[3] },
   { chip: 'Posto e ninguém chega', manchete: ['seu conteúdo', 'no ar,', 'convertendo.'], ...PROBLEMAS[4] },
+  { chip: 'Sou consultoria', manchete: ['sua consultoria', 'no ar,', 'faturando.'], ...PROBLEMAS[5] },
   {
     chip: 'Quero vender meu sistema', manchete: ['seu método', 'no ar,', 'rendendo.'],
     area: 'Sistema para revender',
@@ -118,6 +126,7 @@ const OBJETIVOS = [
   'Site',
   'Sistema sob medida (RH, manutenção…)',
   'Sistema para revender (app do meu nicho)',
+  'Sistema para a minha consultoria',
   'Automação de atendimento',
   'Vídeos personalizados',
   'Marketing e tráfego pago',
@@ -874,6 +883,7 @@ export default function App() {
                 <li><a href="/automacao-de-atendimento/"><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></a></li>
                 <li><a href="/sistemas-sob-medida/"><b>Sistemas sob medida</b><span>gestão de RH, de manutenção e o que o seu processo pedir</span></a></li>
                 <li><a href="/sistema-para-revender/"><b>Sistema para revender</b><span>o app do seu nicho, no seu nome; seus colegas pagam por mês</span></a></li>
+                <li><a href="/para-consultorias/"><b>Para consultorias</b><span>sistema no nome da consultoria: implementação e mensalidade dos seus clientes</span></a></li>
               </ul>
               {/* páginas por segmento: URL, título e texto próprios (SEO) */}
               <p className="servicos-nichos">

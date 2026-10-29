@@ -59,7 +59,7 @@ for (const [rota, h1] of NOVAS) {
 
 // página-mãe: hub por nicho + Maintor FIT na prova
 await p.goto(BASE + '/sistema-para-revender/', { waitUntil: 'networkidle' });
-ok((await p.locator('#por-nicho a').count()) === 3, '/sistema-para-revender/ tem a seção "Por nicho" com 3 links');
+ok((await p.locator('#por-nicho a').count()) === 4, '/sistema-para-revender/ tem a seção "Por nicho" com 3 nichos + o link para consultorias');
 ok((await p.locator('a[href="https://maintorfit.com"]').count()) >= 1, '/sistema-para-revender/ cita o Maintor FIT com link');
 ok((await p.locator('.pg-faq details').count()) === 5, '/sistema-para-revender/ FAQ intacto');
 
@@ -91,7 +91,7 @@ ok(L.h1 === 'Sua loja, seu site, seu sistema — no seu nome.', `/links/ h1 (${L
 ok(L.frentes.length === 9 && L.frentes.every((f) => !/R\$/.test(f)), `/links/ "O que a gente faz": 9 frentes, nenhum preço (${L.frentes.length})`);
 ok(['vokewear.com.br', 'benditaacessorios.com', 'maintor.com.br', 'maintorfit.com'].every((d) => L.provas.some((u) => u.includes(d))), '/links/ provas: VOKE, Bendita, CMMS e FIT');
 ok(L.nichos.length === 4, `/links/ provas separadas por nicho (${L.nichos.join(' | ')})`);
-ok(L.novo.length === 4, '/links/ bloco Novo com 4 caminhos');
+ok(L.novo.length === 5, '/links/ bloco Novo com 5 caminhos (inclui para consultorias)');
 ok(L.zap.includes('wa.me/5511946610634') && /blur/.test(L.vidro), `/links/ botão do WhatsApp em vidro (${L.vidro})`);
 ok(L.origem === 'instagram', '/links/ marca a origem instagram');
 for (const u of ['https://vokewear.com.br', 'https://benditaacessorios.com', 'https://maintor.com.br', 'https://maintorfit.com']) {

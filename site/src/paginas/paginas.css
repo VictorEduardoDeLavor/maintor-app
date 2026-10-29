@@ -182,3 +182,7 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-link { display: inline-flex; align-items: center; min-height: 44px; }
 /* os controles do vídeo recebem o foco no próprio <video>: o anel tem que aparecer nele */
 .pg-video video:focus, .pg-video video:focus-within { outline: 2px solid var(--mostarda); outline-offset: 3px; }
+
+/* print de sistema em largura total (para-consultorias): proporção da tela, sem corte */
+.pg-foto-larga.pg-foto-print { aspect-ratio: 16 / 10; background: #fff; }
+.pg-foto-larga.pg-foto-print img { object-position: left top; }
