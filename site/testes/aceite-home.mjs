@@ -156,6 +156,25 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(!r.canvas && r.fio, 'movimento reduzido: sem 3D, com o fio em SVG');
   await ctxR.close();
 }
+// 05/11: guia da exposição — aparece no passeio, anda de obra em obra, WhatsApp com a obra
+{
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  const p = await ctx.newPage();
+  await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(1200);
+  ok(!(await p.evaluate(() => document.querySelector('.guia')?.classList.contains('guia-on'))), 'guia escondido na entrada');
+  await p.evaluate(() => { const el = document.getElementById('obra-bendita'); window.scrollTo(0, window.scrollY + el.getBoundingClientRect().top + el.offsetHeight / 2 - innerHeight / 2); }); await p.waitForTimeout(900);
+  const g1 = await p.evaluate(() => ({ on: document.querySelector('.guia').classList.contains('guia-on'), titulo: document.querySelector('.guia-onde b').innerText, pontos: document.querySelectorAll('.guia-ponto').length, zap: decodeURIComponent(document.querySelector('.guia-quero').href) }));
+  ok(g1.on && g1.titulo === 'Bendita Acessórios' && g1.pontos === 20, `guia aparece no passeio e diz onde estou (${g1.titulo}, ${g1.pontos} pontos)`);
+  ok(/Bendita Acessórios/.test(g1.zap) && /exposição/.test(g1.zap), '"Quero algo assim" leva a obra na mensagem do WhatsApp');
+  await p.keyboard.press('ArrowRight'); await p.waitForTimeout(2600);
+  const t2 = await p.evaluate(() => document.querySelector('.guia-onde b').innerText);
+  ok(t2 === 'Besten Consultoria', `seta → anda para a próxima obra (${t2})`);
+  await p.locator('.guia-seta[aria-label="Próxima obra"]').click(); await p.waitForTimeout(2600);
+  ok((await p.evaluate(() => document.querySelector('.guia-onde b').innerText)) === 'Maintor CMMS', 'botão › anda para a próxima obra');
+  await p.evaluate(() => document.getElementById('contato').scrollIntoView()); await p.waitForTimeout(900);
+  ok(!(await p.evaluate(() => document.querySelector('.guia').classList.contains('guia-on'))), 'guia some no fim do passeio');
+  await ctx.close();
+}
 // decisão de 28/10: nenhum preço da Flow no site (o valor sai fechado na proposta)
 {
   const { readdirSync, statSync } = await import('node:fs');

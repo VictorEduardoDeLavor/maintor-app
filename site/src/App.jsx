@@ -12,6 +12,7 @@ import Fio from './Fio.jsx'
 // a exposição 3D (home como galeria) baixa depois do primeiro paint
 const Exposicao = lazy(() => import('./Exposicao.jsx'))
 import { ALAS } from './obras.js'
+import Guia from './Guia.jsx'
 
 /* A abertura 3D roda uma vez por sessão. Fica de fora para quem pede
    movimento reduzido, para robôs (navigator.webdriver: o prerender e os
@@ -774,6 +775,9 @@ export default function App() {
           </div>
         </section>
       </main>
+
+      {/* o guia da exposição: onde estou, próxima obra, "quero algo assim" */}
+      <Guia lenisRef={lenisRef} ativo={!abrindo} />
 
       <footer>
         <div className="wrap rodape-linhas">

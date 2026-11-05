@@ -1258,3 +1258,57 @@ html.sem-3d .obra-legenda img { display: block; width: 100%; height: auto; borde
   .cena-entrada .lado-dir { max-width: none; }
 }
 
+/* ---- guia da exposição (05/11): barra de passeio no rodapé ---- */
+.guia {
+  position: fixed; left: 50%; bottom: 18px; z-index: 40;
+  display: flex; align-items: center; gap: 12px;
+  width: min(760px, calc(100vw - 32px)); padding: 10px 10px 10px 12px; border-radius: 20px;
+  background: rgba(13, 38, 38, .72); border: 1px solid rgba(230, 221, 208, .2);
+  -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .45);
+  transform: translate(-50%, 140%); opacity: 0; pointer-events: none;
+  transition: transform .6s cubic-bezier(.2, .8, .2, 1), opacity .4s ease;
+}
+.guia.guia-on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.guia-seta {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  border: 1px solid rgba(230, 221, 208, .25); background: rgba(250, 247, 242, .04);
+  color: var(--creme); font-size: 22px; line-height: 1;
+  transition: border-color var(--t-rapido), background var(--t-rapido);
+}
+.guia-seta:hover:not(:disabled), .guia-seta:focus-visible { border-color: var(--mostarda); background: rgba(212, 165, 116, .12); }
+.guia-seta:disabled { opacity: .3; cursor: default; }
+.guia-meio { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.guia-onde { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.guia-onde .micro { flex: none; color: var(--mostarda); }
+.guia-onde b { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 600; color: var(--creme); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.guia-conta { flex: none; font-size: 11.5px; color: var(--cinza-claro); }
+.guia-mapa { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
+.guia-ala { display: inline-flex; align-items: center; gap: 4px; }
+.guia-ala i { display: inline-block; width: 14px; height: 1px; background: rgba(230, 221, 208, .25); margin: 0 4px; }
+.guia-ponto {
+  width: 8px; height: 8px; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 1px solid rgba(230, 221, 208, .45); background: transparent;
+  transition: transform .3s, background .3s, border-color .3s;
+  position: relative;
+}
+.guia-ponto::after { content: ""; position: absolute; inset: -10px -3px; } /* área de toque maior */
+.guia-ponto.visto { background: rgba(212, 165, 116, .55); border-color: transparent; }
+.guia-ponto.atual { background: var(--mostarda); border-color: var(--mostarda); transform: scale(1.6); box-shadow: 0 0 10px rgba(212, 165, 116, .8); }
+.guia-ponto:focus-visible { outline: 2px solid var(--mostarda); outline-offset: 3px; }
+.guia-quero {
+  flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px;
+  background: var(--mostarda); color: var(--profundo); font-weight: 700; font-size: 13.5px; text-decoration: none; white-space: nowrap;
+  transition: background var(--t-rapido), transform var(--t-rapido);
+}
+.guia-quero:hover { background: var(--caramelo); transform: translateY(-1px); }
+@media (max-width: 700px) {
+  .guia { bottom: 10px; gap: 8px; padding: 8px; width: calc(100vw - 20px); }
+  .guia-onde .micro, .guia-conta { display: none; }
+  .guia-mapa { display: none; }
+  .guia-onde b { font-size: 13px; }
+  .guia-quero { padding: 0 14px; font-size: 13px; }
+  .obra { padding-bottom: 86px; } /* a legenda não fica atrás do guia */
+}
+@media (prefers-reduced-motion: reduce) { .guia { transition: opacity .2s; } }
+
