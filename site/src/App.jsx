@@ -27,6 +27,8 @@ function deveAbrir() {
 gsap.registerPlugin(ScrollTrigger)
 
 const WHATS_NUM = 'https://wa.me/5511946610634'
+// token do site no CRM Maintor Leads (público por desenho: só cria/atualiza lead, com limite por IP)
+const CRM_TOKEN = '2l-UaqQnRhF-oi_S6oDqgVSZxFJKyj5kU78QpVGMbuw'
 // todo link do WhatsApp abre com a mensagem pronta: a conversa chega dizendo
 // que veio do site (e de onde, quando a visita trouxe utm_source — ver medicao.js)
 const WHATS = `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow.')}`
@@ -206,6 +208,7 @@ export default function App() {
   const [objetivo, setObjetivo] = useState(null)
   const [nome, setNome] = useState('')
   const [negocio, setNegocio] = useState('')
+  const [whats, setWhats] = useState('')
   const [somLigado, setSomLigado] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
   const botaoMenuRef = useRef(null)
@@ -404,6 +407,24 @@ export default function App() {
 
   const abrirWhats = (e) => {
     e.preventDefault()
+    // CRM comercial (Maintor Leads): registra o contato ANTES de abrir o WhatsApp, só quando a
+    // pessoa deixou um WhatsApp — sem telefone a função recusa, e o lead nasce pela conversa mesmo.
+    // O token é público por desenho (a função só cria/atualiza lead, com limite por IP e sem duplicar).
+    const digitos = whats.replace(/\D/g, '')
+    if (digitos.length >= 10) {
+      const utm = new URLSearchParams(location.search)
+      fetch('https://maintor-leads-30a0a804.base44.app/functions/captarLead', {
+        method: 'POST', keepalive: true,
+        headers: { 'Content-Type': 'application/json', 'x-site-token': CRM_TOKEN },
+        body: JSON.stringify({
+          frente: 'flow', nome: nome.trim(), telefone: digitos,
+          mensagem: [objetivo && `Objetivo: ${objetivo}`, negocio.trim() && `Negócio: ${negocio.trim()}`].filter(Boolean).join(' · '),
+          origem: 'site · formulário home',
+          utm_source: utm.get('utm_source') || sessionStorage.getItem('flow.origem') || '',
+          utm_medium: utm.get('utm_medium') || '', utm_campaign: utm.get('utm_campaign') || '',
+        }),
+      }).catch(() => {})
+    }
     const partes = ['Olá! Vim pelo site da Maintor Flow.']
     if (objetivo) partes.push(`Quero conversar sobre: ${objetivo}.`)
     if (nome.trim() && negocio.trim()) {
@@ -920,6 +941,16 @@ export default function App() {
                 onChange={(e) => setNome(e.target.value)}
                 autoComplete="name"
               />
+              <label className="micro" htmlFor="campo-whats">Seu WhatsApp (opcional)</label>
+              <input
+                id="campo-whats"
+                type="tel"
+                inputMode="tel"
+                placeholder="(11) 99999-9999 — para a gente te achar se a conversa não abrir"
+                value={whats}
+                onChange={(e) => setWhats(e.target.value)}
+                autoComplete="tel"
+              />
               <label className="micro" htmlFor="campo-negocio">Seu negócio (opcional)</label>
               <input
                 id="campo-negocio"
@@ -936,7 +967,8 @@ export default function App() {
               </div>
               <p className="form-obs">
                 Abre direto no WhatsApp (11) 94661-0634 — sem formulário perdido
-                em caixa de entrada.
+                em caixa de entrada. Se deixar o seu WhatsApp, guardamos o contato
+                para retornar caso a conversa não abra.
               </p>
             </form>
           </div>
