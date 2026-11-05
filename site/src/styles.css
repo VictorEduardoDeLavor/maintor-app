@@ -64,7 +64,7 @@ a { color: inherit; }
 #canvas-root {
   position: fixed;
   inset: 0;
-  z-index: 2;
+  z-index: 0; /* a exposição fica ATRÁS do texto (05/11); antes as partículas passavam na frente */
   pointer-events: none;
   animation: canvas-aparecer 1.4s ease-out both; /* sem "estalo" quando o chunk 3D chega */
 }
@@ -1195,3 +1195,13 @@ main#conteudo > section, main#conteudo > .marquee { position: relative; z-index:
 .problemas-grade .problema-outro .problema-dor { flex: 1 1 260px; margin: 0; }
 .problemas-grade .problema-outro .problema-solucao { flex: 2 1 340px; margin: 0; }
 @media (max-width: 700px) { .problemas-grade .problema-outro .problema-corpo { flex-direction: column; align-items: flex-start; } }
+
+/* ---- a exposição 3D atrás do conteúdo (05/11) ---- */
+#canvas-root canvas { display: block; width: 100%; height: 100%; }
+/* o texto precisa ler sobre a galeria: um véu suave atrás de cada coluna de conteúdo */
+main#conteudo > section.cena > .wrap { position: relative; }
+main#conteudo > section.cena > .wrap::before {
+  content: ""; position: absolute; inset: -32px -40px; z-index: -1; border-radius: 28px; pointer-events: none;
+  background: radial-gradient(ellipse at 40% 40%, rgba(13, 38, 38, .72), rgba(13, 38, 38, .35) 55%, rgba(13, 38, 38, 0) 80%);
+}
+#topo .manchete, #contato .manchete { text-shadow: 0 2px 24px rgba(13, 38, 38, .8); }

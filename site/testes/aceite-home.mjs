@@ -61,7 +61,7 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   const p = await ctx.newPage();
   await p.goto(BASE + '/', { waitUntil: 'networkidle' });
   const d = await p.evaluate(() => ({
-    icones: document.querySelectorAll('.icone-flutuante, .icone-vitrine, #canvas-root, .num-fantasma').length,
+    icones: document.querySelectorAll('.icone-flutuante, .icone-vitrine, .num-fantasma').length, // #canvas-root agora é a exposição 3D (05/11)
     fio: !!document.querySelector('svg.fio .fio-linha[d]'),
     trabalhos: [...document.querySelectorAll('#trabalhos .trabalho')].map((t) => ({
       nome: t.querySelector('h3')?.innerText, url: t.querySelector('a.btn')?.href, imgs: t.querySelectorAll('img').length,
@@ -69,8 +69,8 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
     nav: [...document.querySelectorAll('header .navlinks a')].map((a) => a.getAttribute('href')),
     logo: document.querySelector('header .marca-lockup img')?.getAttribute('src'),
   }));
-  ok(d.icones === 0, 'sem ícones flutuantes, partículas nem números-fantasma');
-  ok(d.fio, 'o fio está desenhado');
+  ok(d.icones === 0, 'sem ícones flutuantes nem números-fantasma');
+  ok(d.fio || !!(await p.evaluate(() => document.querySelector('#canvas-root canvas'))), 'o fio está desenhado (ou a exposição 3D está montada)');
   ok(d.trabalhos.length === 8 && d.trabalhos.every((t) => t.url && t.imgs >= 2), `8 trabalhos com link e prints (${d.trabalhos.map((t) => t.nome).join(', ')})`);
   ok(d.nav.includes('#trabalhos') && !d.nav.includes('#vitrine'), 'menu leva a "Trabalhos"');
   ok(!/base44/i.test(await p.evaluate(() => document.querySelector('#trabalhos').innerText)), 'trabalhos: a plataforma não aparece em texto')
@@ -87,11 +87,15 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
     const s = await fetch(u, { redirect: 'follow' }).then((r) => r.status).catch(() => 0);
     ok(s === 200, `no ar: ${u} (${s})`);
   }
-  // o fio acompanha a rolagem
-  const o1 = await p.evaluate(() => parseFloat(document.querySelector('.fio-linha').style.strokeDashoffset));
-  await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await p.waitForTimeout(600);
-  const o2 = await p.evaluate(() => parseFloat(document.querySelector('.fio-linha').style.strokeDashoffset));
-  ok(o2 < o1, `o fio se desenha com a rolagem (${Math.round(o1)} → ${Math.round(o2)})`);
+  // o fio acompanha a rolagem (só no fallback em SVG; com WebGL quem anda é a câmera 3D)
+  if (await p.locator('svg.fio .fio-linha').count()) {
+    const o1 = await p.evaluate(() => parseFloat(document.querySelector('.fio-linha').style.strokeDashoffset));
+    await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await p.waitForTimeout(600);
+    const o2 = await p.evaluate(() => parseFloat(document.querySelector('.fio-linha').style.strokeDashoffset));
+    ok(o2 < o1, `o fio se desenha com a rolagem (${Math.round(o1)} → ${Math.round(o2)})`);
+  } else {
+    ok(await p.evaluate(() => !!document.querySelector('#canvas-root canvas')), 'com WebGL, a exposição 3D substitui o fio');
+  }
   await ctx.close();
 }
 // celular
@@ -134,6 +138,23 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   const sm = await (await fetch(BASE + '/sitemap.xml')).text();
   ok(sm.includes('/para-consultorias/'), 'sitemap com /para-consultorias/');
   await ctx.close();
+}
+// 05/11: a exposição 3D — canvas atrás do conteúdo com WebGL; fio em SVG sem WebGL/movimento reduzido
+{
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  const p = await ctx.newPage(); const erros = []; p.on('pageerror', (e) => erros.push(e.message));
+  await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(2500);
+  const e = await p.evaluate(() => ({ canvas: !!document.querySelector('#canvas-root canvas'), fio: !!document.querySelector('svg.fio'), z: getComputedStyle(document.querySelector('#canvas-root')).zIndex, dica: document.querySelector('#topo .dica-scroll')?.innerText }));
+  ok(e.canvas && !e.fio && e.z === '0', `exposição 3D montada atrás do conteúdo (canvas=${e.canvas}, fio=${e.fio}, z=${e.z})`);
+  ok(/exposição/i.test(e.dica || ''), 'hero convida a caminhar pela exposição');
+  await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)); await p.waitForTimeout(1500);
+  ok(erros.length === 0, `exposição sem erro de JavaScript ao rolar (${erros.join(' | ')})`);
+  await ctx.close();
+  const ctxR = await b.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const pr = await ctxR.newPage(); await pr.goto(BASE + '/', { waitUntil: 'networkidle' }); await pr.waitForTimeout(800);
+  const r = await pr.evaluate(() => ({ canvas: !!document.querySelector('#canvas-root canvas'), fio: !!document.querySelector('svg.fio') }));
+  ok(!r.canvas && r.fio, 'movimento reduzido: sem 3D, com o fio em SVG');
+  await ctxR.close();
 }
 // decisão de 28/10: nenhum preço da Flow no site (o valor sai fechado na proposta)
 {

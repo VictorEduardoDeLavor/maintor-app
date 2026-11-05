@@ -10,6 +10,8 @@ import { depoimentos, telas } from './dados.js'
 const Abertura = lazy(() => import('./Abertura.jsx'))
 const ABERTURA_CHAVE = 'flow.abertura' // o mesmo nome no index.html e no Abertura.jsx
 import Fio from './Fio.jsx'
+// a exposição 3D (home como galeria) baixa depois do primeiro paint
+const Exposicao = lazy(() => import('./Exposicao.jsx'))
 import Trabalhos from './Trabalhos.jsx'
 
 /* A abertura 3D roda uma vez por sessão. Fica de fora para quem pede
@@ -198,6 +200,8 @@ export default function App() {
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
   const [abrindo, setAbrindo] = useState(deveAbrir)
+  // a galeria 3D: só com WebGL e sem pedido de movimento reduzido; senão fica o fio em SVG
+  const [expor] = useState(() => { try { const c = document.createElement('canvas'); return !reduzido && !!(c.getContext('webgl2') || c.getContext('webgl')) } catch { return false } })
   const fimAbertura = useCallback(() => {
     setAbrindo(false)
     document.documentElement.classList.remove('com-abertura')
@@ -526,7 +530,7 @@ export default function App() {
       </div>
 
       <main id="conteudo">
-        <Fio reduzido={reduzido} />
+        {expor ? <Suspense fallback={null}><Exposicao /></Suspense> : <Fio reduzido={reduzido} />}
         {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
             navega por teclado, era um link invisível roubando o foco */}
         <p className="sr-only">
@@ -565,7 +569,7 @@ export default function App() {
             <div className="hero-base">
               {/* sem data-reveal: fica abaixo do gatilho de 85% e só apareceria depois de rolar */}
               <a className="dica-scroll" href="#trabalhos">
-                Trabalhos no ar ↓
+                {expor ? 'Role para caminhar pela exposição ↓' : 'Trabalhos no ar ↓'}
               </a>
               <div className="lado-dir" data-reveal aria-live="polite">
                 {atual ? (
