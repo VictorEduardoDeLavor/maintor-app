@@ -68,10 +68,10 @@ await p.goto(BASE + '/sistemas-sob-medida/', { waitUntil: 'networkidle' });
 ok((await p.locator('a[href="https://maintorfit.com"]').count()) === 1, '/sistemas-sob-medida/ tem o Maintor FIT');
 ok((await p.locator('a[href="/automacao-de-atendimento/"]').count()) >= 1, '/sistemas-sob-medida/ ainda leva à automação');
 
-// home: bloco do sistema para revender com os 4 caminhos
+// home: a obra do sistema para revender leva à página e ao guia
 await p.goto(BASE + '/', { waitUntil: 'networkidle' });
-const hl = await p.evaluate(() => [...document.querySelectorAll('.sistema-revenda-links a')].map((a) => a.getAttribute('href')));
-ok(hl.length === 4 && hl.includes('/sistema-para-revender/app-para-personal-trainer/') && hl.includes('/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/'), `home: bloco do sistema para revender com 4 links (${hl.length})`);
+const hl = await p.evaluate(() => [...document.querySelectorAll('#obra-s-revender a')].map((a) => a.getAttribute('href')));
+ok(hl.includes('/sistema-para-revender/') && hl.includes('/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/'), `home: obra do sistema para revender com os links (${hl.join(', ')})`);
 
 // /links/ v3
 await p.goto(BASE + '/links/', { waitUntil: 'networkidle' });

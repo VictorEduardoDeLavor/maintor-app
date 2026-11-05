@@ -7,12 +7,11 @@ import { CarrosselDepoimentos, CarrosselTelas } from './Carrosseis.jsx'
 import { depoimentos, telas } from './dados.js'
 
 // three.js só baixa quando a abertura vai rodar — não pesa a home de quem já viu
-const Abertura = lazy(() => import('./Abertura.jsx'))
-const ABERTURA_CHAVE = 'flow.abertura' // o mesmo nome no index.html e no Abertura.jsx
+const ABERTURA_CHAVE = 'flow.abertura' // o mesmo nome no index.html
 import Fio from './Fio.jsx'
 // a exposição 3D (home como galeria) baixa depois do primeiro paint
 const Exposicao = lazy(() => import('./Exposicao.jsx'))
-import Trabalhos from './Trabalhos.jsx'
+import { ALAS } from './obras.js'
 
 /* A abertura 3D roda uma vez por sessão. Fica de fora para quem pede
    movimento reduzido, para robôs (navigator.webdriver: o prerender e os
@@ -110,7 +109,6 @@ const HERO_PROBLEMAS = [
     href: '/sistema-para-revender/', rotulo: 'Ver o sistema para revender',
   },
 ]
-const MANCHETE_PADRAO = ['seu negócio', 'no ar,', 'fluindo.']
 const whatsProblema = (dor) =>
   `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow. Meu problema: ' + dor.charAt(0).toLowerCase() + dor.slice(1))}`
 
@@ -193,7 +191,6 @@ function Marquee() {
 export default function App() {
   const [escolha, setEscolha] = useState(null)
   const atual = escolha == null ? null : HERO_PROBLEMAS[escolha]
-  const manchete = atual ? atual.manchete : MANCHETE_PADRAO
   const progressoRef = useRef(0)
   const velocidadeRef = useRef(0)
   const [reduzido] = useState(
@@ -202,13 +199,19 @@ export default function App() {
   const [abrindo, setAbrindo] = useState(deveAbrir)
   // a galeria 3D: só com WebGL e sem pedido de movimento reduzido; senão fica o fio em SVG
   const [expor] = useState(() => { try { const c = document.createElement('canvas'); return !reduzido && !!(c.getContext('webgl2') || c.getContext('webgl')) } catch { return false } })
+  // sem 3D, as legendas das obras mostram a própria imagem
+  useEffect(() => { document.documentElement.classList.toggle('sem-3d', !expor) }, [expor])
+  const pularRef = useRef(null)
   const fimAbertura = useCallback(() => {
+    try { sessionStorage.setItem(ABERTURA_CHAVE, '1') } catch {}
     setAbrindo(false)
     document.documentElement.classList.remove('com-abertura')
     window.scrollTo(0, 0)
     lenisRef.current?.start()
     ScrollTrigger.refresh()
   }, [])
+  // sem WebGL não há onde rodar a abertura: libera a página na hora
+  useEffect(() => { if (abrindo && !expor) fimAbertura() }, [abrindo, expor, fimAbertura])
   const [objetivo, setObjetivo] = useState(null)
   const [nome, setNome] = useState('')
   const [negocio, setNegocio] = useState('')
@@ -446,7 +449,11 @@ export default function App() {
 
   return (
     <>
-      {abrindo && <Suspense fallback={null}><Abertura aoTerminar={fimAbertura} /></Suspense>}
+      {abrindo && expor && (
+        <button type="button" className="pular-abertura" onClick={() => (pularRef.current ? pularRef.current() : fimAbertura())}>
+          <span aria-hidden="true">ılı</span> Pular abertura
+        </button>
+      )}
 
       <div id="cursor" aria-hidden="true" />
       <div id="grao" aria-hidden="true" />
@@ -530,7 +537,9 @@ export default function App() {
       </div>
 
       <main id="conteudo">
-        {expor ? <Suspense fallback={null}><Exposicao /></Suspense> : <Fio reduzido={reduzido} />}
+        {expor
+          ? <Suspense fallback={null}><Exposicao intro={abrindo} aoFimIntro={fimAbertura} pularRef={pularRef} /></Suspense>
+          : <Fio reduzido={reduzido} />}
         {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
             navega por teclado, era um link invisível roubando o foco */}
         <p className="sr-only">
@@ -539,284 +548,71 @@ export default function App() {
           <a href="/index.md" tabIndex={-1}>maintorflow.com.br/index.md</a>.
         </p>
 
-        {/* ============ CENA 1 · HERO — manchete full-bleed ============ */}
-        <section className="cena" id="topo">
+        {/* ============ A ENTRADA — o pórtico em 3D é a fachada; aqui só a pergunta ============ */}
+        <section className="cena cena-entrada" id="topo">
           <div className="wrap">
-            <div className="micro" data-reveal style={{ color: 'var(--mostarda)', marginBottom: 'var(--s3)' }}>
-              Sites, sistemas e marketing sob medida — São Paulo
-            </div>
-            <h1 className="manchete serif" data-palavras>
-              <span className="linha"><Palavras texto={manchete[0]} /></span>
-              <span className="linha recuo"><Palavras texto={manchete[1]} /></span>
-              <span className="linha direita"><Palavras texto={manchete[2]} destaque={manchete[2].split(' ').map((_, i) => i)} /></span>
-            </h1>
-            {/* a pergunta que a home inteira responde, já na primeira tela:
-                o chip reescreve a manchete e deixa o WhatsApp com o problema pronto */}
-            <div className="hero-escolha" role="group" aria-label="Qual é o seu problema?">
-              <div className="micro">Qual é o seu problema?</div>
-              <div className="hero-chips">
-                {HERO_PROBLEMAS.map((p, i) => (
-                  <button
-                    type="button" className="hero-chip" key={p.href}
-                    aria-pressed={escolha === i}
-                    onClick={() => setEscolha(escolha === i ? null : i)}
-                  >
-                    {p.chip}
-                  </button>
-                ))}
+            <h1 className="micro entrada-titulo">Sites, sistemas e marketing sob medida — São Paulo</h1>
+            <div className="entrada-base">
+              <div className="hero-escolha" role="group" aria-label="Qual é o seu problema?">
+                <div className="micro">Qual é o seu problema?</div>
+                <div className="hero-chips">
+                  {HERO_PROBLEMAS.map((p, i) => (
+                    <button type="button" className="hero-chip" key={p.href} aria-pressed={escolha === i} onClick={() => setEscolha(escolha === i ? null : i)}>
+                      {p.chip}
+                    </button>
+                  ))}
+                </div>
+                <div className="lado-dir" aria-live="polite">
+                  {atual && (
+                    <>
+                      <p className="hero-dor serif">“{atual.dor}”</p>
+                      <p className="corpo-apoio">{atual.solucao}</p>
+                      <div className="hero-links">
+                        <a className="btn" href={whatsProblema(atual.dor)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Contar esse problema no WhatsApp</a>
+                        <a className="link-mostarda" href={atual.href}>{atual.rotulo} →</a>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="hero-base">
-              {/* sem data-reveal: fica abaixo do gatilho de 85% e só apareceria depois de rolar */}
-              <a className="dica-scroll" href="#trabalhos">
-                {expor ? 'Role para caminhar pela exposição ↓' : 'Trabalhos no ar ↓'}
-              </a>
-              <div className="lado-dir" data-reveal aria-live="polite">
-                {atual ? (
-                  <>
-                    <p className="hero-dor serif">“{atual.dor}”</p>
-                    <p className="corpo-apoio">{atual.solucao}</p>
-                    <div className="hero-links">
-                      <a className="btn" href={whatsProblema(atual.dor)} target="_blank" rel="noopener" onMouseEnter={blipHover}>
-                        Contar esse problema no WhatsApp
-                      </a>
-                      <a className="link-mostarda" href={atual.href}>{atual.rotulo} →</a>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="corpo-apoio">
-                      A gente começa pelo problema do seu negócio e constrói a
-                      solução: loja virtual sem mensalidade, sistema de RH ou
-                      de manutenção, automação, vídeo e anúncio — do seu jeito.
-                    </p>
-                    <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
-                      Contar meu problema no WhatsApp
-                    </a>
-                  </>
-                )}
-              </div>
+              <a className="dica-scroll" href="#trabalhos">{expor ? 'Role para caminhar pela exposição ↓' : 'Trabalhos no ar ↓'}</a>
             </div>
           </div>
         </section>
 
         <Marquee />
 
-        {/* ============ TRABALHOS NO AR — o site é o portfólio ============ */}
-        <section className="cena" id="trabalhos">
-          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="Trabalhos no ar" direita="Abra, clique, compre — é tudo real" />
-            <h2 className="titulo-cena serif" data-palavras>
-              <Palavras texto="Não precisa acreditar. Dá para abrir." destaque={[3, 4, 5]} />
-            </h2>
-            <p className="corpo-apoio" data-reveal>
-              Lojas de clientes vendendo de verdade e sistemas nossos rodando
-              por assinatura. Os prints são de hoje; o botão leva ao que está
-              no ar.
-            </p>
-            <Trabalhos />
-          </div>
-        </section>
-
-        {/* ============ PONTO DE PARTIDA · O PROBLEMA DE QUEM VISITA ============ */}
-        <section className="cena" id="problemas">
-          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="O ponto de partida" direita="Qual destas é a sua?" />
-            <h2 className="titulo-cena serif" data-palavras>
-              <Palavras texto="Tudo começa pelo problema do seu negócio." destaque={[3]} />
-            </h2>
-            <p className="corpo-apoio" data-reveal>
-              Não tem pacote pronto aqui. A gente escuta onde o seu dia trava e
-              constrói a solução que resolve aquilo — do tamanho do seu negócio,
-              no seu nome.
-            </p>
-            <div className="problemas-grade">
-              {PROBLEMAS.map((p) => (
-                <a className="problema" href={p.href} key={p.foto} data-reveal>
-                  <figure className="problema-foto">
-                    <img
-                      src={`/midia/fotos/${p.foto}-640.webp`}
-                      srcSet={`/midia/fotos/${p.foto}-640.webp 640w, /midia/fotos/${p.foto}-960.webp 960w`}
-                      sizes="(max-width: 700px) 92vw, (max-width: 1100px) 46vw, 380px"
-                      alt={p.alt}
-                      width="640" height="482" loading="lazy" decoding="async"
-                    />
-                  </figure>
-                  <div className="problema-corpo">
-                    <span className="micro">{p.area}</span>
-                    <p className="problema-dor serif">“{p.dor}”</p>
-                    <p className="problema-solucao"><b>A gente constrói:</b> {p.solucao}</p>
-                    <span className="problema-link">{p.rotulo} →</span>
+        {/* ============ AS ALAS — cada obra se solta da parede quando a legenda dela está na tela ============ */}
+        {ALAS.map((ala) => (
+          <section className="cena cena-ala" id={ala.id} key={ala.id}>
+            <div className="wrap ala-cabeca">
+              <Regua esquerda={ala.eyebrow} direita={`${ala.obras.length} obras`} />
+              <h2 className="titulo-cena serif" data-palavras><Palavras texto={ala.titulo} /></h2>
+              <p className="corpo-apoio" data-reveal>{ala.lead}</p>
+            </div>
+            {ala.obras.map((o, i) => (
+              <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} key={o.id} data-img={o.img} data-w={o.w} data-lado={i % 2 ? 1 : -1}>
+                <div className="wrap">
+                  <div className="obra-legenda">
+                    <img src={o.img} alt="" width="720" height="450" loading="lazy" decoding="async" />
+                    <span className="micro">{o.tag}</span>
+                    <h3 className="serif">{o.titulo}</h3>
+                    {o.nicho && <p className="obra-nicho">{o.nicho}</p>}
+                    <p>{o.texto}</p>
+                    <div className="obra-links">
+                      {o.externo
+                        ? <a className="btn btn-fino" href={o.href} target="_blank" rel="noopener">{o.rotulo} ↗</a>
+                        : <a className="btn btn-fino" href={o.href}>{o.rotulo} →</a>}
+                      {o.extra && (o.extra.externo
+                        ? <a className="link-mostarda" href={o.extra.href} target="_blank" rel="noopener">{o.extra.rotulo} ↗</a>
+                        : <a className="link-mostarda" href={o.extra.href}>{o.extra.rotulo} →</a>)}
+                    </div>
                   </div>
-                </a>
-              ))}
-              <div className="problema problema-outro" data-reveal>
-                <div className="problema-corpo">
-                  <span className="micro">Totalmente sob medida</span>
-                  <p className="problema-dor serif">O seu problema não está aqui?</p>
-                  <p className="problema-solucao">
-                    É o que a gente mais gosta de construir. Conta em três linhas
-                    onde o seu dia trava. Se uma ferramenta pronta resolver, eu
-                    digo — e você economiza.
-                  </p>
-                  <a className="btn" href={WHATS} target="_blank" rel="noopener" onMouseEnter={blipHover}>
-                    Contar meu problema
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============ CENA 3 · SISTEMAS SOB MEDIDA ============ */}
-        <section className="cena" id="sistemas">
-          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="02 · Sistemas sob medida" direita="Feitos por nós, rodando hoje" />
-            <h2 className="titulo-cena serif" data-palavras>
-              <Palavras texto="Quando o pronto não serve, a gente constrói." destaque={[5, 6]} />
-            </h2>
-            <p className="corpo-apoio" data-reveal>
-              Software pronto obriga você a trabalhar do jeito dele. Sistema sob
-              medida trabalha do seu. Não é promessa: estes nasceram assim, de
-              uma dor real de operação, e estão rodando.
-            </p>
-
-            <div className="sistemas-destaque">
-              <article className="sistema" id="sistema-manutencao" data-reveal>
-                <figure className="sistema-foto">
-                  <img
-                    src="/midia/fotos/manutencao-oficina-640.webp"
-                    srcSet="/midia/fotos/manutencao-oficina-640.webp 640w, /midia/fotos/manutencao-oficina-960.webp 960w"
-                    sizes="(max-width: 900px) 92vw, 560px"
-                    alt="Bancada de oficina industrial com caderno de manutenção aberto, prancheta e caixa de ferramentas"
-                    width="640" height="482" loading="lazy" decoding="async"
-                  />
-                </figure>
-                <div className="micro">Gestão de manutenção</div>
-                <h3 className="serif">Maintor CMMS</h3>
-                <p>
-                  Ordens de serviço com triagem por criticidade, árvore de
-                  máquinas, planos preventivos que geram a OS sozinhos, baixa da
-                  peça no estoque e histórico de cada equipamento — com análise de
-                  causa por inteligência artificial.
-                </p>
-                <div className="sistema-links">
-                  <a className="link-mostarda" href="/sistemas-sob-medida/#manutencao">Como funciona →</a>
-                  <a className="link-mostarda" href="https://maintor.com.br" target="_blank" rel="noopener">Acessar o Maintor CMMS ↗</a>
                 </div>
               </article>
-              <article className="sistema" id="sistema-rh" data-reveal>
-                <figure className="sistema-foto">
-                  <img
-                    src="/midia/fotos/rh-papelada-640.webp"
-                    srcSet="/midia/fotos/rh-papelada-640.webp 640w, /midia/fotos/rh-papelada-960.webp 960w"
-                    sizes="(max-width: 900px) 92vw, 560px"
-                    alt="Mesa de escritório com pilhas de pastas, relógio de ponto antigo, crachás e calendário"
-                    width="640" height="482" loading="lazy" decoding="async"
-                  />
-                </figure>
-                <div className="micro">Gestão de pessoas</div>
-                <h3 className="serif">Maintor RH</h3>
-                <p>
-                  Colaboradores e departamentos, ponto, férias, folha com
-                  holerite, recrutamento com página pública de vagas e
-                  comunicados para a equipe pelo WhatsApp — o RH saindo do papel.
-                </p>
-                <div className="sistema-links">
-                  <a className="link-mostarda" href="/sistemas-sob-medida/#rh">Como funciona →</a>
-                  <a className="link-mostarda" href="https://maintor-rh.base44.app" target="_blank" rel="noopener">Acessar o Maintor RH ↗</a>
-                </div>
-              </article>
-            </div>
-
-            <div style={{ marginTop: 'var(--s5)' }} data-reveal>
-              <div className="regua" style={{ marginBottom: 'var(--s4)' }}>
-                <span className="micro">Da mesma bancada</span>
-                <span className="micro">Outros sistemas que a gente mantém</span>
-              </div>
-              <div className="bancada-grade">
-                <div className="bancada-item">
-                  <h3 className="serif">Task</h3>
-                  <div className="micro">Operação e qualidade</div>
-                  <p>POPs, checklists e tarefas por setor e responsável, com não conformidade e plano de ação no padrão ISO 9001.</p>
-                  <div className="sistema-links"><a className="link-mostarda" href="https://maintor-task.base44.app" target="_blank" rel="noopener">Acessar o Task ↗</a></div>
-                </div>
-                <div className="bancada-item">
-                  <h3 className="serif">GateKeeper</h3>
-                  <div className="micro">Portaria digital</div>
-                  <p>Visitante, prestador e fornecedor do agendamento à saída, com operação de doca e pontualidade de fornecedor medida.</p>
-                </div>
-                <div className="bancada-item">
-                  <h3 className="serif">SorrIA</h3>
-                  <div className="micro">Clínicas odontológicas</div>
-                  <p>Simulação estética de sorriso com inteligência artificial: o paciente vê o resultado provável antes de fechar o tratamento.</p>
-                </div>
-              </div>
-              <p className="corpo-apoio" style={{ marginTop: 'var(--s3)' }}>
-                O próximo pode ser o do seu negócio.{' '}
-                <a className="link-mostarda" href="/sistemas-sob-medida/">Ver sistemas sob medida →</a>
-              </p>
-              <aside className="sistema-revenda" data-reveal>
-                <div className="micro">E se o sistema for o seu produto?</div>
-                <h3 className="serif">O que você sabe fazer vira um sistema — <em>e os seus colegas pagam para usar.</em></h3>
-                <p>O personal com o app de treino, a cabeleireira com a agenda do salão: a gente constrói o sistema do seu nicho, no seu nome. Você usa no seu negócio e vende para quem faz o mesmo que você — a mensalidade é sua.</p>
-                <p className="sistema-revenda-links">
-                  <a className="link-mostarda" href="/sistema-para-revender/">Ver como funciona →</a>
-                  <a className="link-mostarda" href="/sistema-para-revender/app-para-personal-trainer/">App para personal →</a>
-                  <a className="link-mostarda" href="/sistema-para-revender/sistema-para-salao-de-beleza/">Sistema para salão →</a>
-                  <a className="link-mostarda" href="/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/">Guia: a conta real →</a>
-                </p>
-              </aside>
-            </div>
-
-            {telas.length > 0 && (
-              <div style={{ marginTop: 'var(--s6)' }} data-reveal>
-                <div className="regua" style={{ marginBottom: 'var(--s4)' }}>
-                  <span className="micro">Por dentro</span>
-                  <span className="micro">Telas dos sistemas · use ← → para navegar</span>
-                </div>
-                <CarrosselTelas itens={telas} />
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* ============ CENA 4 · MARKETING ============ */}
-        <section className="cena" id="marketing">
-          <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="03 · Marketing que traz cliente" direita="Conteúdo · vídeo · anúncio" />
-            <div className="cena-grid">
-              <div>
-                <h2 className="titulo-cena serif" data-palavras>
-                  <Palavras texto="Ser encontrado dá trabalho. A gente faz." destaque={[4, 5]} />
-                </h2>
-                <p className="corpo-apoio" data-reveal>
-                  Site pronto não chama cliente sozinho. Conteúdo no padrão da sua
-                  marca, vídeo que mostra o seu produto de verdade e anúncio que
-                  leva para uma página feita para virar conversa.
-                </p>
-                <figure className="painel-foto" style={{ marginTop: 'var(--s4)' }} data-reveal>
-                  <img
-                    src="/midia/fotos/estudio-conteudo-640.webp"
-                    srcSet="/midia/fotos/estudio-conteudo-640.webp 640w, /midia/fotos/estudio-conteudo-960.webp 960w"
-                    sizes="(max-width: 900px) 92vw, 600px"
-                    alt="Estúdio de conteúdo com celular no tripé e luz de anel gravando tênis e roupas coloridas"
-                    width="640" height="482" loading="lazy" decoding="async"
-                  />
-                </figure>
-              </div>
-              <div className="servicos-lista marketing-lista" data-reveal>
-                <h3 className="micro servicos-titulo">O que entra no marketing</h3>
-                <ul>
-                  <li><a href="/marketing-e-redes/"><b>Conteúdo e redes</b><span>posts no padrão da sua marca, no ritmo do seu dia</span></a></li>
-                  <li><a href="/videos-personalizados/"><b>Vídeos personalizados</b><span>Reels, comercial do produto e depoimento de cliente</span></a></li>
-                  <li><a href="/trafego-pago/"><b>Tráfego pago</b><span>Google e Instagram, com a verba na sua conta</span></a></li>
-                  <li><a href="/por-onde-comecar/"><b>Google e a ordem certa</b><span>perfil no Google, site e só depois o anúncio</span></a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
+            ))}
+          </section>
+        ))}
 
         {/* ============ CENA 5 · SOB MEDIDA: COMO A GENTE CONSTRÓI ============ */}
         <section className="cena cena-curta" id="como">

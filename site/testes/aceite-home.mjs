@@ -13,23 +13,24 @@ const humano = (ctx) => ctx.addInitScript(() => Object.defineProperty(Navigator.
 // HTML pré-renderizado: sem abertura nem fio, com os trabalhos
 const estatico = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
 ok(!estatico.includes('id="abertura"') && !/<svg[^>]*class="fio"/.test(estatico), 'prerender sem a abertura e sem o fio');
-ok((estatico.match(/class="trabalho( inverso)?"/g) || []).length === 8, 'prerender com os 8 trabalhos');
-ok(estatico.includes("classList.add('com-abertura')"), 'index.html tem a capa creme antes do primeiro quadro');
+ok((estatico.match(/class="obra( obra-dir)?"/g) || []).length === 20, `prerender com as 20 obras (${(estatico.match(/class="obra( obra-dir)?"/g) || []).length})`);
+ok(estatico.includes("classList.add('com-abertura')") && estatico.includes('background:#0D2626'), 'index.html tem a capa escura antes do primeiro quadro');
 
-// 1ª visita: a abertura roda e termina sozinha
+// 1ª visita: a abertura roda DENTRO da exposição e termina sozinha
 {
   const ctx = await b.newContext({ viewport: { width: 1280, height: 800 } }); await humano(ctx);
   const p = await ctx.newPage(); const erros = []; p.on('pageerror', (e) => erros.push(e.message));
   await p.goto(BASE + '/');
-  await p.waitForSelector('#abertura canvas', { timeout: 8000 });
   ok(await p.evaluate(() => document.documentElement.classList.contains('com-abertura')), 'abertura: página travada (com-abertura) enquanto roda');
-  ok((await p.locator('#abertura .pular').count()) === 1, 'abertura: botão "Pular abertura"');
-  await p.waitForSelector('#abertura', { state: 'detached', timeout: 12000 });
-  ok(!(await p.evaluate(() => document.documentElement.classList.contains('com-abertura'))), 'abertura termina sozinha e libera a página');
+  ok((await p.locator('.pular-abertura').count()) === 1, 'abertura: botão "Pular abertura"');
+  await p.waitForFunction(() => document.documentElement.classList.contains('expo-pronta'), null, { timeout: 30000 });
+  const t0 = Date.now();
+  await p.waitForFunction(() => !document.documentElement.classList.contains('com-abertura'), null, { timeout: 20000 });
+  const dur = (Date.now() - t0) / 1000;
+  ok(dur > 3.5 && dur < 12, `abertura termina sozinha depois do 1º quadro (${dur.toFixed(1)} s) e libera a página`);
   ok(await p.evaluate(() => sessionStorage.getItem('flow.abertura') === '1'), 'abertura marcada como vista na sessão');
-  await p.reload({ waitUntil: 'networkidle' });
-  await p.waitForTimeout(800);
-  ok((await p.locator('#abertura').count()) === 0, '2ª carga na mesma sessão: sem abertura');
+  await p.reload({ waitUntil: 'networkidle' }); await p.waitForTimeout(800);
+  ok(!(await p.evaluate(() => document.documentElement.classList.contains('com-abertura'))) && (await p.locator('.pular-abertura').count()) === 0, '2ª carga na mesma sessão: sem abertura');
   ok(erros.length === 0, `sem erro de JavaScript na abertura (${erros.join(' | ')})`);
   await ctx.close();
 }
@@ -38,11 +39,10 @@ ok(estatico.includes("classList.add('com-abertura')"), 'index.html tem a capa cr
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await humano(ctx);
   const p = await ctx.newPage();
   await p.goto(BASE + '/');
-  await p.waitForSelector('#abertura .pular');
-  await p.waitForTimeout(600);
-  await p.locator('#abertura .pular').click();
-  await p.waitForSelector('#abertura', { state: 'detached', timeout: 4000 });
-  ok(true, 'abertura: "Pular" fecha em menos de 4 s (celular)');
+  await p.waitForSelector('.pular-abertura'); await p.waitForTimeout(600);
+  await p.locator('.pular-abertura').click();
+  await p.waitForFunction(() => !document.documentElement.classList.contains('com-abertura'), null, { timeout: 4000 });
+  ok(true, 'abertura: "Pular" libera a página em menos de 4 s (celular)');
   ok((await p.evaluate(() => window.scrollY)) === 0, 'depois de pular, a página começa no topo');
   await ctx.close();
 }
@@ -63,27 +63,26 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   const d = await p.evaluate(() => ({
     icones: document.querySelectorAll('.icone-flutuante, .icone-vitrine, .num-fantasma').length, // #canvas-root agora é a exposição 3D (05/11)
     fio: !!document.querySelector('svg.fio .fio-linha[d]'),
-    trabalhos: [...document.querySelectorAll('#trabalhos .trabalho')].map((t) => ({
-      nome: t.querySelector('h3')?.innerText, url: t.querySelector('a.btn')?.href, imgs: t.querySelectorAll('img').length,
+    obras: [...document.querySelectorAll('article.obra')].map((t) => ({
+      id: t.id, ala: t.closest('section')?.id, img: t.dataset.img, url: t.querySelector('a.btn')?.href, titulo: t.querySelector('h3')?.innerText,
     })),
     nav: [...document.querySelectorAll('header .navlinks a')].map((a) => a.getAttribute('href')),
     logo: document.querySelector('header .marca-lockup img')?.getAttribute('src'),
   }));
   ok(d.icones === 0, 'sem ícones flutuantes nem números-fantasma');
   ok(d.fio || !!(await p.evaluate(() => document.querySelector('#canvas-root canvas'))), 'o fio está desenhado (ou a exposição 3D está montada)');
-  ok(d.trabalhos.length === 8 && d.trabalhos.every((t) => t.url && t.imgs >= 2), `8 trabalhos com link e prints (${d.trabalhos.map((t) => t.nome).join(', ')})`);
+  ok(d.obras.length === 20 && d.obras.every((o) => o.url && o.img && o.titulo), `20 obras com quadro, título e link (${d.obras.length})`);
+  ok(d.obras.filter((o) => o.ala === 'trabalhos').length === 8 && d.obras.filter((o) => o.ala === 'problemas').length === 6, 'ala trabalhos com 8 obras e ala do problema com 6');
   ok(d.nav.includes('#trabalhos') && !d.nav.includes('#vitrine'), 'menu leva a "Trabalhos"');
   ok(!/base44/i.test(await p.evaluate(() => document.querySelector('#trabalhos').innerText)), 'trabalhos: a plataforma não aparece em texto')
   ok(d.logo === '/midia/marca/maintor-lockup-claro.svg', 'cabeçalho com o lockup oficial');
-  for (let i = 0; i < 8; i++) {
-    const t = p.locator('#trabalhos .trabalho').nth(i);
-    await t.scrollIntoViewIfNeeded(); await p.waitForTimeout(500);
-    const w = await t.evaluate((el) => [...el.querySelectorAll('img.ativa, .tela-celular img:first-child, .tela-desktop img:first-child')].map((i) => { i.loading = 'eager'; return i.naturalWidth; }));
-    await p.waitForTimeout(400);
-    const w2 = await t.evaluate((el) => [...el.querySelectorAll('.tela-desktop img, .tela-celular img')].filter((i) => i.classList.contains('ativa') || i === i.parentElement.firstElementChild).every((i) => i.naturalWidth > 0));
-    ok(w2, `trabalho ${i + 1}: prints carregam`);
+  // os quadros existem como imagem (HEAD 200) — no 3D são textura, no fallback aparecem na legenda
+  for (const o of d.obras) {
+    const st = await p.evaluate(async (u) => (await fetch(u, { method: 'HEAD' })).status, o.img);
+    if (st !== 200) ok(false, `quadro ${o.id}: imagem ${o.img} responde ${st}`);
   }
-  for (const u of d.trabalhos.map((t) => t.url)) {
+  ok(true, 'todos os quadros têm imagem servida');
+  for (const u of [...new Set(d.obras.filter((o) => o.ala === 'trabalhos').map((o) => o.url))]) {
     const s = await fetch(u, { redirect: 'follow' }).then((r) => r.status).catch(() => 0);
     ok(s === 200, `no ar: ${u} (${s})`);
   }
@@ -127,14 +126,15 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(/consultoria/i.test(d.wa) && d.promessa, '/para-consultorias/: WhatsApp próprio e exemplo marcado "não é promessa"');
   await p.goto(BASE + '/', { waitUntil: 'networkidle' });
   const h = await p.evaluate(() => ({
-    card: !!document.querySelector('#problemas a.problema[href="/para-consultorias/"]'),
+    card: !!document.querySelector('#problemas article.obra a[href="/para-consultorias/"]'),
     chips: [...document.querySelectorAll('#topo .hero-chip')].map((c) => c.innerText),
     contato: !!document.querySelector('#contato a[href="/para-consultorias/"]'),
   }));
   ok(h.card && h.contato && h.chips.includes('Sou consultoria') && h.chips.length === 7, `home: cartão, chip "Sou consultoria" e serviço no contato (${h.chips.length} chips)`);
   await p.locator('#topo .hero-chip', { hasText: 'Sou consultoria' }).click();
   await p.waitForTimeout(300);
-  ok((await p.locator('#topo h1').innerText()).replace(/\s+/g, ' ').includes('sua consultoria') && (await p.locator('#topo .hero-links a[href="/para-consultorias/"]').count()) === 1, 'chip "Sou consultoria" reescreve a manchete e leva à página');
+  ok((await p.locator('#topo .hero-links a[href="/para-consultorias/"]').count()) === 1 && (await p.locator('#topo .hero-dor').count()) === 1, 'chip "Sou consultoria" abre a dor e leva à página');
+  ok((await p.locator('#topo .manchete').count()) === 0 && (await p.locator('#topo h1').count()) === 1, 'entrada sem o texto da frente, com um h1 discreto');
   const sm = await (await fetch(BASE + '/sitemap.xml')).text();
   ok(sm.includes('/para-consultorias/'), 'sitemap com /para-consultorias/');
   await ctx.close();
