@@ -19,8 +19,14 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js'
    · o fio mostarda é a linha-guia no chão; o ponto vai à frente
    · alas sem quadro ganham uma peça (lâminas de vidro, laço, balão)
 
-   ⚠ v2 AINDA NÃO FOI BUILDADA NEM TESTADA (sessão cortada pelo limite de uso
-   em 05/11). Próximo passo: `npm run build`, fotografar, rodar as baterias.
+   v3 (05/11, à noite) — o que era HTML por cima virou parte do mundo:
+   · o TOTEM da entrada pergunta "Qual é o seu problema?"; clicar nele
+     abre as opções (o painel continua em HTML, acessível)
+   · o LETREIRO pendurado sobre o corredor corre os serviços (era a faixa)
+   · o SAGUÃO da Ala 2: seis portas, uma por dor, sobem do chão quando se
+     chega; clicar numa porta leva para a SALA daquele tema (cômodo fora do
+     corredor, com cortina de transição), de onde se volta ao saguão ou se
+     passa para a porta seguinte — o estado da sala vive no React
    ================================================================ */
 
 const COR = { abismo: 0x0d2626, petroleo: 0x1f4747, mostarda: 0xd4a574, creme: 0xfaf7f2, bege: 0xe6ddd0 }
@@ -31,8 +37,44 @@ const OLHO = 1.7
 const suave = (a, b, x) => { const t = THREE.MathUtils.clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t) }
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
-export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
+/* texto desenhado num canvas vira textura (placas, totem, letreiro).
+   Repinta quando as fontes do site terminam de carregar. */
+function placaCanvas(w, h, desenhar) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h
+  const tex = new THREE.CanvasTexture(c)
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8
+  let ultimos = []
+  const pintar = (...a) => { if (a.length) ultimos = a; const g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height); desenhar(g, c, ...ultimos); tex.needsUpdate = true }
+  pintar()
+  if (document.fonts) Promise.all([
+    document.fonts.load('italic 80px "DM Serif Display"'), document.fonts.load('700 30px Inter'), document.fonts.load('400 30px Inter'),
+  ]).then(() => pintar()).catch(() => {})
+  return { tex, pintar, canvas: c }
+}
+function quebrar(g, texto, larg) {
+  const linhas = []; let atual = ''
+  for (const p of texto.split(' ')) { const t = atual ? atual + ' ' + p : p; if (g.measureText(t).width > larg && atual) { linhas.push(atual); atual = p } else atual = t }
+  if (atual) linhas.push(atual)
+  return linhas
+}
+// a foto "cobre" o retângulo (como object-fit: cover)
+function cobrir(tex, aspectoAlvo) {
+  const a = tex.image.width / tex.image.height
+  if (a > aspectoAlvo) { tex.repeat.set(aspectoAlvo / a, 1); tex.offset.set((1 - aspectoAlvo / a) / 2, 0) }
+  else { tex.repeat.set(1, a / aspectoAlvo); tex.offset.set(0, (1 - a / aspectoAlvo) / 2) }
+}
+const F_LETREIRO = 'italic 104px "DM Serif Display"'
+const SERVICOS = ['loja virtual', 'loja no Instagram', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
+  'gestão de RH', 'sistema para revender', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago']
+
+export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas = [], sala = null, aoPorta, aoPergunta }) {
   const hostRef = useRef(null)
+  // a cena é montada uma vez; o que muda depois chega por referência
+  const salaRef = useRef(sala)
+  const cbRef = useRef({})
+  salaRef.current = sala
+  cbRef.current = { aoPorta, aoPergunta }
+  const portasRef = useRef(portas)
 
   useEffect(() => {
     const host = hostRef.current
@@ -248,6 +290,177 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
       const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.8, 0.9, 32), matParede); ped.position.y = 0.45; g.add(ped)
     }
 
+    // ---------- o que se clica dentro do 3D ----------
+    const clicaveis = []   // meshes com userData.acao
+    const matBase = (cor) => new THREE.MeshBasicMaterial({ color: cor, toneMapped: false })
+
+    // 1) o TOTEM da entrada: "Qual é o seu problema?" — clicar abre as opções
+    const retratoIni = window.innerWidth < window.innerHeight
+    const totem = new THREE.Group(); cena.add(totem)
+    const totemPos = retratoIni ? new THREE.Vector3(0.35, 0, -9.5) : new THREE.Vector3(2.05, 0, -7)
+    totem.position.copy(totemPos)
+    totem.rotation.y = Math.atan2(-1.6 - totemPos.x, -totemPos.z)
+    const placaTotem = placaCanvas(1024, 440, (g, c, hover = false) => {
+      g.fillStyle = 'rgba(9, 27, 27, 0.94)'; g.beginPath(); g.roundRect(6, 6, c.width - 12, c.height - 12, 34); g.fill()
+      g.lineWidth = hover ? 7 : 4; g.strokeStyle = '#D4A574'; g.stroke()
+      g.fillStyle = '#D4A574'; g.font = '700 28px Inter'; g.letterSpacing = '7px'; g.fillText('COMECE POR AQUI', 64, 92)
+      g.letterSpacing = '0px'; g.font = 'italic 96px "DM Serif Display"'
+      g.fillStyle = '#FAF7F2'; g.fillText('Qual é o seu', 64, 205)
+      g.fillStyle = '#D4A574'; g.fillText('problema?', 64, 300)
+      g.fillStyle = hover ? '#FAF7F2' : '#E6DDD0'; g.font = '600 32px Inter'; g.fillText('Clique e escolha o seu  →', 64, 384)
+    })
+    const telaTotem = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 1.95 * 440 / 1024), new THREE.MeshBasicMaterial({ map: placaTotem.tex, transparent: true, toneMapped: false }))
+    telaTotem.position.set(0, 1.55, 0.03); telaTotem.userData.acao = { tipo: 'pergunta' }
+    totem.add(telaTotem); clicaveis.push(telaTotem)
+    const costas = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.88, 0.04), matLatao); costas.position.set(0, 1.55, 0); totem.add(costas)
+    const haste = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.12, 16), matLatao); haste.position.y = 0.56; totem.add(haste)
+    const pe = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.4, 0.05, 32), matLatao); pe.position.y = 0.025; totem.add(pe)
+    const anel = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.47, 48), matBase(COR.mostarda))
+    anel.rotation.x = -Math.PI / 2; anel.position.y = 0.012; totem.add(anel)
+    const luzTotem = new THREE.PointLight(COR.mostarda, 3, 4, 2); luzTotem.position.set(0, 1.6, 0.8); totem.add(luzTotem)
+
+    // 2) o LETREIRO dos serviços, pendurado sobre o corredor (era a faixa que passava no site)
+    const ALTL = 0.62, LARGL = LARG * 0.84
+    // a textura é recriada quando a fonte carrega (a largura do texto muda e o WebGL não redimensiona textura já enviada)
+    const telaLetreiro = new THREE.Mesh(new THREE.PlaneGeometry(LARGL, ALTL), new THREE.MeshBasicMaterial({ color: 0x081a1a, toneMapped: false }))
+    const letreiro = { tex: null }
+    const montarLetreiro = () => {
+      if (!vivo) return
+      const c = document.createElement('canvas'), H = 160, F = 'italic 104px "DM Serif Display"'
+      let g = c.getContext('2d'); g.font = F
+      const pedacos = SERVICOS.flatMap((s) => [[s, '#FAF7F2'], ['   ✦   ', '#D4A574']])
+      const larg = pedacos.reduce((s, [t]) => s + g.measureText(t).width, 0)
+      c.width = Math.min(16000, Math.ceil(larg)); c.height = H
+      g = c.getContext('2d'); g.font = F; g.fillStyle = '#081a1a'; g.fillRect(0, 0, c.width, H)
+      let x = 0
+      for (const [t, cor] of pedacos) { g.fillStyle = cor; g.fillText(t, x, 112); x += g.measureText(t).width }
+      const tex = new THREE.CanvasTexture(c)
+      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; tex.wrapS = THREE.RepeatWrapping
+      tex.repeat.x = LARGL / ((c.width / H) * ALTL)
+      if (letreiro.tex) { tex.offset.x = letreiro.tex.offset.x; letreiro.tex.dispose() }
+      letreiro.tex = tex
+      telaLetreiro.material.map = tex; telaLetreiro.material.color.set(0xffffff); telaLetreiro.material.needsUpdate = true
+    }
+    montarLetreiro()
+    document.fonts?.load(F_LETREIRO).then(montarLetreiro).catch(() => {})
+    const caixaLetreiro = new THREE.Group(); caixaLetreiro.position.set(0, 6.35, -15); cena.add(caixaLetreiro)
+    telaLetreiro.position.z = 0.04; caixaLetreiro.add(telaLetreiro)
+    const moldL = new THREE.Mesh(new THREE.BoxGeometry(LARGL + 0.12, ALTL + 0.12, 0.06), matLatao); caixaLetreiro.add(moldL)
+    for (const x of [-LARGL / 2 + 0.4, LARGL / 2 - 0.4]) {
+      const cabo = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, ALT - 6.35, 6), matLatao)
+      cabo.position.set(x, (ALT - 6.35) / 2 + ALTL / 2, 0); caixaLetreiro.add(cabo)
+    }
+
+    // 3) o SAGUÃO da Ala 2: seis portas, uma por dor; sobem do chão quando se chega
+    const portas3d = portasRef.current.map((pt, k) => {
+      const g = new THREE.Group(); g.visible = false; cena.add(g)
+      const PW = 1.5, PH = 2.6
+      const vao = new THREE.Mesh(new THREE.PlaneGeometry(PW, PH), new THREE.MeshBasicMaterial({ color: 0x3a4a48, toneMapped: false }))
+      vao.position.y = PH / 2; vao.userData.acao = { tipo: 'porta', k }; g.add(vao); clicaveis.push(vao)
+      loader.load(pt.img, (tex) => {
+        if (!vivo) return
+        tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); cobrir(tex, PW / PH)
+        vao.material.map = tex; vao.material.color.setScalar(0.72); vao.material.needsUpdate = true
+      })
+      for (const [w, h, x, y] of [[0.09, PH + 0.09, -PW / 2 - 0.045, PH / 2], [0.09, PH + 0.09, PW / 2 + 0.045, PH / 2], [PW + 0.18, 0.09, 0, PH + 0.045]]) {
+        const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.12), matLatao); b.position.set(x, y, 0); g.add(b)
+      }
+      const placa = placaCanvas(640, 190, (gc, c, hover = false) => {
+        gc.fillStyle = hover ? '#D4A574' : 'rgba(9, 27, 27, 0.95)'; gc.beginPath(); gc.roundRect(4, 4, c.width - 8, c.height - 8, 22); gc.fill()
+        gc.fillStyle = hover ? '#0D2626' : '#D4A574'; gc.font = '700 24px Inter'; gc.letterSpacing = '6px'
+        gc.fillText(`PORTA ${String(k + 1).padStart(2, '0')}`, 34, 58); gc.letterSpacing = '0px'
+        gc.fillStyle = hover ? '#0D2626' : '#FAF7F2'; gc.font = 'italic 58px "DM Serif Display"'
+        gc.fillText(pt.curto, 34, 140)
+      })
+      const plaq = new THREE.Mesh(new THREE.PlaneGeometry(PW + 0.18, (PW + 0.18) * 190 / 640), new THREE.MeshBasicMaterial({ map: placa.tex, transparent: true, toneMapped: false }))
+      plaq.position.set(0, PH + 0.42, 0.02); plaq.userData.acao = { tipo: 'porta', k }; g.add(plaq); clicaveis.push(plaq)
+      const luz = new THREE.Mesh(new THREE.PlaneGeometry(PW, 0.9), new THREE.MeshBasicMaterial({ color: COR.mostarda, transparent: true, opacity: 0.12, toneMapped: false, depthWrite: false }))
+      luz.rotation.x = -Math.PI / 2; luz.position.set(0, 0.015, 0.5); g.add(luz)
+      return { g, vao, placa, luz, base: new THREE.Vector3(), hover: 0 }
+    })
+    const ANG = [-20, -11, -2, 7, 16, 25].map((a) => THREE.MathUtils.degToRad(a))
+    let saguao = { topo: 0, alt: 1 }, saguaoVivo = false
+
+    // 4) a SALA de cada tema: um cômodo fora do corredor, para onde se entra pela porta
+    const SX = 140
+    const salaG = new THREE.Group(); salaG.position.set(SX, 0, 0); cena.add(salaG)
+    const SW = 12, SD = 14, SH = 6.6
+    const chaoS = new THREE.Mesh(new THREE.PlaneGeometry(SW, SD), matChao); chaoS.rotation.x = -Math.PI / 2; salaG.add(chaoS)
+    const tetoS = new THREE.Mesh(new THREE.PlaneGeometry(SW, SD), matTeto); tetoS.rotation.x = Math.PI / 2; tetoS.position.y = SH; salaG.add(tetoS)
+    for (const [w, x, z, ry] of [[SW, 0, -SD / 2, 0], [SD, -SW / 2, 0, Math.PI / 2], [SD, SW / 2, 0, -Math.PI / 2], [SW, 0, SD / 2, Math.PI]]) {
+      const p = new THREE.Mesh(new THREE.PlaneGeometry(w, SH), matParede); p.position.set(x, SH / 2, z); p.rotation.y = ry; salaG.add(p)
+    }
+    const FW = 6.4, FH = 4.0
+    const fotoSala = new THREE.Mesh(new THREE.PlaneGeometry(FW, FH), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }))
+    fotoSala.position.set(1.2, 2.75, -SD / 2 + 0.08); salaG.add(fotoSala)
+    const moldS = new THREE.Mesh(new THREE.BoxGeometry(FW + 0.22, FH + 0.22, 0.1), matLatao); moldS.position.set(1.2, 2.75, -SD / 2 + 0.02); salaG.add(moldS)
+    const placaSala = placaCanvas(1400, 260, (g, c, dados) => {
+      if (!dados) return
+      g.fillStyle = '#D4A574'; g.font = '700 30px Inter'; g.letterSpacing = '8px'; g.fillText(dados.area.toUpperCase(), 8, 52); g.letterSpacing = '0px'
+      g.fillStyle = '#FAF7F2'; g.font = 'italic 64px "DM Serif Display"'
+      quebrar(g, `“${dados.dor}”`, c.width - 20).slice(0, 2).forEach((l, i) => g.fillText(l, 8, 140 + i * 78))
+    })
+    const plaqSala = new THREE.Mesh(new THREE.PlaneGeometry(FW, FW * 260 / 1400), new THREE.MeshBasicMaterial({ map: placaSala.tex, transparent: true, toneMapped: false }))
+    plaqSala.position.set(1.2, 2.75 + FH / 2 + 0.75, -SD / 2 + 0.06); salaG.add(plaqSala)
+    for (let i = 0; i < 3; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(SW * 0.5, 0.05, 0.18), matLuzTeto); l.position.set(0, SH - 0.03, 3 - i * 4); salaG.add(l) }
+    const fioSala = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.02, SD - 1), matFio); fioSala.position.set(-1.2, 0.02, 0); salaG.add(fioSala)
+    const spotSala = new THREE.SpotLight(0xfff1dc, 90, 22, Math.PI / 5, 0.5, 1.4)
+    spotSala.position.set(SX + 1.2, SH - 0.2, 1); spotSala.target.position.set(SX + 1.2, 2.6, -SD / 2); cena.add(spotSala); cena.add(spotSala.target)
+    const texFotos = {}
+    const mostrarSala = (k) => {
+      const pt = portasRef.current[k]; if (!pt) return
+      placaSala.pintar(pt)
+      const usar = (tex) => { fotoSala.material.map = tex; fotoSala.material.needsUpdate = true }
+      if (texFotos[k]) usar(texFotos[k])
+      else loader.load(pt.img, (tex) => { tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); cobrir(tex, FW / FH); texFotos[k] = tex; if (salaVista === k) usar(tex) })
+    }
+
+    // a cortina: escurece a tela para trocar de lugar (corredor ↔ sala)
+    const cortina = document.createElement('div')
+    cortina.style.cssText = 'position:absolute;inset:0;background:#0D2626;opacity:0;pointer-events:none'
+    host.appendChild(cortina)
+    let modo = 'passeio', salaVista = null, trocando = false
+    const trocar = (destino) => {
+      trocando = true
+      gsap.to(cortina, { opacity: 1, duration: 0.38, ease: 'power2.in', onComplete: () => {
+        if (destino == null) { modo = 'passeio'; salaVista = null }
+        else { modo = 'sala'; salaVista = destino; mostrarSala(destino) }
+        gsap.to(cortina, { opacity: 0, duration: 0.7, ease: 'power2.out', delay: 0.05, onComplete: () => { trocando = false } })
+      } })
+    }
+
+    // cliques e passagem do mouse sobre o que é clicável
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2()
+    const acima = (x, y) => {
+      ndc.set((x / window.innerWidth) * 2 - 1, -(y / window.innerHeight) * 2 + 1)
+      ray.setFromCamera(ndc, cam)
+      const vis = clicaveis.filter((m) => { let o = m; while (o) { if (!o.visible) return false; o = o.parent } return true })
+      const h = ray.intersectObjects(vis, false)[0]
+      return h && h.distance < 30 ? h.object.userData.acao : null
+    }
+    const interativo = (el) => el?.closest?.('a, button, input, textarea, select, label, .obra-legenda, .guia, header, .sala-painel, .pergunta-painel, .portas-lista')
+    let hoverAcao = null
+    const aoClicar = (e) => {
+      if (modo !== 'passeio' || trocando || interativo(e.target)) return
+      const a = acima(e.clientX, e.clientY)
+      if (!a) return
+      if (a.tipo === 'pergunta') cbRef.current.aoPergunta?.()
+      if (a.tipo === 'porta') cbRef.current.aoPorta?.(a.k)
+    }
+    const aoPairar = (e) => {
+      if (modo !== 'passeio' || interativo(e.target)) { if (hoverAcao) { hoverAcao = null; document.body.style.cursor = '' } return }
+      const a = acima(e.clientX, e.clientY)
+      const mudou = JSON.stringify(a) !== JSON.stringify(hoverAcao)
+      if (!mudou) return
+      hoverAcao = a
+      document.body.style.cursor = a ? 'pointer' : ''
+      document.getElementById('cursor')?.classList.toggle('cresce', !!a)
+      placaTotem.pintar(a?.tipo === 'pergunta')
+      portas3d.forEach((p, k) => p.placa.pintar(a?.tipo === 'porta' && a.k === k))
+    }
+    window.addEventListener('click', aoClicar)
+    if (matchMedia('(pointer: fine)').matches) window.addEventListener('pointermove', aoPairar, { passive: true })
+
     const nP = celular ? 240 : 700
     const pa = new Float32Array(nP * 3)
     for (let i = 0; i < nP; i++) { pa[i * 3] = (Math.random() - 0.5) * LARG; pa[i * 3 + 1] = Math.random() * ALT; pa[i * 3 + 2] = -Math.random() * COMP }
@@ -272,8 +485,29 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
         o.parede.quat.setFromEuler(new THREE.Euler(0, (o.lado < 0 ? -Math.PI / 2 : Math.PI / 2) - o.lado * 0.25, 0))
         o.grupo.position.copy(o.parede.pos); o.grupo.quaternion.copy(o.parede.quat); o.grupo.scale.setScalar(1)
       }
+      montarSaguao()
       const w = host.clientWidth, h = host.clientHeight
       renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix()
+    }
+    // o saguão: as portas formam um arco à frente de quem chega na cabeça da Ala 2.
+    // Recalculado também quando as portas começam a subir (aí o layout da página já assentou).
+    function montarSaguao() {
+      const cab = document.querySelector('#problemas .ala-cabeca')
+      if (cab && portas3d.length) {
+        const r = cab.getBoundingClientRect(); saguao = { topo: window.scrollY + r.top, alt: Math.max(r.height, 1) }
+        // o arco nasce de onde a câmera está e para onde ela olha quando o saguão está no meio da tela
+        const uS = uDe(alaDe(saguao.topo + saguao.alt * 0.45))
+        const c = new THREE.Vector3(), f = new THREE.Vector3()
+        caminho.getPointAt(uS, c); caminho.getPointAt(Math.min(uS + 0.012, 0.999), f)
+        const dir = Math.atan2(f.x - c.x, f.z - c.z) // ângulo do olhar no plano do chão
+        const R = 10.5
+        portas3d.forEach((p, k) => {
+          const a = dir + (ANG[k] ?? 0) * -1
+          const x = THREE.MathUtils.clamp(c.x + Math.sin(a) * R, -LARG / 2 + 1, LARG / 2 - 1), z = c.z + Math.cos(a) * R
+          p.base.set(x, 0, z)
+          p.g.position.copy(p.base); p.g.rotation.y = Math.atan2(c.x - x, c.z - z)
+        })
+      }
     }
     const mouse = { x: 0, y: 0, sx: 0, sy: 0 }
     const temMouse = matchMedia('(pointer: fine)').matches
@@ -282,6 +516,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
     window.addEventListener('resize', medir)
     const ro = new ResizeObserver(() => medir()); ro.observe(document.querySelector('main#conteudo'))
     medir()
+    // fontes e imagens mudam a altura das seções depois do primeiro quadro: mede de novo
+    document.fonts?.ready.then(() => vivo && medir())
+    const remedir = setTimeout(() => vivo && medir(), 1800)
 
     const relogio = new THREE.Clock()
     const pos = new THREE.Vector3(), frente = new THREE.Vector3(), olhar = new THREE.Vector3()
@@ -297,13 +534,51 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
       prog += (alvo - prog) * Math.min(1, dt * 4.5)
       mouse.sx += (mouse.x - mouse.sx) * Math.min(1, dt * 4); mouse.sy += (mouse.y - mouse.sy) * Math.min(1, dt * 4)
 
+      // a porta escolhida no site (estado do React) chega por referência: entra, troca ou sai da sala
+      const pedida = salaRef.current
+      if (!trocando && pedida !== salaVista) trocar(pedida)
+
       const u = uDe(prog * (N - 1))
       caminho.getPointAt(u, pos); caminho.getPointAt(Math.min(u + 0.012, 0.999), frente)
       pos.y = OLHO + Math.sin(t * 1.4) * 0.025
+      if (modo === 'sala') {
+        // dentro da sala: parado diante da obra do tema, olhando com o mouse
+        const retr = cam.aspect < 1
+        // no celular, de mais longe e olhando um pouco para baixo: a obra fica na metade de cima, acima do painel
+        cam.position.set(SX + (retr ? 1.2 : -1.6) + mouse.sx * 0.3, OLHO + 0.1 + Math.sin(t * 1.2) * 0.02, retr ? 6.9 : 3.6)
+        cam.lookAt(SX + (retr ? 1.2 : -0.2) + mouse.sx * 1.2, (retr ? 0.6 : 2.9) - mouse.sy * 0.4, -SD / 2)
+        letreiro.tex && (letreiro.tex.offset.x += dt * 0.025)
+        renderer.render(cena, cam)
+        raf = requestAnimationFrame(quadro)
+        return
+      }
       cam.position.copy(pos)
       olhar.copy(frente); olhar.y = OLHO - 0.18 + mouse.sy * -0.35; olhar.x += mouse.sx * 1.6
       cam.lookAt(olhar)
       cam.getWorldDirection(fwd); right.crossVectors(fwd, up).normalize()
+
+      // o letreiro corre; o totem fica na entrada e afunda quando se segue; as portas sobem no saguão
+      if (letreiro.tex) letreiro.tex.offset.x += dt * 0.025
+      const pTopo = (yTela - window.innerHeight * 0.5) / Math.max(window.innerHeight, 1)
+      const fTotem = 1 - suave(0.35, 0.9, pTopo)
+      totem.visible = fTotem > 0.01
+      totem.position.y = (fTotem - 1) * 2.6
+      anel.material.opacity = 1; anel.scale.setScalar(1 + Math.sin(t * 3) * 0.08)
+      luzTotem.intensity = 2.2 + Math.sin(t * 3) * 0.8
+      const pS = (yTela - saguao.topo) / saguao.alt
+      const fS = suave(-0.55, 0.05, pS) * (1 - suave(0.95, 1.45, pS))
+      if (fS > 0 && !saguaoVivo) montarSaguao() // as portas vão começar a subir: posiciona com o layout final
+      saguaoVivo = fS > 0
+      portas3d.forEach((p, k) => {
+        const fk = suave(0, 1, fS * 1.6 - k * 0.1)
+        p.g.visible = fk > 0.01
+        p.g.position.y = (fk - 1) * 3.4
+        const alvoH = hoverAcao?.tipo === 'porta' && hoverAcao.k === k ? 1 : 0
+        p.hover += (alvoH - p.hover) * Math.min(1, dt * 8)
+        if (p.vao.material.map) p.vao.material.color.setScalar(0.72 + p.hover * 0.28)
+        p.luz.material.opacity = 0.1 + p.hover * 0.25
+        p.g.scale.setScalar(1 + p.hover * 0.03)
+      })
 
       fioCurva.getPointAt(Math.min(u + 0.02, 0.999), ponto.position)
       ponto.position.y = 0.14 + Math.abs(Math.sin(t * 2.2)) * 0.08
@@ -348,9 +623,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
 
     return () => {
       vivo = false
-      cancelAnimationFrame(raf); introTl?.kill(); ro.disconnect()
+      cancelAnimationFrame(raf); introTl?.kill(); ro.disconnect(); clearTimeout(remedir)
       window.removeEventListener('resize', medir)
       if (temMouse) window.removeEventListener('pointermove', aoMover)
+      window.removeEventListener('click', aoClicar); window.removeEventListener('pointermove', aoPairar)
+      document.body.style.cursor = ''
       document.removeEventListener('visibilitychange', aoVis)
       pmrem.dispose(); renderer.dispose(); host.innerHTML = ''
       document.documentElement.classList.remove('obra-em-foco')

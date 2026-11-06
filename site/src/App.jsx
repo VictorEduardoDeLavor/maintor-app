@@ -110,6 +110,15 @@ const HERO_PROBLEMAS = [
     href: '/sistema-para-revender/', rotulo: 'Ver o sistema para revender',
   },
 ]
+/* O saguão da Ala 2 (05/11): uma porta por dor. Na exposição 3D cada porta
+   leva a uma sala do tema; sem 3D, o botão leva até a obra da mesma dor. */
+const PORTAS = PROBLEMAS.map((p, k) => ({
+  ...p,
+  curto: ['Lojas de moda', 'Atendimento', 'Manutenção', 'RH no papel', 'Marketing', 'Consultorias'][k],
+  obra: ['p-loja', 'p-atend', 'p-manut', 'p-rh', 'p-mkt', 'p-cons'][k],
+  img: `/midia/fotos/${p.foto}-960.webp`,
+}))
+
 const whatsProblema = (dor) =>
   `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow. Meu problema: ' + dor.charAt(0).toLowerCase() + dor.slice(1))}`
 
@@ -191,6 +200,9 @@ function Marquee() {
 
 export default function App() {
   const [escolha, setEscolha] = useState(null)
+  const [perguntaAberta, setPerguntaAberta] = useState(false)
+  const [sala, setSala] = useState(null) // porta do saguão em que o visitante entrou (null = no corredor)
+  const salaTituloRef = useRef(null)
   const atual = escolha == null ? null : HERO_PROBLEMAS[escolha]
   const progressoRef = useRef(0)
   const velocidadeRef = useRef(0)
@@ -405,6 +417,41 @@ export default function App() {
     }
   }, [menuAberto])
 
+  /* Dentro de uma sala do saguão a página não rola (o visitante está "dentro"
+     da porta): Esc volta ao saguão, as setas trocam de porta. */
+  useEffect(() => {
+    if (sala == null) return
+    const lenis = lenisRef.current
+    lenis?.stop()
+    document.documentElement.style.overflow = 'hidden'
+    // o texto do corredor some enquanto se está dentro da sala
+    const raiz = document.documentElement
+    const tEntra = setTimeout(() => raiz.classList.add('em-sala'), 300)
+    const t = setTimeout(() => salaTituloRef.current?.focus(), 450)
+    const aoTeclar = (e) => {
+      if (e.key === 'Escape') setSala(null)
+      if (e.key === 'ArrowRight') setSala((s) => (s + 1) % PORTAS.length)
+      if (e.key === 'ArrowLeft') setSala((s) => (s - 1 + PORTAS.length) % PORTAS.length)
+    }
+    document.addEventListener('keydown', aoTeclar)
+    return () => {
+      clearTimeout(t); clearTimeout(tEntra)
+      setTimeout(() => raiz.classList.remove('em-sala'), 380)
+      document.removeEventListener('keydown', aoTeclar)
+      document.documentElement.style.overflow = ''
+      lenis?.start()
+    }
+  }, [sala == null])
+
+  const entrarPorta = (k) => {
+    if (expor) { setSala(k); return }
+    const el = document.getElementById(`obra-${PORTAS[k].obra}`)
+    if (!el) return
+    if (lenisRef.current) lenisRef.current.scrollTo(el, { offset: -40 })
+    else el.scrollIntoView()
+  }
+  const abrirPergunta = useCallback(() => setPerguntaAberta(true), [])
+
   // fecha o menu se a tela crescer e as âncoras do header voltarem
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 821px)')
@@ -539,7 +586,7 @@ export default function App() {
 
       <main id="conteudo">
         {expor
-          ? <Suspense fallback={null}><Exposicao intro={abrindo} aoFimIntro={fimAbertura} pularRef={pularRef} /></Suspense>
+          ? <Suspense fallback={null}><Exposicao intro={abrindo} aoFimIntro={fimAbertura} pularRef={pularRef} portas={PORTAS} sala={sala} aoPorta={setSala} aoPergunta={abrirPergunta} /></Suspense>
           : <Fio reduzido={reduzido} />}
         {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
             navega por teclado, era um link invisível roubando o foco */}
@@ -554,8 +601,20 @@ export default function App() {
           <div className="wrap">
             <h1 className="micro entrada-titulo">Sites, sistemas e marketing sob medida — São Paulo</h1>
             <div className="entrada-base">
-              <div className="hero-escolha" role="group" aria-label="Qual é o seu problema?">
-                <div className="micro">Qual é o seu problema?</div>
+              {/* na exposição, a pergunta mora no totem em 3D; este botão é o mesmo
+                  convite para teclado e celular (no computador só aparece com foco) */}
+              {expor && !perguntaAberta && (
+                <button type="button" className="pergunta-gatilho" onClick={() => setPerguntaAberta(true)}>
+                  <span className="micro">Comece por aqui</span> Qual é o seu problema? <i aria-hidden="true">→</i>
+                </button>
+              )}
+              <div className={`hero-escolha${expor ? ' pergunta-painel' : ''}${perguntaAberta ? ' aberta' : ''}`} role="group" aria-label="Qual é o seu problema?">
+                <div className="pergunta-topo">
+                  <div className="micro">Qual é o seu problema?</div>
+                  {expor && (
+                    <button type="button" className="pergunta-fechar" onClick={() => { setPerguntaAberta(false); setEscolha(null) }} aria-label="Fechar as opções">✕</button>
+                  )}
+                </div>
                 <div className="hero-chips">
                   {HERO_PROBLEMAS.map((p, i) => (
                     <button type="button" className="hero-chip" key={p.href} aria-pressed={escolha === i} onClick={() => setEscolha(escolha === i ? null : i)}>
@@ -581,15 +640,28 @@ export default function App() {
           </div>
         </section>
 
-        <Marquee />
+        {/* na exposição, os serviços correm no letreiro pendurado no corredor */}
+        {!expor && <Marquee />}
 
         {/* ============ AS ALAS — cada obra se solta da parede quando a legenda dela está na tela ============ */}
         {ALAS.map((ala) => (
           <section className="cena cena-ala" id={ala.id} key={ala.id}>
-            <div className="wrap ala-cabeca">
-              <Regua esquerda={ala.eyebrow} direita={`${ala.obras.length} obras`} />
+            <div className={`wrap ala-cabeca${ala.id === 'problemas' ? ' saguao' : ''}`}>
+              <Regua esquerda={ala.eyebrow} direita={ala.id === 'problemas' ? `${PORTAS.length} portas` : `${ala.obras.length} obras`} />
               <h2 className="titulo-cena serif" data-palavras><Palavras texto={ala.titulo} /></h2>
               <p className="corpo-apoio" data-reveal>{ala.lead}</p>
+              {ala.id === 'problemas' && (
+                <nav className="portas-lista" aria-label="Portas do saguão: escolha o seu problema">
+                  <span className="micro">{expor ? 'Clique numa porta ou escolha aqui' : 'Escolha a sua'}</span>
+                  <div>
+                    {PORTAS.map((p, k) => (
+                      <button type="button" key={p.obra} className="porta-btn" onClick={() => entrarPorta(k)}>
+                        <i aria-hidden="true">{String(k + 1).padStart(2, '0')}</i>{p.curto}
+                      </button>
+                    ))}
+                  </div>
+                </nav>
+              )}
             </div>
             {ala.obras.map((o, i) => (
               <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} key={o.id} data-img={o.img} data-img-hd={imagemHD(o.img)} data-w={o.w} data-lado={i % 2 ? 1 : -1}>
@@ -777,7 +849,30 @@ export default function App() {
       </main>
 
       {/* o guia da exposição: onde estou, próxima obra, "quero algo assim" */}
-      <Guia lenisRef={lenisRef} ativo={!abrindo} />
+      <Guia lenisRef={lenisRef} ativo={!abrindo && sala == null} />
+
+      {/* a sala de um tema do saguão: o 3D mostra o cômodo; aqui, o texto e a navegação */}
+      {sala != null && (() => {
+        const p = PORTAS[sala]
+        return (
+          <aside className="sala-painel" aria-label={`Sala: ${p.area}`} key={sala}>
+            <span className="micro">Porta {String(sala + 1).padStart(2, '0')} de {String(PORTAS.length).padStart(2, '0')} · {p.area}</span>
+            <h2 className="serif" tabIndex={-1} ref={salaTituloRef}>“{p.dor}”</h2>
+            <p className="sala-solucao"><b>A gente constrói:</b> {p.solucao}</p>
+            <div className="sala-ctas">
+              <a className="btn" href={whatsProblema(p.dor)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Contar esse problema no WhatsApp</a>
+              <a className="link-mostarda" href={p.href}>{p.rotulo} →</a>
+            </div>
+            <div className="sala-nav">
+              <button type="button" className="sala-voltar" onClick={() => setSala(null)}>← Voltar ao saguão</button>
+              <span>
+                <button type="button" className="guia-seta" aria-label="Porta anterior" onClick={() => setSala((sala - 1 + PORTAS.length) % PORTAS.length)}>‹</button>
+                <button type="button" className="guia-seta" aria-label="Próxima porta" onClick={() => setSala((sala + 1) % PORTAS.length)}>›</button>
+              </span>
+            </div>
+          </aside>
+        )
+      })()}
 
       <footer>
         <div className="wrap rodape-linhas">

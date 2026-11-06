@@ -131,6 +131,8 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
     contato: !!document.querySelector('#contato a[href="/para-consultorias/"]'),
   }));
   ok(h.card && h.contato && h.chips.includes('Sou consultoria') && h.chips.length === 7, `home: cartão, chip "Sou consultoria" e serviço no contato (${h.chips.length} chips)`);
+  // com a exposição, as opções moram atrás do totem: abre o painel antes (o botão gatilho faz o mesmo que o totem)
+  await p.evaluate(() => document.querySelector('.pergunta-gatilho')?.click()); await p.waitForTimeout(300);
   await p.locator('#topo .hero-chip', { hasText: 'Sou consultoria' }).click();
   await p.waitForTimeout(300);
   ok((await p.locator('#topo .hero-links a[href="/para-consultorias/"]').count()) === 1 && (await p.locator('#topo .hero-dor').count()) === 1, 'chip "Sou consultoria" abre a dor e leva à página');
@@ -154,6 +156,41 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   const pr = await ctxR.newPage(); await pr.goto(BASE + '/', { waitUntil: 'networkidle' }); await pr.waitForTimeout(800);
   const r = await pr.evaluate(() => ({ canvas: !!document.querySelector('#canvas-root canvas'), fio: !!document.querySelector('svg.fio') }));
   ok(!r.canvas && r.fio, 'movimento reduzido: sem 3D, com o fio em SVG');
+  await ctxR.close();
+}
+// 05/11 (v3): a pergunta no totem, o letreiro no lugar da faixa, o saguão com portas e as salas
+{
+  const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+  const p = await ctx.newPage(); const erros = []; p.on('pageerror', (e) => erros.push(e.message));
+  await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(3000);
+  const e0 = await p.evaluate(() => ({ marquee: !!document.querySelector('.marquee'), painel: getComputedStyle(document.querySelector('.pergunta-painel')).display, chips: document.querySelectorAll('#topo .hero-chip').length }));
+  ok(!e0.marquee, 'com 3D, a faixa de serviços sai do site (corre no letreiro dentro da exposição)');
+  ok(e0.painel === 'none' && e0.chips === 7, `entrada limpa: as 7 opções existem mas só abrem quando se pede (display=${e0.painel})`);
+  await p.mouse.click(1090, 412); await p.waitForTimeout(700);
+  ok(await p.evaluate(() => !!document.querySelector('.pergunta-painel.aberta')), 'clicar no totem em 3D abre "Qual é o seu problema?"');
+  await p.locator('.pergunta-fechar').click(); await p.waitForTimeout(300);
+  ok(!(await p.evaluate(() => !!document.querySelector('.pergunta-painel.aberta'))), 'o ✕ fecha as opções');
+  const portas = await p.evaluate(() => [...document.querySelectorAll('#problemas .porta-btn')].map((b) => b.innerText.replace(/\s+/g, ' ').trim()));
+  ok(portas.length === 6, `saguão da Ala 2 com 6 portas (${portas.join(' | ')})`);
+  await p.locator('#problemas .porta-btn').nth(2).click(); await p.waitForTimeout(1200);
+  const s1 = await p.evaluate(() => ({ painel: document.querySelector('.sala-painel')?.innerText || '', trava: document.documentElement.style.overflow, guia: document.querySelector('.guia')?.classList.contains('guia-on') || false, emSala: document.documentElement.classList.contains('em-sala') }));
+  ok(/Porta 03 de 06/i.test(s1.painel) && /manutenção/i.test(s1.painel) && s1.trava === 'hidden' && !s1.guia && s1.emSala, 'porta 03 leva à sala de manutenção, com a página parada e o corredor escondido');
+  ok(/wa\.me/.test(await p.evaluate(() => document.querySelector('.sala-painel a.btn').href)), 'a sala tem o WhatsApp com a dor');
+  await p.keyboard.press('ArrowRight'); await p.waitForTimeout(900);
+  ok(/Porta 04 de 06/i.test(await p.evaluate(() => document.querySelector('.sala-painel')?.innerText || '')), 'seta → passa para a porta seguinte sem voltar ao corredor');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(900);
+  const s2 = await p.evaluate(() => ({ painel: !!document.querySelector('.sala-painel'), trava: document.documentElement.style.overflow, emSala: document.documentElement.classList.contains('em-sala') }));
+  ok(!s2.painel && s2.trava === '' && !s2.emSala, 'Esc volta ao saguão e devolve a rolagem');
+  ok(erros.length === 0, `saguão e salas sem erro de JavaScript (${erros.join(' | ')})`);
+  await ctx.close();
+  // sem 3D: a faixa volta, as opções aparecem direto e a porta leva até a obra da dor
+  const ctxR = await b.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const pr = await ctxR.newPage(); await pr.goto(BASE + '/', { waitUntil: 'networkidle' }); await pr.waitForTimeout(800);
+  const r0 = await pr.evaluate(() => ({ marquee: !!document.querySelector('.marquee'), chipVisivel: document.querySelector('#topo .hero-chip').getBoundingClientRect().height > 0 }));
+  ok(r0.marquee && r0.chipVisivel, 'sem 3D: faixa de serviços e opções do hero visíveis como antes');
+  await pr.locator('#problemas .porta-btn').nth(2).click(); await pr.waitForTimeout(900);
+  const topo = await pr.evaluate(() => document.getElementById('obra-p-manut').getBoundingClientRect().top);
+  ok(Math.abs(topo) < 200 && !(await pr.locator('.sala-painel').count()), `sem 3D: a porta leva até a obra da dor (topo ${Math.round(topo)})`);
   await ctxR.close();
 }
 // 05/11: guia da exposição — aparece no passeio, anda de obra em obra, WhatsApp com a obra

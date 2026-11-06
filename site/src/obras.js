@@ -40,9 +40,9 @@ export const ALAS = [
   },
   {
     id: 'problemas',
-    eyebrow: 'Ala 02 · O ponto de partida',
-    titulo: 'Tudo começa pelo problema do seu negócio.',
-    lead: 'Não tem pacote pronto aqui. A gente escuta onde o seu dia trava e constrói a solução que resolve aquilo — do tamanho do seu negócio, no seu nome.',
+    eyebrow: 'Ala 02 · O saguão das dores',
+    titulo: 'Escolha a porta do seu problema.',
+    lead: 'São as seis dores que a gente mais escuta de quem tem negócio. Entre pela sua: do outro lado está o que a gente constrói para resolver aquilo, do tamanho do seu negócio e no seu nome. Saia quando quiser e entre em outra — ou siga em frente e veja todas.',
     obras: [
       { id: 'p-loja', tag: 'Lojas de moda e varejo', titulo: '“Vendo pelo direct e não dou conta de responder todo mundo.”', texto: 'A gente constrói: uma loja virtual que mostra o tamanho, cobra no Pix e calcula o frete sozinha. Pagamento único, sem mensalidade.', img: F + 'loja-moda-640.webp', w: 4.6, href: '/loja-virtual/', rotulo: 'Ver a loja virtual' },
       { id: 'p-atend', tag: 'Atendimento', titulo: '“Respondo as mesmas perguntas o dia inteiro no WhatsApp.”', texto: 'A gente constrói: automação que responde o que se repete, confirma pedido e só chama você quando precisa de você.', img: F + 'balcao-pedidos-640.webp', w: 4.6, href: '/automacao-de-atendimento/', rotulo: 'Ver a automação' },
