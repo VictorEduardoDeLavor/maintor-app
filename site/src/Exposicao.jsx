@@ -63,6 +63,12 @@ function cobrir(tex, aspectoAlvo) {
   if (a > aspectoAlvo) { tex.repeat.set(aspectoAlvo / a, 1); tex.offset.set((1 - aspectoAlvo / a) / 2, 0) }
   else { tex.repeat.set(1, a / aspectoAlvo); tex.offset.set(0, (1 - a / aspectoAlvo) / 2) }
 }
+// repete a textura pelo tamanho real da superfície (uma junta a cada 2,4 m na parede, réguas de 3 m no chão)
+function uvEscala(geo, sx, sy) {
+  const uv = geo.attributes.uv
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * sx, uv.getY(i) * sy)
+  return geo
+}
 const F_LETREIRO = 'italic 104px "DM Serif Display"'
 const SERVICOS = ['loja virtual', 'loja no Instagram', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
   'gestão de RH', 'sistema para revender', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago']
@@ -73,7 +79,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
   const salaRef = useRef(sala)
   const cbRef = useRef({})
   salaRef.current = sala
-  cbRef.current = { aoPorta, aoPergunta }
+  cbRef.current = { aoPorta, aoPergunta, aoFimIntro }
   const portasRef = useRef(portas)
 
   useEffect(() => {
@@ -82,8 +88,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     let vivo = true
     const celular = window.innerWidth < 820 || matchMedia('(pointer: coarse)').matches
 
-    const renderer = new THREE.WebGLRenderer({ antialias: !celular, alpha: false, powerPreference: 'high-performance' })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, celular ? 1.5 : 2))
+    // 06/11: o celular também ganha antialias e a densidade real da tela (até 2x) — o 1,5x deixava tudo borrado
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(COR.abismo, 1)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.toneMapping = THREE.ACESFilmicToneMapping
@@ -108,23 +115,51 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     pontos.push(new THREE.Vector3(0, OLHO, -N * PASSO))
     const caminho = new THREE.CatmullRomCurve3(pontos, false, 'centripetal', 0.6)
 
-    const matParede = new THREE.MeshStandardMaterial({ color: COR.petroleo, roughness: 0.96 })
-    const matChao = new THREE.MeshStandardMaterial({ color: 0x0b1f1f, roughness: 0.42, metalness: 0.08, envMapIntensity: 0.9 })
+    // 06/11: paredes e chão com acabamento (reboco com juntas e rodameio; piso em réguas) — antes era cor chapada
+    const texParede = (() => {
+      const c = document.createElement('canvas'); c.width = 256; c.height = 1024
+      const g = c.getContext('2d')
+      g.fillStyle = '#1F4747'; g.fillRect(0, 0, 256, 1024)
+      const gr = g.createLinearGradient(0, 0, 0, 1024)
+      gr.addColorStop(0, 'rgba(0,0,0,.28)'); gr.addColorStop(0.25, 'rgba(0,0,0,0)'); gr.addColorStop(0.8, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.22)')
+      g.fillStyle = gr; g.fillRect(0, 0, 256, 1024)
+      for (let i = 0; i < 9000; i++) { const v = Math.random(); g.fillStyle = v > 0.5 ? `rgba(255,255,255,${(v - 0.5) * 0.05})` : `rgba(0,0,0,${v * 0.09})`; g.fillRect(Math.random() * 256, Math.random() * 1024, 1.4, 1.4) }
+      g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, 2, 1024); g.fillStyle = 'rgba(255,255,255,.05)'; g.fillRect(2, 0, 1, 1024)
+      const yR = 1024 * (1 - 1.05 / ALT)
+      g.fillStyle = 'rgba(212,165,116,.22)'; g.fillRect(0, yR, 256, 3); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, yR + 3, 256, 2)
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.anisotropy = 8
+      return t
+    })()
+    const texChao = (() => {
+      const c = document.createElement('canvas'); c.width = 512; c.height = 512
+      const g = c.getContext('2d')
+      g.fillStyle = '#0b1f1f'; g.fillRect(0, 0, 512, 512)
+      for (let k = 0; k < 4; k++) { g.fillStyle = `rgba(255,255,255,${0.012 + (k % 2) * 0.012})`; g.fillRect(k * 128, 0, 128, 512) }
+      for (let i = 0; i < 7000; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.12})`; g.fillRect(Math.random() * 512, Math.random() * 512, 1, 3 + Math.random() * 9) }
+      g.fillStyle = 'rgba(0,0,0,.45)'; for (let k = 0; k < 4; k++) g.fillRect(k * 128, 0, 1.5, 512)
+      g.fillRect(0, 0, 128, 1.5); g.fillRect(128, 256, 128, 1.5); g.fillRect(256, 128, 128, 1.5); g.fillRect(384, 384, 128, 1.5)
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8
+      return t
+    })()
+    const matParede = new THREE.MeshStandardMaterial({ color: 0xffffff, map: texParede, roughness: 0.96 })
+    const matChao = new THREE.MeshStandardMaterial({ color: 0xffffff, map: texChao, roughness: 0.42, metalness: 0.08, envMapIntensity: 0.9 })
     const matTeto = new THREE.MeshStandardMaterial({ color: 0x0a1c1c, roughness: 1 })
     const matLatao = new THREE.MeshStandardMaterial({ color: COR.mostarda, roughness: 0.3, metalness: 0.9 })
     const matLuzTeto = new THREE.MeshStandardMaterial({ color: COR.bege, emissive: COR.bege, emissiveIntensity: 1.6, roughness: 1 })
     const matFio = new THREE.MeshStandardMaterial({ color: COR.mostarda, emissive: COR.mostarda, emissiveIntensity: 1.4, roughness: 0.6 })
     const matVidro = new THREE.MeshPhysicalMaterial({ color: COR.creme, roughness: 0.08, transmission: 0.85, thickness: 0.6, ior: 1.45, transparent: true, opacity: 0.9 })
     const matCreme = new THREE.MeshPhysicalMaterial({ color: COR.creme, emissive: COR.creme, emissiveIntensity: 0.14, roughness: 0.35, metalness: 0.05, clearcoat: 0.6 })
+    // o pórtico tem material próprio: no celular ele esmaece enquanto um quadro está na frente dele
+    const matLataoL = matLatao.clone(); matLataoL.transparent = true; matCreme.transparent = true
 
     const COMP = N * PASSO + PASSO
     const zMeio = -COMP / 2 + PASSO / 2
-    const chao = new THREE.Mesh(new THREE.PlaneGeometry(LARG, COMP), matChao)
+    const chao = new THREE.Mesh(uvEscala(new THREE.PlaneGeometry(LARG, COMP), LARG / 3, COMP / 3), matChao)
     chao.rotation.x = -Math.PI / 2; chao.position.set(0, 0, zMeio); chao.receiveShadow = true; cena.add(chao)
     const teto = new THREE.Mesh(new THREE.PlaneGeometry(LARG, COMP), matTeto)
     teto.rotation.x = Math.PI / 2; teto.position.set(0, ALT, zMeio); cena.add(teto)
     for (const lado of [-1, 1]) {
-      const p = new THREE.Mesh(new THREE.PlaneGeometry(COMP, ALT), matParede)
+      const p = new THREE.Mesh(uvEscala(new THREE.PlaneGeometry(COMP, ALT), COMP / 2.4, 1), matParede)
       p.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
       p.position.set(lado * LARG / 2, ALT / 2, zMeio); p.receiveShadow = true; cena.add(p)
       const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, COMP), matLatao)
@@ -166,13 +201,18 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const esc = 8 / 940
     lockup.scale.set(esc, -esc, esc)
     lockup.position.set(-470 * esc + 1.2, 300 * esc + 3.6, -24)
-    let introTl = null, renderizou = false
+    let introTl = null, renderizou = false, introAcabou = !intro
+    // o totem e o letreiro só entram depois que o logo se monta (antes disputavam a tela com a abertura)
+    const entrada = { v: intro ? 0 : 1 }
     const terminarIntro = () => {
-      if (introTl) { introTl.kill(); introTl = null }
+      introAcabou = true
+      // pulou no meio: o logo vai direto para a forma final — a fachada fica idêntica ao fim da animação
+      if (introTl) { const tl = introTl; introTl = null; tl.eventCallback('onComplete', null); tl.progress(1).kill() }
       gsap.to(hemi, { intensity: INT.hemi, duration: 0.6 }); gsap.to(sol, { intensity: INT.sol, duration: 0.6 })
       gsap.to(spotA, { intensity: INT.spotA, duration: 0.6 }); gsap.to(spotB, { intensity: INT.spotB, duration: 0.6 })
       gsap.to(luzPortico, { intensity: INT.portico, duration: 0.6 }); gsap.to(matFio, { emissiveIntensity: INT.fio, duration: 0.6 })
-      aoFimIntro?.()
+      gsap.to(entrada, { v: 1, duration: 1.3, ease: 'power3.out', delay: 0.15 })
+      cbRef.current.aoFimIntro?.()
     }
     if (pularRef) pularRef.current = terminarIntro
     fetch('/midia/marca/maintor-lockup-pecas.svg').then((r) => r.text()).then((txt) => {
@@ -185,11 +225,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         geo.computeBoundingBox()
         const bb = geo.boundingBox, cx = (bb.min.x + bb.max.x) / 2, base = bb.max.y
         geo.translate(-cx, -base, 0)
-        const m = new THREE.Mesh(geo, ['arco', 'bolinha', 'ponto'].includes(id) ? matLatao : matCreme)
+        const m = new THREE.Mesh(geo, ['arco', 'bolinha', 'ponto'].includes(id) ? matLataoL : matCreme)
         m.position.set(cx, base, 0); m.castShadow = !celular
         lockup.add(m); pecas[id] = m
       }
-      if (!intro) return
+      if (!intro || introAcabou) return
       const W = (k) => pecas[k]
       for (let i = 0; i < 7; i++) { const l = W('wm-' + i); l.userData.y0 = l.position.y; l.position.y -= 420 + i * 60; l.rotation.z = (i % 2 ? 1 : -1) * 0.45 }
       W('simbolo').scale.set(1, 0.001, 1)
@@ -236,10 +276,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
 
     // as obras
     const loader = new THREE.TextureLoader()
+    const toque = matchMedia('(pointer: coarse)').matches
     const obras = [...document.querySelectorAll('article.obra[data-img]')].map((el) => ({
-      // no computador, a versão HD (1920 px); no celular, a de 720 basta e pesa menos
-      el, src: (!celular && el.dataset.imgHd) || el.dataset.img, w: parseFloat(el.dataset.w || '5'), lado: parseInt(el.dataset.lado || '1', 10),
-      grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0,
+      // no computador a HD (1920 px); no celular a de 1280 (06/11: a de 720 ficava borrada na tela 2x)
+      el, src: (celular ? el.dataset.imgHd?.replace('-1920.webp', '-1280.webp') : el.dataset.imgHd) || el.dataset.img, w: parseFloat(el.dataset.w || '5'), lado: parseInt(el.dataset.lado || '1', 10),
+      grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0, fs: 0, ws: 0, foco: false,
     }))
     for (const o of obras) {
       cena.add(o.grupo)
@@ -307,7 +348,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       g.letterSpacing = '0px'; g.font = 'italic 96px "DM Serif Display"'
       g.fillStyle = '#FAF7F2'; g.fillText('Qual é o seu', 64, 205)
       g.fillStyle = '#D4A574'; g.fillText('problema?', 64, 300)
-      g.fillStyle = hover ? '#FAF7F2' : '#E6DDD0'; g.font = '600 32px Inter'; g.fillText('Clique e escolha o seu  →', 64, 384)
+      g.fillStyle = hover ? '#FAF7F2' : '#E6DDD0'; g.font = '600 32px Inter'; g.fillText(toque ? 'Toque e escolha o seu  →' : 'Clique e escolha o seu  →', 64, 384)
     })
     const telaTotem = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 1.95 * 440 / 1024), new THREE.MeshBasicMaterial({ map: placaTotem.tex, transparent: true, toneMapped: false }))
     telaTotem.position.set(0, 1.55, 0.03); telaTotem.userData.acao = { tipo: 'pergunta' }
@@ -385,10 +426,10 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const SX = 140
     const salaG = new THREE.Group(); salaG.position.set(SX, 0, 0); cena.add(salaG)
     const SW = 12, SD = 14, SH = 6.6
-    const chaoS = new THREE.Mesh(new THREE.PlaneGeometry(SW, SD), matChao); chaoS.rotation.x = -Math.PI / 2; salaG.add(chaoS)
+    const chaoS = new THREE.Mesh(uvEscala(new THREE.PlaneGeometry(SW, SD), SW / 3, SD / 3), matChao); chaoS.rotation.x = -Math.PI / 2; salaG.add(chaoS)
     const tetoS = new THREE.Mesh(new THREE.PlaneGeometry(SW, SD), matTeto); tetoS.rotation.x = Math.PI / 2; tetoS.position.y = SH; salaG.add(tetoS)
     for (const [w, x, z, ry] of [[SW, 0, -SD / 2, 0], [SD, -SW / 2, 0, Math.PI / 2], [SD, SW / 2, 0, -Math.PI / 2], [SW, 0, SD / 2, Math.PI]]) {
-      const p = new THREE.Mesh(new THREE.PlaneGeometry(w, SH), matParede); p.position.set(x, SH / 2, z); p.rotation.y = ry; salaG.add(p)
+      const p = new THREE.Mesh(uvEscala(new THREE.PlaneGeometry(w, SH), w / 2.4, 1), matParede); p.position.set(x, SH / 2, z); p.rotation.y = ry; salaG.add(p)
     }
     const FW = 6.4, FH = 4.0
     const fotoSala = new THREE.Mesh(new THREE.PlaneGeometry(FW, FH), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }))
@@ -523,6 +564,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const relogio = new THREE.Clock()
     const pos = new THREE.Vector3(), frente = new THREE.Vector3(), olhar = new THREE.Vector3()
     const fwd = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), alvoPos = new THREE.Vector3()
+    const dirOlhar = new THREE.Vector3(), dirObra = new THREE.Vector3(), ctrl = new THREE.Vector3()
+    const balanco = new THREE.Quaternion(), eixoZ = new THREE.Vector3(0, 0, 1)
     let prog = 0, raf, visivel = true, primeiro = true, emFoco = false
     const aoVis = () => { visivel = document.visibilityState === 'visible'; if (visivel) quadro() }
     document.addEventListener('visibilitychange', aoVis)
@@ -552,15 +595,41 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         raf = requestAnimationFrame(quadro)
         return
       }
+      const retrato = cam.aspect < 1
+
+      // 06/11 — cada quadro tem o seu trecho de rolagem, em três tempos:
+      //  1. quem anda VIRA O ROSTO para o quadro na parede (no celular a parede fica fora da tela estreita;
+      //     sem isso o quadro "surgia" do nada na frente)
+      //  2. o quadro SE SOLTA: sai da parede para o meio do corredor e faz uma curva até a posição de leitura
+      //  3. ao seguir, ele faz o caminho de volta para a parede — e o próximo quadro repete o mesmo gesto
+      // Tudo segue o scroll com amortecimento: o toque do celular rola aos trancos e o quadro não pode pular.
+      let olharPeso = 0, olharObra = null
+      for (const o of obras) {
+        const p = (yTela - o.topo) / o.alt
+        const fAlvo = p < -0.9 || p > 1.5 ? 0 : suave(-0.1, 0.38, p) * (1 - suave(0.56, 0.9, p))
+        o.fs += (fAlvo - o.fs) * Math.min(1, dt * 6)
+        if (Math.abs(fAlvo - o.fs) < 0.0005) o.fs = fAlvo
+        // o olhar para o próximo começa quando o anterior volta para a parede (os dois gestos se encadeiam)
+        const wAlvo = p < -1 || p > 1 ? 0 : suave(-0.45, -0.15, p) * (1 - suave(0, 0.3, p))
+        o.ws += (wAlvo - o.ws) * Math.min(1, dt * 4)
+        if (o.ws > olharPeso) { olharPeso = o.ws; olharObra = o }
+      }
+
       cam.position.copy(pos)
       olhar.copy(frente); olhar.y = OLHO - 0.18 + mouse.sy * -0.35; olhar.x += mouse.sx * 1.6
+      dirOlhar.copy(olhar).sub(pos).normalize()
+      if (olharObra && olharPeso > 0.002) {
+        dirObra.copy(olharObra.parede.pos).sub(pos); dirObra.y *= 0.5; dirObra.normalize()
+        dirOlhar.lerp(dirObra, olharPeso * (retrato ? 0.8 : 0.28)).normalize()
+      }
+      olhar.copy(pos).add(dirOlhar)
       cam.lookAt(olhar)
       cam.getWorldDirection(fwd); right.crossVectors(fwd, up).normalize()
 
       // o letreiro corre; o totem fica na entrada e afunda quando se segue; as portas sobem no saguão
       if (letreiro.tex) letreiro.tex.offset.x += dt * 0.025
       const pTopo = (yTela - window.innerHeight * 0.5) / Math.max(window.innerHeight, 1)
-      const fTotem = 1 - suave(0.35, 0.9, pTopo)
+      const fTotem = (1 - suave(0.35, 0.9, pTopo)) * entrada.v
       totem.visible = fTotem > 0.01
       totem.position.y = (fTotem - 1) * 2.6
       anel.material.opacity = 1; anel.scale.setScalar(1 + Math.sin(t * 3) * 0.08)
@@ -583,23 +652,34 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       fioCurva.getPointAt(Math.min(u + 0.02, 0.999), ponto.position)
       ponto.position.y = 0.14 + Math.abs(Math.sin(t * 2.2)) * 0.08
 
-      let maior = 0, atual = null
-      const retrato = cam.aspect < 1
+      let maior = 0, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
       const dist = retrato ? 7.2 : 4.6
       const largVisivel = 2 * dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect
       for (const o of obras) {
-        const p = (yTela - o.topo) / o.alt
-        const f = p < -0.3 || p > 1.3 ? 0 : suave(0.06, 0.34, p) * (1 - suave(0.66, 0.94, p))
+        const f = o.fs
+        const focoObra = f > 0.72
+        if (focoObra !== o.foco) { o.foco = focoObra; o.el.classList.toggle('em-foco', focoObra) }
         if (f <= 0.001) { if (o.f) { o.grupo.position.copy(o.parede.pos); o.grupo.quaternion.copy(o.parede.quat); o.grupo.scale.setScalar(1); o.f = 0 } continue }
         o.f = f
         const e = easeInOut(f)
-        alvoPos.copy(cam.position).addScaledVector(fwd, dist).addScaledVector(right, retrato ? 0 : -o.lado * 1.75).addScaledVector(up, (retrato ? 0.9 : 0.05) + Math.sin(t * 1.1) * 0.04)
-        o.grupo.position.lerpVectors(o.parede.pos, alvoPos, e)
-        o.grupo.quaternion.slerpQuaternions(o.parede.quat, cam.quaternion, e)
+        alvoPos.copy(cam.position).addScaledVector(fwd, dist).addScaledVector(right, retrato ? 0 : -o.lado * 1.75).addScaledVector(up, (retrato ? 0.85 : 0.05) + Math.sin(t * 1.1) * 0.04)
+        // a curva: da parede, primeiro para o meio do corredor (e um pouco para cima), depois para a frente de quem anda
+        ctrl.copy(o.parede.pos); ctrl.x += o.lado * 2.8; ctrl.y += 0.45
+        const a = (1 - e) * (1 - e), b = 2 * (1 - e) * e, c = e * e
+        o.grupo.position.set(0, 0, 0).addScaledVector(o.parede.pos, a).addScaledVector(ctrl, b).addScaledVector(alvoPos, c)
+        // vira de frente um pouco antes de chegar, com um leve balanço de quem foi tirado da parede
+        o.grupo.quaternion.slerpQuaternions(o.parede.quat, cam.quaternion, suave(0, 0.85, e))
+        balanco.setFromAxisAngle(eixoZ, Math.sin(Math.PI * e) * 0.07 * o.lado); o.grupo.quaternion.multiply(balanco)
         const escAlvo = Math.min(1, (largVisivel * (retrato ? 0.9 : 0.5)) / o.w)
         o.grupo.scale.setScalar(1 + (escAlvo - 1) * e)
-        if (f > maior) { maior = f; atual = o }
+        if (f > maior) maior = f
+        if (f > maiorLuz) { maiorLuz = f; atual = o }
       }
+      // no celular o quadro sobe à frente do pórtico: o logo esmaece enquanto se lê
+      const opPortico = retrato ? 1 - 0.85 * suave(0.2, 0.8, maior) : 1
+      matCreme.opacity = opPortico; matLataoL.opacity = opPortico
+      // o totem e o letreiro entram depois da abertura
+      caixaLetreiro.position.y = 6.35 + (1 - entrada.v) * 2.2
 
       // com uma obra flutuando, o grão de filme quase some (ele sujava o print)
       const foco = maior > 0.35
@@ -631,9 +711,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       document.removeEventListener('visibilitychange', aoVis)
       pmrem.dispose(); renderer.dispose(); host.innerHTML = ''
       document.documentElement.classList.remove('obra-em-foco')
+      obras.forEach((o) => o.el.classList.remove('em-foco'))
       if (pularRef) pularRef.current = null
     }
-  }, [intro, aoFimIntro, pularRef])
+    // monta UMA vez: quando a abertura acaba, a cena segue a mesma (antes ela era desmontada e remontada
+    // no fim da abertura, e o logo da fachada sumia e voltava)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return <div id="canvas-root" ref={hostRef} aria-hidden="true" />
 }
