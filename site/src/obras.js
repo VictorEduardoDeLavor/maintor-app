@@ -12,6 +12,15 @@
 const P = '/midia/portfolio/'
 const F = '/midia/fotos/'
 
+/* versão HD de cada imagem para o quadro em 3D (05/11): prints dos sites em 1920 px
+   (capturados em 2x) e fotos em 960 px. RH e Task só existem na resolução da captura. */
+const COM_HD = ['bendita-desktop', 'besten-kpis', 'cmms-painel', 'fit-site-desktop', 'horaqui-site', 'voke-desktop', 'cmms-os', 'cmms-copiloto', 'besten-biblioteca', 'besten-onboarding']
+export function imagemHD(img) {
+  const m = img.match(/\/midia\/portfolio\/(.+)-720\.webp$/)
+  if (m) return COM_HD.includes(m[1]) ? img.replace('-720.webp', '-1920.webp') : img.replace('-720.webp', '-1280.webp')
+  return img.replace(/-640\.webp$/, '-960.webp')
+}
+
 export const ALAS = [
   {
     id: 'trabalhos',

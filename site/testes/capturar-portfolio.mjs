@@ -7,19 +7,21 @@ import { chromium } from 'file:///C:/Users/victo/AppData/Roaming/npm/node_module
 const OUT = process.argv[2];
 mkdirSync(OUT, { recursive: true });
 const SO = process.argv[3]; // opcional: capturar só um projeto
+const HD = process.argv.includes('--hd'); // desktop em 2x (2880×1800) para os quadros da exposição
 const SITES = [
   ['voke', 'https://vokewear.com.br'],
   ['bendita', 'https://benditaacessorios.com'],
   ['cmms-site', 'https://maintor.com.br'],
   ['fit-site', 'https://maintorfit.com'],
   ['besten-site', 'https://besten-site.vercel.app'],
+  ['horaqui-site', 'https://www.horaqui.com.br'],
 ];
 const b = await chromium.launch({ executablePath: 'C:/Users/victo/AppData/Local/ms-playwright/chromium-1234/chrome-win64/chrome.exe' });
-for (const [nome, url] of SITES.filter(([n]) => !SO || n === SO)) {
-  for (const [sufixo, opts] of [
-    ['desktop', { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }],
+for (const [nome, url] of SITES.filter(([n]) => !SO || SO === '--hd' || n === SO)) {
+  for (const [sufixo, opts] of (HD ? (a) => a.slice(0, 1) : (a) => a)([
+    ['desktop', { viewport: { width: 1440, height: 900 }, deviceScaleFactor: HD ? 2 : 1 }],
     ['celular', { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }],
-  ]) {
+  ])) {
     const ctx = await b.newContext({ ...opts, locale: 'pt-BR' });
     const p = await ctx.newPage();
     try {

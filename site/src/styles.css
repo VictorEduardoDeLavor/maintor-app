@@ -95,6 +95,7 @@ body::before {
   pointer-events: none;
   opacity: .07;
   background-image: url('/midia/grao.png');
+  transition: opacity .5s ease;
   background-repeat: repeat;
 }
 
@@ -1312,3 +1313,5 @@ html.sem-3d .obra-legenda img { display: block; width: 100%; height: auto; borde
 }
 @media (prefers-reduced-motion: reduce) { .guia { transition: opacity .2s; } }
 
+/* 05/11: o grão de filme sujava os prints flutuantes — some enquanto uma obra está em destaque */
+html.obra-em-foco #grao { opacity: .015; }

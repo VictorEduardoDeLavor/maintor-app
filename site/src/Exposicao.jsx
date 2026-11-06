@@ -195,7 +195,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
     // as obras
     const loader = new THREE.TextureLoader()
     const obras = [...document.querySelectorAll('article.obra[data-img]')].map((el) => ({
-      el, src: el.dataset.img, w: parseFloat(el.dataset.w || '5'), lado: parseInt(el.dataset.lado || '1', 10),
+      // no computador, a versão HD (1920 px); no celular, a de 720 basta e pesa menos
+      el, src: (!celular && el.dataset.imgHd) || el.dataset.img, w: parseFloat(el.dataset.w || '5'), lado: parseInt(el.dataset.lado || '1', 10),
       grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0,
     }))
     for (const o of obras) {
@@ -203,13 +204,15 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
       loader.load(o.src, (tex) => {
         if (!vivo) return
         tex.colorSpace = THREE.SRGBColorSpace
-        tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy())
+        tex.anisotropy = renderer.capabilities.getMaxAnisotropy()
+        tex.generateMipmaps = true; tex.minFilter = THREE.LinearMipmapLinearFilter; tex.magFilter = THREE.LinearFilter
         const h = o.w * (tex.image.height / tex.image.width)
         const moldura = new THREE.Mesh(new THREE.BoxGeometry(o.w + 0.18, h + 0.18, 0.09), matLatao)
         moldura.position.z = -0.045; moldura.castShadow = !celular
         const passe = new THREE.Mesh(new THREE.BoxGeometry(o.w + 0.08, h + 0.08, 0.06), new THREE.MeshStandardMaterial({ color: 0x0b1f1f, roughness: 0.9 }))
         passe.position.z = -0.02
-        const tela = new THREE.Mesh(new THREE.PlaneGeometry(o.w, h), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.55 }))
+        // a tela mostra a cor EXATA do print: sem luz da cena e sem o filtro de tom (ACES lavava o contraste)
+        const tela = new THREE.Mesh(new THREE.PlaneGeometry(o.w, h), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }))
         tela.position.z = 0.012
         const placa = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.16, 0.02), matLatao)
         placa.position.set(0, -h / 2 - 0.32, 0)
@@ -283,7 +286,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
     const relogio = new THREE.Clock()
     const pos = new THREE.Vector3(), frente = new THREE.Vector3(), olhar = new THREE.Vector3()
     const fwd = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), alvoPos = new THREE.Vector3()
-    let prog = 0, raf, visivel = true, primeiro = true
+    let prog = 0, raf, visivel = true, primeiro = true, emFoco = false
     const aoVis = () => { visivel = document.visibilityState === 'visible'; if (visivel) quadro() }
     document.addEventListener('visibilitychange', aoVis)
     const quadro = () => {
@@ -323,6 +326,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
         if (f > maior) { maior = f; atual = o }
       }
 
+      // com uma obra flutuando, o grão de filme quase some (ele sujava o print)
+      const foco = maior > 0.35
+      if (foco !== emFoco) { emFoco = foco; document.documentElement.classList.toggle('obra-em-foco', foco) }
       const ala = Math.round(prog * (N - 1)), alaZ = (i) => -i * PASSO
       if (atual) { spotA.position.copy(cam.position).addScaledVector(up, ALT - 0.2 - OLHO).addScaledVector(fwd, 1.5); spotA.target.position.copy(atual.grupo.position) }
       else { spotA.position.set(0, ALT - 0.2, alaZ(ala) - 4); spotA.target.position.set(0, 1.4, alaZ(ala) - 14) }
@@ -347,6 +353,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef }) {
       if (temMouse) window.removeEventListener('pointermove', aoMover)
       document.removeEventListener('visibilitychange', aoVis)
       pmrem.dispose(); renderer.dispose(); host.innerHTML = ''
+      document.documentElement.classList.remove('obra-em-foco')
       if (pularRef) pularRef.current = null
     }
   }, [intro, aoFimIntro, pularRef])

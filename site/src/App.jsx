@@ -11,7 +11,7 @@ const ABERTURA_CHAVE = 'flow.abertura' // o mesmo nome no index.html
 import Fio from './Fio.jsx'
 // a exposição 3D (home como galeria) baixa depois do primeiro paint
 const Exposicao = lazy(() => import('./Exposicao.jsx'))
-import { ALAS } from './obras.js'
+import { ALAS, imagemHD } from './obras.js'
 import Guia from './Guia.jsx'
 
 /* A abertura 3D roda uma vez por sessão. Fica de fora para quem pede
@@ -592,7 +592,7 @@ export default function App() {
               <p className="corpo-apoio" data-reveal>{ala.lead}</p>
             </div>
             {ala.obras.map((o, i) => (
-              <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} key={o.id} data-img={o.img} data-w={o.w} data-lado={i % 2 ? 1 : -1}>
+              <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} key={o.id} data-img={o.img} data-img-hd={imagemHD(o.img)} data-w={o.w} data-lado={i % 2 ? 1 : -1}>
                 <div className="wrap">
                   <div className="obra-legenda">
                     <img src={o.img} alt="" width="720" height="450" loading="lazy" decoding="async" />
