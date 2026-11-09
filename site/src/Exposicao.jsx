@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import gsap from 'gsap'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+import { criarAcabamento, marcarTela } from './acabamento.js'
 
 /* ================================================================
    A EXPOSIÇÃO (05/11/2026, v2) — a home é uma galeria em 3D que o
@@ -104,7 +106,24 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const pmrem = new THREE.PMREMGenerator(renderer)
     cena.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture
     cena.environmentIntensity = 0.35
+    // 09/11: o reflexo passa a ser de uma galeria de verdade (foto 360° CC0, Poly Haven) — o latão e o vidro
+    // refletem luz quente em vez do estúdio cinza genérico. Até ela chegar, fica o estúdio.
+    new RGBELoader().load('/midia/texturas/galeria-1k.hdr', (hdr) => {
+      if (!vivo) { hdr.dispose(); return }
+      const env = pmrem.fromEquirectangular(hdr).texture; hdr.dispose()
+      cena.environment = env; if (introAcabou) cena.environmentIntensity = INT.env
+    })
+    const maxAniso = renderer.capabilities.getMaxAnisotropy()
+    const texLoader = new THREE.TextureLoader()
+    // textura de material (CC0, Poly Haven): repete e filtra com anisotropia máxima
+    const texMaterial = (url, rx, ry, srgb = false) => {
+      const t = texLoader.load(url)
+      t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.anisotropy = maxAniso
+      if (srgb) t.colorSpace = THREE.SRGBColorSpace
+      return t
+    }
     const cam = new THREE.PerspectiveCamera(52, 1, 0.1, 160)
+    const acab = criarAcabamento(renderer, cena, cam, { celular })
 
     const secoes = [...document.querySelectorAll('main#conteudo > section.cena')]
     const nomes = secoes.map((s) => s.id)
@@ -115,34 +134,47 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     pontos.push(new THREE.Vector3(0, OLHO, -N * PASSO))
     const caminho = new THREE.CatmullRomCurve3(pontos, false, 'centripetal', 0.6)
 
-    // 06/11: paredes e chão com acabamento (reboco com juntas e rodameio; piso em réguas) — antes era cor chapada
+    // 06/11: paredes e chão com acabamento. 09/11: materiais fotografados (CC0, Poly Haven) —
+    // reboco com relevo e brilho variável; piso de taco espinha-de-peixe com veio, relevo e verniz.
+    // A cor da parede continua a da marca: o reboco entra como variação por cima dela.
     const texParede = (() => {
-      const c = document.createElement('canvas'); c.width = 256; c.height = 1024
+      const W = 512, H = 2048
+      const c = document.createElement('canvas'); c.width = W; c.height = H
       const g = c.getContext('2d')
-      g.fillStyle = '#1F4747'; g.fillRect(0, 0, 256, 1024)
-      const gr = g.createLinearGradient(0, 0, 0, 1024)
-      gr.addColorStop(0, 'rgba(0,0,0,.28)'); gr.addColorStop(0.25, 'rgba(0,0,0,0)'); gr.addColorStop(0.8, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.22)')
-      g.fillStyle = gr; g.fillRect(0, 0, 256, 1024)
-      for (let i = 0; i < 9000; i++) { const v = Math.random(); g.fillStyle = v > 0.5 ? `rgba(255,255,255,${(v - 0.5) * 0.05})` : `rgba(0,0,0,${v * 0.09})`; g.fillRect(Math.random() * 256, Math.random() * 1024, 1.4, 1.4) }
-      g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, 2, 1024); g.fillStyle = 'rgba(255,255,255,.05)'; g.fillRect(2, 0, 1, 1024)
-      const yR = 1024 * (1 - 1.05 / ALT)
-      g.fillStyle = 'rgba(212,165,116,.22)'; g.fillRect(0, yR, 256, 3); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, yR + 3, 256, 2)
-      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.anisotropy = 8
+      const pintar = (reboco) => {
+        g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1
+        g.fillStyle = '#1F4747'; g.fillRect(0, 0, W, H)
+        if (reboco) {
+          g.globalAlpha = 0.5; g.globalCompositeOperation = 'overlay'
+          for (let y = 0; y < H; y += W) g.drawImage(reboco, 0, y, W, W) // um ladrilho a cada 2,4 m
+          g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'
+        }
+        const gr = g.createLinearGradient(0, 0, 0, H)
+        gr.addColorStop(0, 'rgba(0,0,0,.28)'); gr.addColorStop(0.25, 'rgba(0,0,0,0)'); gr.addColorStop(0.8, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.22)')
+        g.fillStyle = gr; g.fillRect(0, 0, W, H)
+        g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(0, 0, 3, H); g.fillStyle = 'rgba(255,255,255,.05)'; g.fillRect(3, 0, 2, H)
+        const yR = H * (1 - 1.05 / ALT)
+        g.fillStyle = 'rgba(212,165,116,.26)'; g.fillRect(0, yR, W, 5); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, yR + 5, W, 4)
+      }
+      pintar(null)
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.anisotropy = maxAniso
+      const img = new Image()
+      img.onload = () => { if (vivo) { pintar(img); t.needsUpdate = true } }
+      img.src = '/midia/texturas/reboco-cor-1k.webp'
       return t
     })()
-    const texChao = (() => {
-      const c = document.createElement('canvas'); c.width = 512; c.height = 512
-      const g = c.getContext('2d')
-      g.fillStyle = '#0b1f1f'; g.fillRect(0, 0, 512, 512)
-      for (let k = 0; k < 4; k++) { g.fillStyle = `rgba(255,255,255,${0.012 + (k % 2) * 0.012})`; g.fillRect(k * 128, 0, 128, 512) }
-      for (let i = 0; i < 7000; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.12})`; g.fillRect(Math.random() * 512, Math.random() * 512, 1, 3 + Math.random() * 9) }
-      g.fillStyle = 'rgba(0,0,0,.45)'; for (let k = 0; k < 4; k++) g.fillRect(k * 128, 0, 1.5, 512)
-      g.fillRect(0, 0, 128, 1.5); g.fillRect(128, 256, 128, 1.5); g.fillRect(256, 128, 128, 1.5); g.fillRect(384, 384, 128, 1.5)
-      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8
-      return t
-    })()
-    const matParede = new THREE.MeshStandardMaterial({ color: 0xffffff, map: texParede, roughness: 0.96 })
-    const matChao = new THREE.MeshStandardMaterial({ color: 0xffffff, map: texChao, roughness: 0.42, metalness: 0.08, envMapIntensity: 0.9 })
+    // a parede: UV = 2,4 m por 7,5 m → o relevo repete 1 x 3,1 para ficar quadrado
+    const matParede = new THREE.MeshStandardMaterial({
+      color: 0xffffff, map: texParede, roughness: 1,
+      normalMap: texMaterial('/midia/texturas/reboco-normal-1k.webp', 1, ALT / 2.4), normalScale: new THREE.Vector2(0.9, 0.9),
+      roughnessMap: texMaterial('/midia/texturas/reboco-rugosidade-1k.webp', 1, ALT / 2.4),
+    })
+    // o chão: UV = 3 m; o taco da foto cobre ~2 m → repete 1,5. Tingido para madeira escura (não briga com os quadros)
+    const matChao = new THREE.MeshStandardMaterial({
+      color: 0x403c37, map: texMaterial('/midia/texturas/taco-cor-2k.webp', 1.5, 1.5, true),
+      normalMap: texMaterial('/midia/texturas/taco-normal-2k.webp', 1.5, 1.5), normalScale: new THREE.Vector2(0.7, 0.7),
+      roughnessMap: texMaterial('/midia/texturas/taco-rugosidade-1k.webp', 1.5, 1.5), roughness: 1.7, metalness: 0, envMapIntensity: 0.38,
+    })
     const matTeto = new THREE.MeshStandardMaterial({ color: 0x0a1c1c, roughness: 1 })
     const matLatao = new THREE.MeshStandardMaterial({ color: COR.mostarda, roughness: 0.3, metalness: 0.9 })
     const matLuzTeto = new THREE.MeshStandardMaterial({ color: COR.bege, emissive: COR.bege, emissiveIntensity: 1.6, roughness: 1 })
@@ -165,9 +197,20 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, COMP), matLatao)
       r.position.set(lado * (LARG / 2 - 0.03), 0.06, zMeio); cena.add(r)
     }
+    // 09/11: cada luminária ganha um halo suave no teto (o brilho de luz real, sem custo de pós-processo)
+    const texHalo = (() => {
+      const c = document.createElement('canvas'); c.width = 256; c.height = 64
+      const g = c.getContext('2d'), gr = g.createRadialGradient(128, 32, 0, 128, 32, 128)
+      gr.addColorStop(0, 'rgba(255,240,215,.55)'); gr.addColorStop(0.35, 'rgba(255,236,205,.16)'); gr.addColorStop(1, 'rgba(255,236,205,0)')
+      g.setTransform(1, 0, 0, 0.25, 0, 24); g.fillStyle = gr; g.fillRect(0, 0, 256, 256)
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
+    })()
+    const matHalo = new THREE.MeshBasicMaterial({ map: texHalo, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true })
     for (let i = 0; i < N * 2; i++) {
       const l = new THREE.Mesh(new THREE.BoxGeometry(LARG * 0.5, 0.05, 0.18), matLuzTeto)
       l.position.set(0, ALT - 0.03, -i * PASSO / 2 + 2); cena.add(l)
+      const halo = new THREE.Mesh(new THREE.PlaneGeometry(LARG * 0.95, 2.4), matHalo)
+      halo.rotation.x = Math.PI / 2; halo.position.set(0, ALT - 0.06, l.position.z); cena.add(halo)
     }
     const DIV = LARG * 0.3
     for (let i = 0; i < N - 1; i++) {
@@ -193,7 +236,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const luzPortico = new THREE.SpotLight(0xfff1dc, 140, 30, Math.PI / 6, 0.5, 1.4)
     luzPortico.position.set(1.2, ALT - 0.1, -14); luzPortico.target.position.set(1.2, 5.2, -24)
     cena.add(luzPortico); cena.add(luzPortico.target)
-    const INT = { hemi: 0.55, sol: 0.5, spotA: 60, spotB: 42, portico: 140, fio: 1.4 }
+    const INT = { hemi: 0.55, sol: 0.5, spotA: 60, spotB: 42, portico: 140, fio: 1.4, env: 0.42 }
+    // a abertura começa no escuro: a luz da galeria (foto 360°) acende junto com as outras
+    if (intro) cena.environmentIntensity = 0.04
     if (intro) { hemi.intensity = 0.06; sol.intensity = 0; spotA.intensity = 0; spotB.intensity = 0; luzPortico.intensity = 0; matFio.emissiveIntensity = 0.05 }
 
     // o pórtico (lockup oficial) e a abertura dentro dele
@@ -211,6 +256,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       gsap.to(hemi, { intensity: INT.hemi, duration: 0.6 }); gsap.to(sol, { intensity: INT.sol, duration: 0.6 })
       gsap.to(spotA, { intensity: INT.spotA, duration: 0.6 }); gsap.to(spotB, { intensity: INT.spotB, duration: 0.6 })
       gsap.to(luzPortico, { intensity: INT.portico, duration: 0.6 }); gsap.to(matFio, { emissiveIntensity: INT.fio, duration: 0.6 })
+      gsap.to(cena, { environmentIntensity: INT.env, duration: 0.9 })
       gsap.to(entrada, { v: 1, duration: 1.3, ease: 'power3.out', delay: 0.15 })
       cbRef.current.aoFimIntro?.()
     }
@@ -268,6 +314,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
       introTl.to(hemi, { intensity: INT.hemi, duration: 0.9, ease: 'power2.inOut' }, 3.0)
       introTl.to(sol, { intensity: INT.sol, duration: 0.9 }, 3.0)
+      introTl.to(cena, { environmentIntensity: INT.env, duration: 1.1 }, 3.0)
       introTl.to(spotA, { intensity: INT.spotA, duration: 0.7 }, 3.15)
       introTl.to(spotB, { intensity: INT.spotB, duration: 0.7 }, 3.35)
       introTl.to(matFio, { emissiveIntensity: INT.fio, duration: 1.1, ease: 'power2.out' }, 3.2)
@@ -280,7 +327,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const obras = [...document.querySelectorAll('article.obra[data-img]')].map((el) => ({
       // no computador a HD (1920 px); no celular a de 1280 (06/11: a de 720 ficava borrada na tela 2x)
       el, src: (celular ? el.dataset.imgHd?.replace('-1920.webp', '-1280.webp') : el.dataset.imgHd) || el.dataset.img, w: parseFloat(el.dataset.w || '5'), lado: parseInt(el.dataset.lado || '1', 10),
-      grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0, fs: 0, ws: 0, foco: false,
+      hd: celular ? el.dataset.imgHd : null, tela: null, grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0, fs: 0, ws: 0, foco: false,
     }))
     for (const o of obras) {
       cena.add(o.grupo)
@@ -295,7 +342,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         const passe = new THREE.Mesh(new THREE.BoxGeometry(o.w + 0.08, h + 0.08, 0.06), new THREE.MeshStandardMaterial({ color: 0x0b1f1f, roughness: 0.9 }))
         passe.position.z = -0.02
         // a tela mostra a cor EXATA do print: sem luz da cena e sem o filtro de tom (ACES lavava o contraste)
-        const tela = new THREE.Mesh(new THREE.PlaneGeometry(o.w, h), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }))
+        const tela = new THREE.Mesh(new THREE.PlaneGeometry(o.w, h), marcarTela(new THREE.MeshBasicMaterial({ map: tex, toneMapped: false })))
+        o.tela = tela
         tela.position.z = 0.012
         const placa = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.16, 0.02), matLatao)
         placa.position.set(0, -h / 2 - 0.32, 0)
@@ -528,7 +576,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
       montarSaguao()
       const w = host.clientWidth, h = host.clientHeight
-      renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix()
+      renderer.setSize(w, h, false); acab.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix()
     }
     // o saguão: as portas formam um arco à frente de quem chega na cabeça da Ala 2.
     // Recalculado também quando as portas começam a subir (aí o layout da página já assentou).
@@ -591,7 +639,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         cam.position.set(SX + (retr ? 1.2 : -1.6) + mouse.sx * 0.3, OLHO + 0.1 + Math.sin(t * 1.2) * 0.02, retr ? 6.9 : 3.6)
         cam.lookAt(SX + (retr ? 1.2 : -0.2) + mouse.sx * 1.2, (retr ? 0.6 : 2.9) - mouse.sy * 0.4, -SD / 2)
         letreiro.tex && (letreiro.tex.offset.x += dt * 0.025)
-        renderer.render(cena, cam)
+        acab.foco(5, 0); acab.desenhar(dt)
         raf = requestAnimationFrame(quadro)
         return
       }
@@ -659,6 +707,15 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         const f = o.fs
         const focoObra = f > 0.72
         if (focoObra !== o.foco) { o.foco = focoObra; o.el.classList.toggle('em-foco', focoObra) }
+        // 09/11: no celular, o quadro que chega na leitura troca para a imagem grande (1920 px) — só ele
+        if (f > 0.3 && o.hd && o.tela) {
+          const url = o.hd; o.hd = null
+          loader.load(url, (t2) => {
+            if (!vivo) return
+            t2.colorSpace = THREE.SRGBColorSpace; t2.anisotropy = maxAniso
+            const velha = o.tela.material.map; o.tela.material.map = t2; o.tela.material.needsUpdate = true; velha?.dispose()
+          })
+        }
         if (f <= 0.001) { if (o.f) { o.grupo.position.copy(o.parede.pos); o.grupo.quaternion.copy(o.parede.quat); o.grupo.scale.setScalar(1); o.f = 0 } continue }
         o.f = f
         const e = easeInOut(f)
@@ -677,7 +734,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
       // no celular o quadro sobe à frente do pórtico: o logo esmaece enquanto se lê
       const opPortico = retrato ? 1 - 0.85 * suave(0.2, 0.8, maior) : 1
-      matCreme.opacity = opPortico; matLataoL.opacity = opPortico
+      // 09/11: com o buffer em alta faixa, o reflexo forte do latão atravessava a transparência —
+      // o reflexo esmaece junto (e a opacidade cai em curva) para o logo sumir de verdade atrás do quadro
+      matCreme.opacity = matLataoL.opacity = opPortico * opPortico
+      matCreme.envMapIntensity = matLataoL.envMapIntensity = opPortico
+      matCreme.emissiveIntensity = 0.14 * opPortico
       // o totem e o letreiro entram depois da abertura
       caixaLetreiro.position.y = 6.35 + (1 - entrada.v) * 2.2
 
@@ -695,7 +756,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       for (const g of pecasAla) { const no = g.children[0]; if (no?.geometry?.type === 'TorusKnotGeometry') { no.rotation.y = t * 0.4; no.rotation.x = Math.sin(t * 0.3) * 0.3 } for (const c of g.children) if (c.userData.billboard) c.lookAt(cam.position) }
       po.position.y = Math.sin(t * 0.15) * 0.3; po.rotation.y = t * 0.01
 
-      renderer.render(cena, cam)
+      // foco de câmera no quadro em leitura (o fundo desfoca)
+      acab.foco(retrato ? 7.2 : 4.6, suave(0.5, 0.95, maior))
+      acab.desenhar(dt)
       if (primeiro) { primeiro = false; renderizou = true; document.documentElement.classList.add('expo-pronta'); if (introTl && introTl.paused()) introTl.play() }
       raf = requestAnimationFrame(quadro)
     }
@@ -709,7 +772,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       window.removeEventListener('click', aoClicar); window.removeEventListener('pointermove', aoPairar)
       document.body.style.cursor = ''
       document.removeEventListener('visibilitychange', aoVis)
-      pmrem.dispose(); renderer.dispose(); host.innerHTML = ''
+      acab.dispose(); pmrem.dispose(); renderer.dispose(); host.innerHTML = ''
       document.documentElement.classList.remove('obra-em-foco')
       obras.forEach((o) => o.el.classList.remove('em-foco'))
       if (pularRef) pularRef.current = null
