@@ -170,10 +170,10 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       roughnessMap: texMaterial('/midia/texturas/reboco-rugosidade-1k.webp', 1, ALT / 2.4),
     })
     // o chão: UV = 3 m; o taco da foto cobre ~2 m → repete 1,5. Tingido para madeira escura (não briga com os quadros)
-    const matChao = new THREE.MeshStandardMaterial({
-      color: 0x403c37, map: texMaterial('/midia/texturas/taco-cor-2k.webp', 1.5, 1.5, true),
+    const matChao = new THREE.MeshPhysicalMaterial({
+      color: 0x2c2925, map: texMaterial('/midia/texturas/taco-cor-2k.webp', 1.5, 1.5, true),
       normalMap: texMaterial('/midia/texturas/taco-normal-2k.webp', 1.5, 1.5), normalScale: new THREE.Vector2(0.7, 0.7),
-      roughnessMap: texMaterial('/midia/texturas/taco-rugosidade-1k.webp', 1.5, 1.5), roughness: 1.7, metalness: 0, envMapIntensity: 0.38,
+      roughnessMap: texMaterial('/midia/texturas/taco-rugosidade-1k.webp', 1.5, 1.5), roughness: 1.7, metalness: 0, envMapIntensity: 0.24, specularIntensity: 0.3,
     })
     const matTeto = new THREE.MeshStandardMaterial({ color: 0x0a1c1c, roughness: 1 })
     const matLatao = new THREE.MeshStandardMaterial({ color: COR.mostarda, roughness: 0.3, metalness: 0.9 })
@@ -246,7 +246,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const esc = 8 / 940
     lockup.scale.set(esc, -esc, esc)
     lockup.position.set(-470 * esc + 1.2, 300 * esc + 3.6, -24)
-    let introTl = null, renderizou = false, introAcabou = !intro
+    let introTl = null, renderizou = false, introAcabou = !intro, quadrosDesenhados = 0
     // o totem e o letreiro só entram depois que o logo se monta (antes disputavam a tela com a abertura)
     const entrada = { v: intro ? 0 : 1 }
     const terminarIntro = () => {
@@ -286,7 +286,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const ptFinal = pt.position.clone()
       pt.position.copy(bol.position); pt.scale.setScalar(0.001)
 
-      introTl = gsap.timeline({ paused: true, delay: 0.3, onComplete: () => { introTl = null; terminarIntro() } })
+      introTl = gsap.timeline({ paused: true, delay: 0.5, onComplete: () => { introTl = null; terminarIntro() } })
       if (renderizou) introTl.play()
       introTl.to(luzPortico, { intensity: INT.portico, duration: 0.8, ease: 'power2.out' }, 0)
       for (let i = 0; i < 7; i++) {
@@ -759,7 +759,10 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       // foco de câmera no quadro em leitura (o fundo desfoca)
       acab.foco(retrato ? 7.2 : 4.6, suave(0.5, 0.95, maior))
       acab.desenhar(dt)
-      if (primeiro) { primeiro = false; renderizou = true; document.documentElement.classList.add('expo-pronta'); if (introTl && introTl.paused()) introTl.play() }
+      if (primeiro) { primeiro = false; document.documentElement.classList.add('expo-pronta') }
+      // a abertura só começa depois de uns quadros já desenhados: o 1º quadro compila os shaders (trava),
+      // e se a queda das letras começasse ali o visitante via só o fim dela
+      if (!renderizou && ++quadrosDesenhados >= 4) { renderizou = true; if (introTl && introTl.paused()) introTl.play() }
       raf = requestAnimationFrame(quadro)
     }
     quadro()

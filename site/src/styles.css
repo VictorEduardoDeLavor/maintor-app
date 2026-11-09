@@ -1417,3 +1417,7 @@ html.obra-em-foco #grao { opacity: .015; }
   html.expo-pronta .guia-quero { flex: 1; justify-content: center; }
   #grao { opacity: .035; }
 }
+
+/* Na abertura a cena já nasce no escuro (a capa do index.html segura até o 1º quadro):
+   sem o fade de 1,4 s do canvas, que escondia a queda das letras (09/11) */
+html.com-abertura #canvas-root { animation: none; }
