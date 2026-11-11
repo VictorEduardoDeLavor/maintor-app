@@ -562,7 +562,7 @@ export default function App() {
 
       <main id="conteudo">
         {expor
-          ? <Suspense fallback={null}><Exposicao intro={abrindo} aoFimIntro={fimAbertura} pularRef={pularRef} portas={PORTAS} sala={sala} aoPorta={setSala} aoPergunta={abrirPergunta} /></Suspense>
+          ? <Suspense fallback={null}><Exposicao intro={abrindo} aoFimIntro={fimAbertura} pularRef={pularRef} portas={PORTAS} sala={sala} aoPorta={setSala} aoPergunta={abrirPergunta} pergunta={perguntaAberta} /></Suspense>
           : <Fio reduzido={reduzido} />}
         {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
             navega por teclado, era um link invisível roubando o foco */}

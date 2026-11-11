@@ -37,6 +37,7 @@ const SITE = path.resolve(AQUI, '..')
 const arg = (n, padrao = null) => { const a = process.argv.find((x) => x.startsWith(`--${n}=`)); return a ? a.slice(n.length + 3) : padrao }
 const ROTULO = arg('rotulo', 'antes')
 const SAIDA = path.join(AQUI, 'limpeza', ROTULO)
+const CONSULTA = arg('consulta', '') // parâmetros extras na URL (ex.: --consulta=selo=1), para fotografar opções
 let GL = arg('gl', 'gpu') // gpu (placa de vídeo real, ~100× mais rápido) | swiftshader (sem placa de vídeo); sem WebGL na gpu, cai para swiftshader
 
 const TELAS = [
@@ -68,7 +69,7 @@ const NOME = { 1: 'Fundo calmo', 2: 'Contraste', 3: 'Sem colisão', 4: 'Guia', 5
 /* ------------------------------------------------------------------ a sonda (só em tempo de teste) */
 const MARCA = 'if (navigator.webdriver) window.__guia = guia.raiz'
 const SONDA = `
-    if (navigator.webdriver) window.__expoSonda = () => ({ THREE, cam, cena, lockup, matCreme, caixaLetreiro, totem, portas3d, obras, guia, pecasAla, prog })`
+    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, caixaLetreiro, totem, portas3d, obras, guia, pecasAla, prog })`
 const pluginSonda = () => ({
   name: 'limpeza-sonda', enforce: 'pre',
   transform(code, id) {
@@ -145,7 +146,7 @@ function coletar() {
 // retângulos de tela do 3D e, para cada bloco, o que a câmera vê primeiro atrás dele
 function sondar({ rects, nevoaMin }) {
   const e = window.__expoSonda?.(); if (!e) return null
-  const T = e.THREE, cam = e.cam, vw = innerWidth, vh = innerHeight
+  const T = e.T, cam = e.cam, vw = innerWidth, vh = innerHeight
   cam.updateMatrixWorld()
   const alvos = []
   const add = (nome, tipo, raiz, extra = {}) => { if (raiz) alvos.push({ nome, tipo, raiz, ...extra }) }
@@ -288,7 +289,7 @@ async function abrir(tela, altura = tela.h) {
   await p.addInitScript(() => { window.__quadros = 0; const f = () => { window.__quadros++; requestAnimationFrame(f) }; requestAnimationFrame(f) })
   p.on('pageerror', (e) => erros.push(`${tela.id}: ${e.message}`))
   // a qualidade fica travada na que o aparelho real usa (o robô sem placa de vídeo cairia para a mais baixa)
-  await p.goto(`${BASE}/?qualidade=${tela.celular ? 'media' : 'alta'}`, { waitUntil: 'networkidle' })
+  await p.goto(`${BASE}/?qualidade=${tela.celular ? 'media' : 'alta'}${CONSULTA ? '&' + CONSULTA : ''}`, { waitUntil: 'networkidle' })
   await p.waitForFunction(() => document.documentElement.classList.contains('expo-pronta'), null, { timeout: 90000 })
   await p.addStyleTag({ content: CSS_SEM_TEXTO })
   return { ctx, p }
@@ -402,7 +403,7 @@ if (PONTOS.some((x) => x.id === 'abertura')) {
      vista só a parte de cima aparece. Três casos: o literal do pedido (390×700); o Safari do iPhone
      (100vh = 750, visível 664); e o Chrome do iPhone, medido no print do Victor (100vh ≈ 790, visível 666). */
   R.abertura700 = { montagens: [], ok: true }
-  for (const caso of [{ nome: '390×700 (literal)', alt: 700, corte: 700 }, { nome: 'Safari do iPhone (página 750, visível 664)', alt: 750, corte: 664 }, { nome: 'Chrome do iPhone (página 790, visível 666)', alt: 790, corte: 666 }]) {
+  for (const caso of [{ nome: '390×700 (literal)', alt: 700, corte: 700 }, { nome: 'iPhone com as barras à vista (390×664)', alt: 664, corte: 664 }, { nome: 'Safari do iPhone (página 750, visível 664)', alt: 750, corte: 664 }, { nome: 'Chrome do iPhone (página 790, visível 666)', alt: 790, corte: 666 }]) {
     const { ctx, p } = await abrir({ id: `c390x${caso.alt}`, w: 390, h: caso.alt, dsf: 2, celular: true })
     await assentar(p)
     const bts = await p.evaluate((corte) => { const topo = document.querySelector('header')?.getBoundingClientRect().bottom || 0; return [...document.querySelectorAll('.entrada-ctas .btn')].map((a) => { const r = a.getBoundingClientRect(); return { texto: a.innerText.trim(), topo: Math.round(r.top), base: Math.round(r.bottom), inteiro: r.top >= topo && r.bottom <= corte && r.left >= 0 && r.right <= innerWidth } }) }, caso.corte)

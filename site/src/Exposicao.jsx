@@ -77,12 +77,14 @@ const F_LETREIRO = 'italic 104px "DM Serif Display"'
 const SERVICOS = ['loja virtual', 'loja no Instagram', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
   'gestão de RH', 'sistema para revender', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago']
 
-export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas = [], sala = null, aoPorta, aoPergunta }) {
+export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas = [], sala = null, aoPorta, aoPergunta, pergunta = false }) {
   const hostRef = useRef(null)
   // a cena é montada uma vez; o que muda depois chega por referência
   const salaRef = useRef(sala)
   const cbRef = useRef({})
   salaRef.current = sala
+  const perguntaRef = useRef(pergunta) // o painel "Qual é o seu problema?" está aberto
+  perguntaRef.current = pergunta
   cbRef.current = { aoPorta, aoPergunta, aoFimIntro }
   const portasRef = useRef(portas)
 
@@ -208,11 +210,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
     })()
     const matHalo = new THREE.MeshBasicMaterial({ map: texHalo, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true })
+    const luzesTeto = []
     for (let i = 0; i < N * 2; i++) {
       const l = new THREE.Mesh(new THREE.BoxGeometry(LARG * 0.5, 0.05, 0.18), matLuzTeto)
       l.position.set(0, ALT - 0.03, -i * PASSO / 2 + 2); cena.add(l)
       const halo = new THREE.Mesh(new THREE.PlaneGeometry(LARG * 0.95, 2.4), matHalo)
       halo.rotation.x = Math.PI / 2; halo.position.set(0, ALT - 0.06, l.position.z); cena.add(halo)
+      luzesTeto.push([l, halo])
     }
     const DIV = LARG * 0.3
     for (let i = 0; i < N - 1; i++) {
@@ -238,6 +242,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     halo.rotation.x = -Math.PI / 2; halo.position.y = 0.012; guia.raiz.add(halo)
     guia.raiz.scale.setScalar(0.001); cena.add(guia.raiz)
     if (navigator.webdriver) window.__guia = guia.raiz // só para a bateria de aceite (robôs): conferir que ele anda
+    // 11/11: sonda da limpeza visual (só robôs) — testes/aceite-limpeza.mjs lê daqui os objetos da cena e projeta os retângulos de tela.
+    // Só as classes usadas, nunca o módulo THREE inteiro: passar o módulo como valor desliga o tree-shaking (+45 KB em gzip)
+    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, caixaLetreiro, totem, portas3d, obras, guia, pecasAla, prog })
     const guiaPos = new THREE.Vector3(), guiaAnt = new THREE.Vector3(), guiaTan = new THREE.Vector3(), guiaDelta = new THREE.Vector3()
     let guiaComecou = false
 
@@ -250,7 +257,18 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const luzPortico = new THREE.SpotLight(0xfff1dc, 140, 30, Math.PI / 6, 0.5, 1.4)
     luzPortico.position.set(1.2, ALT - 0.1, -14); luzPortico.target.position.set(1.2, 5.2, -24)
     cena.add(luzPortico); cena.add(luzPortico.target)
-    const INT = { hemi: 0.55, sol: 0.5, spotA: 60, spotB: 42, portico: 140, fio: 1.4, env: 0.42 }
+    const retratoIni = window.innerWidth < window.innerHeight
+    /* 11/11 — ABERTURA NO CELULAR (limpeza visual, Fase 1): "uma coisa por vez". Na primeira tela em pé,
+       cada elemento tem a sua faixa e nenhum passa atrás do texto:
+         · no alto, entre o cabeçalho e o título: o letreiro e, logo abaixo, o logo 3D (mais perto e menor)
+         · no meio: título, proposta e as duas ações, sobre o corredor escurecido (modo LER)
+         · embaixo, à direita: o boneco inteiro, esperando ao lado do fio
+       Para isso quem chega OLHA PARA CIMA, para o pórtico (a câmera inclina ~10°); quando a rolagem
+       começa, o olhar desce, o boneco vem para o fio e o passeio segue como antes. As posições são
+       ângulos (frações da altura da tela), então valem de 664 a 844 px de altura. */
+    const ABRE = { inclina: 0.235, nevoa: 0.03, logoD: 10, logoY: 6.19, logoLarg: 3.5, letD: 8, letY: 6.06, letLarg: 3.3, letAlt: 0.46, bonecoFrente: 0.8, bonecoLado: 0.6, bonecoProf: 6 }
+    const p0 = caminho.getPointAt(0), dir0 = caminho.getPointAt(0.012).sub(p0).setY(0).normalize()
+    const INT = { hemi: 0.55, sol: 0.5, spotA: 60, spotB: 42, portico: retratoIni ? 55 : 140, fio: 1.4, env: 0.42 }
     // a abertura começa no escuro: a luz da galeria (foto 360°) acende junto com as outras
     if (intro) cena.environmentIntensity = 0.04
     if (intro) { hemi.intensity = 0.06; sol.intensity = 0; spotA.intensity = 0; spotB.intensity = 0; luzPortico.intensity = 0; matFio.emissiveIntensity = 0.05 }
@@ -260,6 +278,27 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const esc = 8 / 940
     lockup.scale.set(esc, -esc, esc)
     lockup.position.set(-470 * esc + 1.2, 300 * esc + 3.6, -24)
+    // no retrato o logo vem para perto do teto, logo depois da entrada, e encolhe: cabe na faixa livre acima do título
+    let lockupCaixa = null, lockupGiro = 0
+    const alvoLogo = new THREE.Vector3()
+    const posicionarLockup = () => {
+      // a luminária do teto que ficaria logo abaixo do logo (lida como um risco cinza) sai no retrato
+      luzesTeto[1]?.forEach((o) => { o.visible = !(cam.aspect < 1) })
+      if (!lockupCaixa) return
+      if (cam.aspect < 1) {
+        const e = ABRE.logoLarg / lockupCaixa.larg
+        alvoLogo.copy(p0).addScaledVector(dir0, ABRE.logoD).setY(ABRE.logoY)
+        lockupGiro = Math.atan2(-dir0.x, -dir0.z) // de frente para quem chega
+        lockup.scale.set(e, -e, e)
+        lockup.position.set(alvoLogo.x - lockupCaixa.cx * e * Math.cos(lockupGiro), alvoLogo.y + lockupCaixa.cy * e, alvoLogo.z + lockupCaixa.cx * e * Math.sin(lockupGiro))
+        luzPortico.position.copy(alvoLogo).addScaledVector(dir0, -4.5).setY(ALT - 0.1); luzPortico.target.position.copy(alvoLogo)
+      } else {
+        lockupGiro = 0
+        lockup.scale.set(esc, -esc, esc)
+        lockup.position.set(-470 * esc + 1.2, 300 * esc + 3.6, -24)
+        luzPortico.position.set(1.2, ALT - 0.1, -14); luzPortico.target.position.set(1.2, 5.2, -24)
+      }
+    }
     let introTl = null, renderizou = false, introAcabou = !intro, quadrosDesenhados = 0
     // o totem e o letreiro só entram depois que o logo se monta (antes disputavam a tela com a abertura)
     const entrada = { v: intro ? 0 : 1 }
@@ -289,6 +328,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         m.position.set(cx, base, 0); m.castShadow = !celular
         lockup.add(m); pecas[id] = m
       }
+      // a caixa do logo (em unidades do SVG, com as peças no lugar final) serve para centrar e dimensionar no retrato
+      const cx0 = new THREE.Box3()
+      for (const m of lockup.children) cx0.union(m.geometry.boundingBox.clone().translate(m.position))
+      lockupCaixa = { cx: (cx0.min.x + cx0.max.x) / 2, cy: (cx0.min.y + cx0.max.y) / 2, larg: cx0.max.x - cx0.min.x }
+      posicionarLockup()
       if (!intro || introAcabou) return
       const W = (k) => pecas[k]
       for (let i = 0; i < 7; i++) { const l = W('wm-' + i); l.userData.y0 = l.position.y; l.position.y -= 420 + i * 60; l.rotation.z = (i % 2 ? 1 : -1) * 0.45 }
@@ -398,7 +442,6 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const matBase = (cor) => new THREE.MeshBasicMaterial({ color: cor, toneMapped: false })
 
     // 1) o TOTEM da entrada: "Qual é o seu problema?" — clicar abre as opções
-    const retratoIni = window.innerWidth < window.innerHeight
     const totem = new THREE.Group(); cena.add(totem)
     const totemPos = retratoIni ? new THREE.Vector3(0.35, 0, -9.5) : new THREE.Vector3(2.05, 0, -7)
     totem.position.copy(totemPos)
@@ -426,8 +469,10 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     /* 10/11: no celular em pé o letreiro ficava escondido atrás do cabeçalho e cortado nas laterais
        (9,7 m de largura para uma tela que mostra ~5 m a essa distância). No retrato ele desce,
        chega mais perto e encolhe na largura — as letras ficam do mesmo tamanho na tela. */
-    const LET = retratoIni ? { x: -0.15, y: 4.7, z: -11.5 } : { x: 0, y: 6.35, z: -15 }
-    const ALTL = 0.62, LARGL = retratoIni ? 4.5 : LARG * 0.84
+    /* 11/11: no retrato ele sobe para junto do teto e chega ainda mais perto — fica na faixa do alto da
+       primeira tela, acima do logo, e nunca atrás do título (a câmera olha para cima na abertura). */
+    const LET = retratoIni ? { x: p0.x + dir0.x * ABRE.letD, y: ABRE.letY, z: p0.z + dir0.z * ABRE.letD } : { x: 0, y: 6.35, z: -15 }
+    const ALTL = retratoIni ? ABRE.letAlt : 0.62, LARGL = retratoIni ? ABRE.letLarg : LARG * 0.84
     // a textura é recriada quando a fonte carrega (a largura do texto muda e o WebGL não redimensiona textura já enviada)
     const telaLetreiro = new THREE.Mesh(new THREE.PlaneGeometry(LARGL, ALTL), new THREE.MeshBasicMaterial({ color: 0x081a1a, toneMapped: false }))
     const letreiro = { tex: null }
@@ -451,6 +496,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     montarLetreiro()
     document.fonts?.load(F_LETREIRO).then(montarLetreiro).catch(() => {})
     const caixaLetreiro = new THREE.Group(); caixaLetreiro.position.set(LET.x, LET.y, LET.z); cena.add(caixaLetreiro)
+    if (retratoIni) caixaLetreiro.rotation.y = Math.atan2(-dir0.x, -dir0.z)
     telaLetreiro.position.z = 0.04; caixaLetreiro.add(telaLetreiro)
     const moldL = new THREE.Mesh(new THREE.BoxGeometry(LARGL + 0.12, ALTL + 0.12, 0.06), matLatao); caixaLetreiro.add(moldL)
     for (const x of [-LARGL / 2 + 0.4, LARGL / 2 - 0.4]) {
@@ -595,6 +641,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       montarSaguao()
       const w = host.clientWidth, h = host.clientHeight
       renderer.setSize(w, h, false); acab.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix()
+      posicionarLockup()
     }
     // o saguão: as portas formam um arco à frente de quem chega na cabeça da Ala 2.
     // Recalculado também quando as portas começam a subir (aí o layout da página já assentou).
@@ -640,7 +687,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const fwd = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), alvoPos = new THREE.Vector3()
     const dirOlhar = new THREE.Vector3(), dirObra = new THREE.Vector3(), ctrl = new THREE.Vector3()
     const balanco = new THREE.Quaternion(), eixoZ = new THREE.Vector3(0, 0, 1)
-    let prog = 0, raf, visivel = true, primeiro = true, emFoco = false
+    let prog = 0, raf, visivel = true, primeiro = true, emFoco = false, abre = -1, bonecoSome = 0
     const aoVis = () => { visivel = document.visibilityState === 'visible'; if (visivel) quadro() }
     document.addEventListener('visibilitychange', aoVis)
     const quadro = () => {
@@ -696,13 +743,20 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         dirObra.copy(olharObra.parede.pos).sub(pos); dirObra.y *= 0.5; dirObra.normalize()
         dirOlhar.lerp(dirObra, olharPeso * (retrato ? 0.8 : 0.28)).normalize()
       }
+      // abertura no celular: quem chega olha para o pórtico, no alto; o olhar desce quando a rolagem começa
+      // (amortecido: o toque rola aos trancos). Enquanto se lê a abertura, o fundo do corredor escurece.
+      const pTopo = (yTela - window.innerHeight * 0.5) / Math.max(window.innerHeight, 1)
+      const abreAlvo = retrato ? 1 - suave(0.02, 0.5, pTopo) : 0
+      abre = abre < 0 ? abreAlvo : abre + (abreAlvo - abre) * Math.min(1, dt * 5)
+      if (Math.abs(abreAlvo - abre) < 0.0005) abre = abreAlvo
+      if (abre > 0) { dirOlhar.y += ABRE.inclina * abre; dirOlhar.normalize() }
+      cena.fog.density = 0.028 + ABRE.nevoa * abre
       olhar.copy(pos).add(dirOlhar)
       cam.lookAt(olhar)
       cam.getWorldDirection(fwd); right.crossVectors(fwd, up).normalize()
 
       // o letreiro corre; o totem fica na entrada e afunda quando se segue; as portas sobem no saguão
       if (letreiro.tex) letreiro.tex.offset.x += dt * 0.025
-      const pTopo = (yTela - window.innerHeight * 0.5) / Math.max(window.innerHeight, 1)
       const fTotem = (1 - suave(0.35, 0.9, pTopo)) * entrada.v
       totem.visible = fTotem > 0.01 && !retrato // 10/11: no celular em pé o totem ficava atrás do título; lá o atalho é o botão em HTML
       totem.position.y = (fTotem - 1) * 2.6
@@ -730,10 +784,15 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       if (!guiaComecou) { guiaAnt.copy(guiaPos); guiaComecou = true }
       const vGuia = dt > 0 ? THREE.MathUtils.clamp(guiaDelta.subVectors(guiaPos, guiaAnt).dot(guiaTan) / dt, -6, 6) : 0
       guiaAnt.copy(guiaPos)
+      // abertura no celular: ele espera ao lado do fio, na faixa livre de baixo (fora do texto e dos botões),
+      // e vem para o fio andando quando a rolagem começa
+      if (abre > 0.001) guiaPos.addScaledVector(guiaTan, ABRE.bonecoFrente * abre).addScaledVector(right, ABRE.bonecoLado * 0.4877 * cam.aspect * ABRE.bonecoProf * abre).setY(0)
       guia.raiz.position.copy(guiaPos)
       guiaDelta.subVectors(cam.position, guiaPos).setY(0).setLength(1.1)
       luzGuia.position.copy(guiaPos).add(guiaDelta).setY(1.5)
-      guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v)))
+      // no celular, o painel de opções abre na faixa do boneco: ele sai de cena enquanto o painel está aberto
+      bonecoSome += ((perguntaRef.current && retrato ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
+      guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v) * (1 - bonecoSome)))
       guia.atualizar(dt, { v: vGuia, tangente: guiaTan, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t })
 
       let maior = 0, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
@@ -769,14 +828,16 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         if (f > maiorLuz) { maiorLuz = f; atual = o }
       }
       // no celular o quadro sobe à frente do pórtico: o logo esmaece enquanto se lê
-      const opPortico = retrato ? 1 - 0.85 * suave(0.2, 0.8, maior) : 1
+      // (11/11: e também quando o passeio começa — ele sai por cima sem virar uma mancha atrás do cabeçalho)
+      const opPortico = retrato ? (1 - 0.85 * suave(0.2, 0.8, maior)) * suave(0.5, 0.9, abre) : 1
       // 09/11: com o buffer em alta faixa, o reflexo forte do latão atravessava a transparência —
       // o reflexo esmaece junto (e a opacidade cai em curva) para o logo sumir de verdade atrás do quadro
       matCreme.opacity = matLataoL.opacity = opPortico * opPortico
       matCreme.envMapIntensity = matLataoL.envMapIntensity = opPortico
       matCreme.emissiveIntensity = 0.14 * opPortico
       // o totem e o letreiro entram depois da abertura
-      caixaLetreiro.position.y = LET.y + (1 - entrada.v) * 2.2
+      // (11/11: no retrato ele também se recolhe no teto quando o passeio começa — não passa por trás do cabeçalho)
+      caixaLetreiro.position.y = LET.y + (1 - entrada.v) * 2.2 + (retratoIni && retrato ? (1 - abre) * 2 : 0)
 
       // com uma obra flutuando, o grão de filme quase some (ele sujava o print)
       const foco = maior > 0.35
@@ -788,7 +849,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       spotB.position.set(0, ALT - 0.2, alaZ(prox) - 4); spotB.target.position.set(0, 1.4, alaZ(prox) - 14)
       sol.position.set(pos.x + 3, pos.y + 7, pos.z + 4); sol.target.position.set(pos.x, 0, pos.z - 10)
 
-      lockup.rotation.y = Math.sin(t * 0.5) * 0.08
+      lockup.rotation.y = lockupGiro + Math.sin(t * 0.5) * (retrato ? 0.04 : 0.08)
       for (const g of pecasAla) { const no = g.children[0]; if (no?.geometry?.type === 'TorusKnotGeometry') { no.rotation.y = t * 0.4; no.rotation.x = Math.sin(t * 0.3) * 0.3 } for (const c of g.children) if (c.userData.billboard) c.lookAt(cam.position) }
       po.position.y = Math.sin(t * 0.15) * 0.3; po.rotation.y = t * 0.01
 
