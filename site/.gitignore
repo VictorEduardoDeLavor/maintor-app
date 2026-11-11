@@ -1,2 +1,7 @@
 node_modules/
 dist/
+
+# folha de referência do boneco (caricatura do Victor): só local, não vai para o repositório público
+testes/boneco/*.webp
+testes/boneco/*.png
+testes/boneco/*.jpg

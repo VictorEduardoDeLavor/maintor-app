@@ -186,3 +186,8 @@ body.pagina .link-mostarda { padding: 10px 0; }
 /* print de sistema em largura total (para-consultorias): proporção da tela, sem corte */
 .pg-foto-larga.pg-foto-print { aspect-ratio: 16 / 10; background: #fff; }
 .pg-foto-larga.pg-foto-print img { object-position: left top; }
+
+/* 10/11: dois vídeos de clientes lado a lado na página de vídeos (o comercial com preço saiu) */
+.pg-videos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.pg-videos .pg-video { width: 100%; }
+@media (max-width: 520px) { .pg-videos { gap: 10px; } .pg-videos .pg-video figcaption { font-size: 9.5px; letter-spacing: .08em; } }

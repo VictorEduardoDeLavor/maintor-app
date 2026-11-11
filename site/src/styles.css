@@ -1394,13 +1394,11 @@ html.obra-em-foco #grao { opacity: .015; }
 
 /* ---- 06/11: celular mais limpo — o 3D conta a história; o texto aparece só quando é a vez dele ---- */
 @media (max-width: 820px) {
-  /* entrada: o totem em 3D é o convite ("Toque e escolha"); fica só a dica de rolar */
-  html.expo-pronta .cena-entrada .entrada-titulo,
-  html.expo-pronta .pergunta-gatilho:not(:focus-visible) {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-  }
-  /* cabeça de cada ala: só o título (o parágrafo de apoio disputava a tela com o corredor) */
-  html.expo-pronta .ala-cabeca:not(.saguao) .corpo-apoio { display: none; }
+  /* entrada (10/11): a oferta e as ações vêm primeiro; o atalho "Qual é o seu problema?" fica como
+     botão (o totem em 3D sai do retrato — ficava atrás do título) e a dica de rolar sai */
+  html.expo-pronta .cena-entrada .dica-scroll { display: none; }
+  /* cabeça de cada ala: o parágrafo de apoio volta (10/11), um pouco menor */
+  html.expo-pronta .ala-cabeca .corpo-apoio { font-size: 15px; }
   /* a legenda entra quando o quadro chega na posição de leitura e sai quando ele volta para a parede */
   html.expo-pronta .obra-legenda {
     opacity: 0; transform: translateY(22px); pointer-events: none;
@@ -1408,9 +1406,9 @@ html.obra-em-foco #grao { opacity: .015; }
     padding: 14px 16px 12px; background: rgba(13, 38, 38, .72);
   }
   html.expo-pronta .obra.em-foco .obra-legenda { opacity: 1; transform: none; pointer-events: auto; }
-  html.expo-pronta .obra-legenda > p:not(.obra-nicho) {
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; margin-top: 6px;
-  }
+  /* 10/11: a descrição aparece inteira (antes cortava em 2 linhas) */
+  html.expo-pronta .obra-legenda > p:not(.obra-nicho) { font-size: 14px; margin-top: 6px; }
+  html.expo-pronta .obra-legenda > p.obra-nota { font-size: 11.5px; margin-top: 6px; }
   html.expo-pronta .obra-links { margin-top: 10px; }
   /* o guia vira só ‹ Quero algo assim › — o nome da obra já está na legenda */
   html.expo-pronta .guia-meio { display: none; }
@@ -1421,3 +1419,110 @@ html.obra-em-foco #grao { opacity: .015; }
 /* Na abertura a cena já nasce no escuro (a capa do index.html segura até o 1º quadro):
    sem o fade de 1,4 s do canvas, que escondia a queda das letras (09/11) */
 html.com-abertura #canvas-root { animation: none; }
+
+/* ================================================================
+   PORTFÓLIO COMERCIAL (10/11): a abertura apresenta a oferta e leva aos
+   projetos; a Ala 01 ganha grupos; processo, FAQ e contato revisados.
+   ================================================================ */
+/* abertura: título, proposta e as duas ações, legíveis sobre o 3D */
+.entrada-oferta { position: relative; max-width: 720px; margin-bottom: var(--s3); }
+.entrada-oferta::before {
+  content: ""; position: absolute; inset: -40px -60px -28px; z-index: -1; pointer-events: none; border-radius: 32px;
+  background: radial-gradient(ellipse at 30% 60%, rgba(13, 38, 38, .82), rgba(13, 38, 38, .5) 55%, rgba(13, 38, 38, 0) 82%);
+}
+.entrada-selo { color: var(--mostarda); margin: 0 0 14px; }
+.entrada-h1 { font-size: clamp(32px, 4.6vw, 60px); line-height: 1.04; color: var(--creme); margin: 0; text-wrap: balance; text-shadow: 0 2px 24px rgba(13, 38, 38, .8); }
+.entrada-apoio { color: var(--bege); font-size: clamp(16px, 1.35vw, 18.5px); line-height: 1.55; max-width: 58ch; margin-top: 18px; text-shadow: 0 1px 14px rgba(13, 38, 38, .9); }
+.entrada-ctas { display: flex; flex-wrap: wrap; gap: 12px 14px; margin-top: 26px; }
+.entrada-ctas .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; }
+.entrada-ctas .btn-fantasma { background: rgba(13, 38, 38, .55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.cena-entrada .dica-scroll { margin: 0; }
+@media (max-width: 520px) {
+  .entrada-ctas .btn { width: 100%; white-space: normal; text-align: center; }
+  .entrada-oferta::before { inset: -24px -20px -16px; }
+}
+
+/* Ala 01: atalhos para os dois grupos e o cabeçalho de cada grupo */
+.grupos-atalhos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--s4); }
+.grupos-atalhos .porta-btn { text-decoration: none; }
+.obra-grupo { min-height: 52vh; display: flex; align-items: center; scroll-margin-top: 70px; }
+.grupo-painel {
+  display: inline-block; max-width: 560px; padding: 22px 26px 20px; border-radius: 18px;
+  background: rgba(13, 38, 38, .66); border: var(--hairline);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 30px 70px rgba(0, 0, 0, .35);
+}
+.obra-grupo .micro { color: var(--mostarda); }
+.obra-grupo h3 { font-size: clamp(28px, 3.4vw, 44px); line-height: 1.08; color: var(--creme); margin-top: 10px; border-left: 3px solid var(--mostarda); padding-left: 16px; }
+.obra-grupo p { color: var(--bege); font-size: 16px; margin-top: 12px; }
+
+/* legenda: título do projeto como h4 dentro dos grupos; notas e amostras */
+.obra-legenda h4 { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.15; margin-top: 8px; color: var(--creme); }
+.obra-legenda > p b { color: var(--creme); font-weight: 600; }
+.obra-legenda > p.obra-nota { font-size: 12.5px; color: var(--cinza-claro); opacity: .85; font-style: italic; margin-top: 10px; }
+.obra-amostras { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.obra-amostras li { display: flex; flex-direction: column; gap: 6px; }
+.obra-legenda .obra-amostras img, html.sem-3d .obra-legenda .obra-amostras img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; margin: 0; border: 1px solid rgba(230, 221, 208, .16); }
+.obra-amostras span { font-size: 11.5px; line-height: 1.35; color: var(--cinza-claro); }
+@media (max-width: 820px) {
+  .obra-legenda h4 { font-size: 21px; }
+  .obra-amostras span { display: none; } /* no celular a legenda fixa fica curta: as peças falam por si */
+  .obra-grupo { min-height: 44vh; }
+}
+
+/* como trabalhamos: lista ordenada sem marcador + o que muda por tipo de projeto */
+.linhas-processo { list-style: none; padding: 0; margin-left: 0; }
+.modalidades { margin-top: var(--s5); max-width: 980px; }
+.modalidades h3 { color: var(--mostarda); margin-bottom: var(--s2); }
+.modalidades dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); margin: 0; }
+.modalidades dl > div { border-top: var(--hairline); padding-top: 14px; }
+.modalidades dt { color: var(--creme); font-weight: 600; font-size: 15.5px; }
+.modalidades dd { margin: 6px 0 0; color: var(--cinza-claro); font-size: 14.5px; line-height: 1.5; }
+@media (max-width: 860px) { .modalidades dl { grid-template-columns: 1fr; } }
+
+/* contato: a conversa primeiro */
+.contato-apoio { max-width: 56ch; margin-top: var(--s2); }
+.form-objetivo { border: 0; padding: 0; margin: 0; min-width: 0; }
+.form-objetivo legend { color: var(--mostarda); padding: 0; margin-bottom: 12px; }
+
+/* guia: separador curto entre clientes e produtos na Ala 01 */
+.guia-ala i.guia-grupo { width: 5px; margin: 0 1px; background: rgba(212, 165, 116, .55); }
+
+/* rodapé: o catálogo completo de serviços */
+.rodape-servicos { display: grid; grid-template-columns: 2fr 1fr; gap: var(--s3) var(--s4); padding-bottom: var(--s4); margin-bottom: var(--s3); border-bottom: var(--hairline); }
+.rodape-servicos h2 { color: var(--mostarda); margin: 0 0 8px; }
+.rodape-servicos ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0 22px; }
+.rodape-servicos a { display: inline-block; padding: 10px 0; color: var(--bege); font-size: 14px; text-decoration: none; transition: color var(--t-rapido); }
+.rodape-servicos a:hover, .rodape-servicos a:focus-visible { color: var(--mostarda); }
+@media (max-width: 760px) { .rodape-servicos { grid-template-columns: 1fr; } }
+
+/* formulário e rodapé sobre a exposição 3D: fundo de vidro para ler os campos (10/11) */
+html:not(.sem-3d) .form-flow {
+  padding: clamp(18px, 3vw, 28px); border-radius: 20px; background: rgba(13, 38, 38, .74); border: var(--hairline);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+html:not(.sem-3d) footer { background: linear-gradient(rgba(13, 38, 38, .78), rgba(13, 38, 38, .96)); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+/* sem 3D, quando o card já mostra as amostras, a imagem do quadro não se repete */
+html.sem-3d .obra-legenda img.so-3d { display: none; }
+
+/* 10/11: vídeos de clientes no card de Vídeos personalizados — capa clicável + player em janela */
+.obra-videos { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.obra-videos li { display: flex; flex-direction: column; gap: 5px; }
+.obra-videos b { font-size: 13px; font-weight: 600; color: var(--creme); line-height: 1.3; }
+.obra-videos li > span { font-size: 11.5px; line-height: 1.35; color: var(--cinza-claro); }
+.video-capa { position: relative; display: block; width: 100%; padding: 0; border: 1px solid rgba(230, 221, 208, .2); border-radius: 10px; overflow: hidden; cursor: pointer; background: #000; }
+.obra-legenda .video-capa img, html.sem-3d .obra-legenda .video-capa img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; margin: 0; border: 0; border-radius: 0; transition: transform .4s ease; }
+.video-capa:hover img, .video-capa:focus-visible img { transform: scale(1.04); }
+.video-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; padding-left: 3px; background: var(--mostarda); color: var(--profundo); font-size: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, .45); }
+.video-dur { position: absolute; right: 8px; bottom: 8px; padding: 3px 7px; border-radius: 999px; background: rgba(9, 27, 27, .85); color: var(--creme); font: 600 11px/1 'Inter', system-ui, sans-serif; }
+.video-dialogo { margin: auto; padding: 0; border: var(--hairline); border-radius: 18px; background: #0b1f1f; color: var(--creme); width: min(420px, 92vw); max-height: 94vh; overflow: auto; }
+.video-dialogo::backdrop { background: rgba(5, 15, 15, .84); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.video-corpo { padding: 12px 12px 14px; }
+.video-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.video-topo .micro { color: var(--mostarda); }
+.video-dialogo video { display: block; width: 100%; height: auto; max-height: 74vh; object-fit: contain; border-radius: 10px; background: #000; }
+.video-dialogo p { font-size: 13.5px; color: var(--cinza-claro); margin-top: 10px; }
+@media (max-width: 820px) { .obra-videos li > span { display: none; } }
+@media (prefers-reduced-motion: reduce) { .video-capa img { transition: none; } }
+/* legenda alta (amostras, vídeos): a legenda já fica centrada na obra; o translateY(-50%) padrão a
+   empurrava meia altura para cima, por baixo do cabeçalho (10/11) */
+@media (min-width: 821px) { .obra:has(.obra-amostras) .obra-legenda, .obra:has(.obra-videos) .obra-legenda { transform: none; } }

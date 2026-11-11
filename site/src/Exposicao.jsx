@@ -5,6 +5,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { criarAcabamento, marcarTela } from './acabamento.js'
+import { criarBoneco } from './Boneco.js'
 
 /* ================================================================
    A EXPOSIÇÃO (05/11/2026, v2) — a home é uma galeria em 3D que o
@@ -18,14 +19,15 @@ import { criarAcabamento, marcarTela } from './acabamento.js'
      está na tela, o quadro dela SE SOLTA DA PAREDE, flutua na frente de
      quem anda, virado para a câmera, e volta à parede quando se segue —
      uma de cada vez
-   · o fio mostarda é a linha-guia no chão; o ponto vai à frente
+   · o fio mostarda é a linha-guia no chão; o boneco do Victor caminha sobre ele, à frente
+     (10/11 — era uma bolinha dourada; ver src/Boneco.js)
    · alas sem quadro ganham uma peça (lâminas de vidro, laço, balão)
 
    v3 (05/11, à noite) — o que era HTML por cima virou parte do mundo:
    · o TOTEM da entrada pergunta "Qual é o seu problema?"; clicar nele
      abre as opções (o painel continua em HTML, acessível)
    · o LETREIRO pendurado sobre o corredor corre os serviços (era a faixa)
-   · o SAGUÃO da Ala 2: seis portas, uma por dor, sobem do chão quando se
+   · o SAGUÃO da Ala 2: uma porta por necessidade (sete), sobem do chão quando se
      chega; clicar numa porta leva para a SALA daquele tema (cômodo fora do
      corredor, com cortina de transição), de onde se volta ao saguão ou se
      passa para a porta seguinte — o estado da sala vive no React
@@ -224,8 +226,20 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
 
     const fioCurva = new THREE.CatmullRomCurve3(pontos.map((p) => new THREE.Vector3(p.x, 0.03, p.z)), false, 'centripetal', 0.6)
     cena.add(new THREE.Mesh(new THREE.TubeGeometry(fioCurva, 240, 0.025, 8, false), matFio))
-    const ponto = new THREE.Mesh(new THREE.SphereGeometry(0.11, 24, 24), matFio)
-    ponto.add(new THREE.PointLight(COR.mostarda, 2.2, 6, 2)); cena.add(ponto)
+    // 10/11: o guia do passeio é o boneco do Victor (no lugar da bolinha). Leva o brilho dela:
+    // a mesma luz mostarda e um halo no chão sob os pés.
+    const guia = criarBoneco({ altura: celular ? 0.9 : 1, celular })
+    // a luz fica do lado de quem olha (não dentro do corpo): ilumina o rosto e o chão em volta
+    const luzGuia = new THREE.PointLight(0xffe2bd, 5.5, 7, 2); cena.add(luzGuia)
+    const halo = new THREE.Mesh(new THREE.CircleGeometry(0.46, 40), new THREE.MeshBasicMaterial({
+      map: (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, 'rgba(212,165,116,.85)'); r.addColorStop(1, 'rgba(212,165,116,0)'); g.fillStyle = r; g.fillRect(0, 0, 128, 128); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx })(),
+      transparent: true, opacity: 0.5, depthWrite: false, toneMapped: false, blending: THREE.AdditiveBlending,
+    }))
+    halo.rotation.x = -Math.PI / 2; halo.position.y = 0.012; guia.raiz.add(halo)
+    guia.raiz.scale.setScalar(0.001); cena.add(guia.raiz)
+    if (navigator.webdriver) window.__guia = guia.raiz // só para a bateria de aceite (robôs): conferir que ele anda
+    const guiaPos = new THREE.Vector3(), guiaAnt = new THREE.Vector3(), guiaTan = new THREE.Vector3(), guiaDelta = new THREE.Vector3()
+    let guiaComecou = false
 
     const hemi = new THREE.HemisphereLight(0xdfe9e6, 0x061515, 0.55); cena.add(hemi)
     const sol = new THREE.DirectionalLight(0xfff3e4, 0.5); cena.add(sol); cena.add(sol.target)
@@ -409,7 +423,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const luzTotem = new THREE.PointLight(COR.mostarda, 3, 4, 2); luzTotem.position.set(0, 1.6, 0.8); totem.add(luzTotem)
 
     // 2) o LETREIRO dos serviços, pendurado sobre o corredor (era a faixa que passava no site)
-    const ALTL = 0.62, LARGL = LARG * 0.84
+    /* 10/11: no celular em pé o letreiro ficava escondido atrás do cabeçalho e cortado nas laterais
+       (9,7 m de largura para uma tela que mostra ~5 m a essa distância). No retrato ele desce,
+       chega mais perto e encolhe na largura — as letras ficam do mesmo tamanho na tela. */
+    const LET = retratoIni ? { x: -0.15, y: 4.7, z: -11.5 } : { x: 0, y: 6.35, z: -15 }
+    const ALTL = 0.62, LARGL = retratoIni ? 4.5 : LARG * 0.84
     // a textura é recriada quando a fonte carrega (a largura do texto muda e o WebGL não redimensiona textura já enviada)
     const telaLetreiro = new THREE.Mesh(new THREE.PlaneGeometry(LARGL, ALTL), new THREE.MeshBasicMaterial({ color: 0x081a1a, toneMapped: false }))
     const letreiro = { tex: null }
@@ -432,15 +450,15 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     }
     montarLetreiro()
     document.fonts?.load(F_LETREIRO).then(montarLetreiro).catch(() => {})
-    const caixaLetreiro = new THREE.Group(); caixaLetreiro.position.set(0, 6.35, -15); cena.add(caixaLetreiro)
+    const caixaLetreiro = new THREE.Group(); caixaLetreiro.position.set(LET.x, LET.y, LET.z); cena.add(caixaLetreiro)
     telaLetreiro.position.z = 0.04; caixaLetreiro.add(telaLetreiro)
     const moldL = new THREE.Mesh(new THREE.BoxGeometry(LARGL + 0.12, ALTL + 0.12, 0.06), matLatao); caixaLetreiro.add(moldL)
     for (const x of [-LARGL / 2 + 0.4, LARGL / 2 - 0.4]) {
-      const cabo = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, ALT - 6.35, 6), matLatao)
-      cabo.position.set(x, (ALT - 6.35) / 2 + ALTL / 2, 0); caixaLetreiro.add(cabo)
+      const cabo = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, ALT - LET.y, 6), matLatao)
+      cabo.position.set(x, (ALT - LET.y) / 2 + ALTL / 2, 0); caixaLetreiro.add(cabo)
     }
 
-    // 3) o SAGUÃO da Ala 2: seis portas, uma por dor; sobem do chão quando se chega
+    // 3) o SAGUÃO da Ala 2: uma porta por necessidade (sete desde 10/11); sobem do chão quando se chega
     const portas3d = portasRef.current.map((pt, k) => {
       const g = new THREE.Group(); g.visible = false; cena.add(g)
       const PW = 1.5, PH = 2.6
@@ -459,7 +477,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         gc.fillStyle = hover ? '#0D2626' : '#D4A574'; gc.font = '700 24px Inter'; gc.letterSpacing = '6px'
         gc.fillText(`PORTA ${String(k + 1).padStart(2, '0')}`, 34, 58); gc.letterSpacing = '0px'
         gc.fillStyle = hover ? '#0D2626' : '#FAF7F2'; gc.font = 'italic 58px "DM Serif Display"'
-        gc.fillText(pt.curto, 34, 140)
+        gc.fillText(pt.placa || pt.curto, 34, 140)
       })
       const plaq = new THREE.Mesh(new THREE.PlaneGeometry(PW + 0.18, (PW + 0.18) * 190 / 640), new THREE.MeshBasicMaterial({ map: placa.tex, transparent: true, toneMapped: false }))
       plaq.position.set(0, PH + 0.42, 0.02); plaq.userData.acao = { tipo: 'porta', k }; g.add(plaq); clicaveis.push(plaq)
@@ -467,7 +485,6 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       luz.rotation.x = -Math.PI / 2; luz.position.set(0, 0.015, 0.5); g.add(luz)
       return { g, vao, placa, luz, base: new THREE.Vector3(), hover: 0 }
     })
-    const ANG = [-20, -11, -2, 7, 16, 25].map((a) => THREE.MathUtils.degToRad(a))
     let saguao = { topo: 0, alt: 1 }, saguaoVivo = false
 
     // 4) a SALA de cada tema: um cômodo fora do corredor, para onde se entra pela porta
@@ -485,9 +502,10 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const moldS = new THREE.Mesh(new THREE.BoxGeometry(FW + 0.22, FH + 0.22, 0.1), matLatao); moldS.position.set(1.2, 2.75, -SD / 2 + 0.02); salaG.add(moldS)
     const placaSala = placaCanvas(1400, 260, (g, c, dados) => {
       if (!dados) return
-      g.fillStyle = '#D4A574'; g.font = '700 30px Inter'; g.letterSpacing = '8px'; g.fillText(dados.area.toUpperCase(), 8, 52); g.letterSpacing = '0px'
-      g.fillStyle = '#FAF7F2'; g.font = 'italic 64px "DM Serif Display"'
-      quebrar(g, `“${dados.dor}”`, c.width - 20).slice(0, 2).forEach((l, i) => g.fillText(l, 8, 140 + i * 78))
+      g.fillStyle = '#D4A574'; g.font = '700 30px Inter'; g.letterSpacing = '8px'; g.fillText((dados.objetivo || dados.area || "").toUpperCase(), 8, 52); g.letterSpacing = '0px'
+      // 10/11: as frases das portas ficaram mais longas — até três linhas, um pouco menores
+      g.fillStyle = '#FAF7F2'; g.font = 'italic 52px "DM Serif Display"'
+      quebrar(g, `“${dados.frase || dados.dor}”`, c.width - 20).slice(0, 3).forEach((l, i) => g.fillText(l, 8, 118 + i * 62))
     })
     const plaqSala = new THREE.Mesh(new THREE.PlaneGeometry(FW, FW * 260 / 1400), new THREE.MeshBasicMaterial({ map: placaSala.tex, transparent: true, toneMapped: false }))
     plaqSala.position.set(1.2, 2.75 + FH / 2 + 0.75, -SD / 2 + 0.06); salaG.add(plaqSala)
@@ -584,17 +602,25 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const cab = document.querySelector('#problemas .ala-cabeca')
       if (cab && portas3d.length) {
         const r = cab.getBoundingClientRect(); saguao = { topo: window.scrollY + r.top, alt: Math.max(r.height, 1) }
-        // o arco nasce de onde a câmera está e para onde ela olha quando o saguão está no meio da tela
+        // a fileira fica à frente de onde a câmera está quando o saguão está no meio da tela
         const uS = uDe(alaDe(saguao.topo + saguao.alt * 0.45))
-        const c = new THREE.Vector3(), f = new THREE.Vector3()
-        caminho.getPointAt(uS, c); caminho.getPointAt(Math.min(uS + 0.012, 0.999), f)
-        const dir = Math.atan2(f.x - c.x, f.z - c.z) // ângulo do olhar no plano do chão
-        const R = 10.5
+        const c = new THREE.Vector3()
+        caminho.getPointAt(uS, c)
+        /* 10/11: com sete portas o arco por ângulo batia nas paredes (11,5 m de corredor) e a última
+           sumia atrás da divisória entre as alas. Agora é uma fileira com curva suave, centrada no
+           caminho, à frente da divisória (5–7 m de quem chega), cada porta virada para o visitante;
+           se não couberem em tamanho cheio, as portas encolhem por igual. */
+        const n = portas3d.length, MEIO = 4.2
+        let zFila = c.z - 7
+        for (let i = 0; i < N - 1; i++) { const zd = -i * PASSO - 27; if (zd < c.z - 2 && zd > zFila - 1) zFila = Math.max(zFila, zd + 0.6) }
+        const cx = THREE.MathUtils.clamp(c.x, -1.2, 1.2)
+        const passoX = n > 1 ? (2 * MEIO) / (n - 1) : 0
+        const esc = n > 1 ? Math.min(1, passoX / 1.78) : 1
         portas3d.forEach((p, k) => {
-          const a = dir + (ANG[k] ?? 0) * -1
-          const x = THREE.MathUtils.clamp(c.x + Math.sin(a) * R, -LARG / 2 + 1, LARG / 2 - 1), z = c.z + Math.cos(a) * R
-          p.base.set(x, 0, z)
-          p.g.position.copy(p.base); p.g.rotation.y = Math.atan2(c.x - x, c.z - z)
+          const x = cx + (n > 1 ? -MEIO + k * passoX : 0)
+          const z = zFila + 0.5 * ((x - cx) / MEIO) ** 2
+          p.base.set(x, 0, z); p.esc = esc
+          p.g.position.copy(p.base); p.g.rotation.y = Math.atan2(c.x - x, c.z - z); p.g.scale.setScalar(esc)
         })
       }
     }
@@ -678,7 +704,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       if (letreiro.tex) letreiro.tex.offset.x += dt * 0.025
       const pTopo = (yTela - window.innerHeight * 0.5) / Math.max(window.innerHeight, 1)
       const fTotem = (1 - suave(0.35, 0.9, pTopo)) * entrada.v
-      totem.visible = fTotem > 0.01
+      totem.visible = fTotem > 0.01 && !retrato // 10/11: no celular em pé o totem ficava atrás do título; lá o atalho é o botão em HTML
       totem.position.y = (fTotem - 1) * 2.6
       anel.material.opacity = 1; anel.scale.setScalar(1 + Math.sin(t * 3) * 0.08)
       luzTotem.intensity = 2.2 + Math.sin(t * 3) * 0.8
@@ -694,11 +720,21 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         p.hover += (alvoH - p.hover) * Math.min(1, dt * 8)
         if (p.vao.material.map) p.vao.material.color.setScalar(0.72 + p.hover * 0.28)
         p.luz.material.opacity = 0.1 + p.hover * 0.25
-        p.g.scale.setScalar(1 + p.hover * 0.03)
+        p.g.scale.setScalar((p.esc || 1) * (1 + p.hover * 0.03))
       })
 
-      fioCurva.getPointAt(Math.min(u + 0.02, 0.999), ponto.position)
-      ponto.position.y = 0.14 + Math.abs(Math.sin(t * 2.2)) * 0.08
+      // o boneco caminha no fio, à frente da câmera: a velocidade é a da câmera ao longo do fio
+      // (negativa = o visitante voltou, ele se vira); olha para o quadro que se soltou da parede
+      const uG = Math.min(u + 0.02, 0.999)
+      fioCurva.getPointAt(uG, guiaPos); fioCurva.getTangentAt(uG, guiaTan); guiaPos.y = 0
+      if (!guiaComecou) { guiaAnt.copy(guiaPos); guiaComecou = true }
+      const vGuia = dt > 0 ? THREE.MathUtils.clamp(guiaDelta.subVectors(guiaPos, guiaAnt).dot(guiaTan) / dt, -6, 6) : 0
+      guiaAnt.copy(guiaPos)
+      guia.raiz.position.copy(guiaPos)
+      guiaDelta.subVectors(cam.position, guiaPos).setY(0).setLength(1.1)
+      luzGuia.position.copy(guiaPos).add(guiaDelta).setY(1.5)
+      guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v)))
+      guia.atualizar(dt, { v: vGuia, tangente: guiaTan, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t })
 
       let maior = 0, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
       const dist = retrato ? 7.2 : 4.6
@@ -740,7 +776,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       matCreme.envMapIntensity = matLataoL.envMapIntensity = opPortico
       matCreme.emissiveIntensity = 0.14 * opPortico
       // o totem e o letreiro entram depois da abertura
-      caixaLetreiro.position.y = 6.35 + (1 - entrada.v) * 2.2
+      caixaLetreiro.position.y = LET.y + (1 - entrada.v) * 2.2
 
       // com uma obra flutuando, o grão de filme quase some (ele sujava o print)
       const foco = maior > 0.35

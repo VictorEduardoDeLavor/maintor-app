@@ -1,25 +1,33 @@
-import { useEffect, useMemo, useState } from 'react'
-import { ALAS } from './obras.js'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import { ALAS, GRUPOS, msgWhats } from './obras.js'
 
 /* ================================================================
    GUIA DA EXPOSIÇÃO (05/11/2026) — o visitante nunca fica perdido.
 
    Uma barra discreta no rodapé, que aparece quando o passeio começa:
-   · onde estou: "Ala 1 · Trabalhos — obra 3 de 8" + um mapa de pontos
+   · onde estou: "Ala 1 · Projetos para clientes — 2 de 3" + um mapa de pontos
      (um por obra, agrupados por ala) que se acende conforme se anda
    · andar de obra em obra: ‹ › e as setas do teclado levam até a próxima;
      clicar num ponto vai direto à obra
    · converter na hora: "Quero algo assim" abre o WhatsApp dizendo qual
-     obra a pessoa viu
+     obra a pessoa viu (10/11: o assunto de cada obra vem de obras.js)
+   Na Ala 01 o guia mostra o grupo (clientes ou produtos da Maintor), e o
+   mapa separa os dois grupos — a categoria atual fica sempre à vista.
    Some na entrada, no contato e enquanto a abertura roda.
    ================================================================ */
 
 const WHATS = 'https://wa.me/5511946610634'
 
 export default function Guia({ lenisRef, ativo }) {
-  const obras = useMemo(() => ALAS.flatMap((ala, ia) => ala.obras.map((o, io) => ({
-    ...o, ala: ala.id, ia, io, nAla: ala.obras.length, nomeAla: ala.eyebrow.replace(/^Ala \d+ · /, ''),
-  }))), [])
+  const obras = useMemo(() => ALAS.flatMap((ala, ia) => ala.obras.map((o, io) => {
+    // dentro de um grupo (Ala 01), a contagem é do grupo: "2 de 3" nos projetos para clientes
+    const doGrupo = o.grupo ? ala.obras.filter((x) => x.grupo === o.grupo) : ala.obras
+    return {
+      ...o, ala: ala.id, ia, io: doGrupo.indexOf(o), nAla: doGrupo.length,
+      nomeAla: o.grupo ? GRUPOS[o.grupo].titulo : ala.eyebrow.replace(/^Ala \d+ · /, ''),
+      curto: o.objetivo || o.titulo.replace(/[“”]/g, ''),
+    }
+  })), [])
   const [atual, setAtual] = useState(-1)
   const [visivel, setVisivel] = useState(false)
 
@@ -76,7 +84,7 @@ export default function Guia({ lenisRef, ativo }) {
 
   if (!ativo || atual < 0) return null
   const o = obras[atual]
-  const msg = `Olá! Vim pelo site da Maintor Flow. Vi "${o.titulo.replace(/[“”"]/g, '')}" na exposição e quero algo assim para o meu negócio.`
+  const msg = msgWhats(o.assunto)
   const texto = typeof window !== 'undefined' && typeof window.__flowComOrigem === 'function' ? window.__flowComOrigem(msg) : msg
 
   return (
@@ -85,17 +93,22 @@ export default function Guia({ lenisRef, ativo }) {
       <div className="guia-meio">
         <div className="guia-onde" aria-live="polite">
           <span className="micro">Ala {o.ia + 1} · {o.nomeAla}</span>
-          <b>{o.titulo.replace(/[“”]/g, '')}</b>
-          <span className="guia-conta">obra {o.io + 1} de {o.nAla}</span>
+          <b>{o.curto}</b>
+          <span className="guia-conta">{o.io + 1} de {o.nAla}</span>
         </div>
         <div className="guia-mapa" role="list">
           {ALAS.map((ala, ia) => (
             <span className="guia-ala" role="listitem" key={ala.id}>
-              {ala.obras.map((ob) => {
+              {ala.obras.map((ob, k) => {
                 const i = obras.findIndex((x) => x.id === ob.id)
+                const x = obras[i]
                 return (
-                  <button type="button" key={ob.id} className={`guia-ponto${i === atual ? ' atual' : i < atual ? ' visto' : ''}`}
-                    onClick={() => irPara(i)} aria-label={`Ir para ${ob.titulo.replace(/[“”]/g, '')}`} tabIndex={visivel ? 0 : -1} />
+                  <Fragment key={ob.id}>
+                    {/* na Ala 01, um traço curto separa clientes de produtos */}
+                    {k > 0 && ob.grupo && ob.grupo !== ala.obras[k - 1].grupo && <i className="guia-grupo" aria-hidden="true" />}
+                    <button type="button" className={`guia-ponto${i === atual ? ' atual' : i < atual ? ' visto' : ''}`}
+                      onClick={() => irPara(i)} aria-label={`Ir para ${x.curto} (${x.nomeAla})`} tabIndex={visivel ? 0 : -1} />
+                  </Fragment>
                 )
               })}
               {ia < ALAS.length - 1 && <i aria-hidden="true" />}

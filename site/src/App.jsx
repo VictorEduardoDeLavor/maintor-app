@@ -11,7 +11,7 @@ const ABERTURA_CHAVE = 'flow.abertura' // o mesmo nome no index.html
 import Fio from './Fio.jsx'
 // a exposição 3D (home como galeria) baixa depois do primeiro paint
 const Exposicao = lazy(() => import('./Exposicao.jsx'))
-import { ALAS, imagemHD } from './obras.js'
+import { ALAS, GRUPOS, PORTAS, imagemHD, msgWhats } from './obras.js'
 import Guia from './Guia.jsx'
 
 /* A abertura 3D roda uma vez por sessão. Fica de fora para quem pede
@@ -32,116 +32,75 @@ const WHATS_NUM = 'https://wa.me/5511946610634'
 // token do site no CRM Maintor Leads (público por desenho: só cria/atualiza lead, com limite por IP)
 const CRM_TOKEN = '2l-UaqQnRhF-oi_S6oDqgVSZxFJKyj5kU78QpVGMbuw'
 // todo link do WhatsApp abre com a mensagem pronta: a conversa chega dizendo
-// que veio do site (e de onde, quando a visita trouxe utm_source — ver medicao.js)
-const WHATS = `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow.')}`
+// que veio do portfólio e o assunto (e de onde, quando a visita trouxe utm_source — ver medicao.js)
+const whatsDe = (assunto) => `${WHATS_NUM}?text=${encodeURIComponent(msgWhats(assunto))}`
+const WHATS = whatsDe()
 
+/* Menu (10/11): o mesmo para o cabeçalho e para o painel do celular. Os ids
+   das seções são os de antes — links já compartilhados (/#trabalhos,
+   /#problemas…) continuam chegando no mesmo lugar. */
 const SECOES = [
-  { href: '#problemas', rotulo: 'Seu problema' },
-  { href: '#trabalhos', rotulo: 'Trabalhos' },
+  { href: '#trabalhos', rotulo: 'Portfólio' },
+  { href: '#problemas', rotulo: 'Serviços' },
   { href: '#sistemas', rotulo: 'Sistemas' },
   { href: '#marketing', rotulo: 'Marketing' },
   { href: '#contato', rotulo: 'Contato' },
 ]
 
-/* A narrativa da home começa pelo problema de quem visita, não pelo nosso
-   catálogo: cada cartão é uma dor dita do jeito que o dono diz, e a solução
-   que a gente constrói para ela. As fotos mostram o mundo do visitante
-   (ambientes, sem pessoas e sem tela falsa — regra de marca de 25/08). */
-const PROBLEMAS = [
+/* "Qual é o seu problema?" virou atalho opcional (10/11): as opções são as
+   sete portas da Ala 02, mais o atalho direto para a Ala 03. O percurso
+   principal (abertura → portfólio → contato) não depende dele. */
+const HERO_ATALHOS = [
+  ...PORTAS.map((p) => ({ chip: p.objetivo, dor: p.frase, solucao: p.texto, href: p.acao.href, rotulo: p.acao.rotulo, assunto: p.assunto })),
   {
-    area: 'Lojas de moda e varejo',
-    dor: 'Vendo pelo direct e não dou conta de responder todo mundo.',
-    solucao: 'Uma loja virtual que mostra o tamanho, cobra no Pix e calcula o frete sozinha. Pagamento único, sem mensalidade.',
-    href: '/loja-virtual/', rotulo: 'Ver a loja virtual',
-    foto: 'loja-moda', alt: 'Loja de moda com arara de roupas coloridas e sacolas de papel no balcão, ao fim da tarde',
-  },
-  {
-    area: 'Atendimento',
-    dor: 'Respondo as mesmas perguntas o dia inteiro no WhatsApp.',
-    solucao: 'Automação que responde o que se repete, confirma pedido e só chama você quando precisa de você.',
-    href: '/automacao-de-atendimento/', rotulo: 'Ver a automação',
-    foto: 'balcao-pedidos', alt: 'Balcão à noite com celular, bloco de pedidos anotados à mão e pacotes prontos para envio',
-  },
-  {
-    area: 'Indústria e manutenção',
-    dor: 'A manutenção das máquinas vive em caderno e planilha.',
-    solucao: 'Um sistema de ordens de serviço, preventivas e estoque de peças — como o Maintor CMMS, que a gente desenvolveu e mantém.',
-    href: '/sistemas-sob-medida/#manutencao', rotulo: 'Ver o sistema de manutenção',
-    foto: 'manutencao-oficina', alt: 'Bancada de oficina industrial com caderno de manutenção aberto, prancheta e caixa de ferramentas',
-  },
-  {
-    area: 'Gestão de pessoas',
-    dor: 'O RH roda no papel: ponto, férias, folha e admissão.',
-    solucao: 'Um sistema de RH com ponto, férias, folha e recrutamento — como o Maintor RH, que a gente desenvolveu.',
-    href: '/sistemas-sob-medida/#rh', rotulo: 'Ver o sistema de RH',
-    foto: 'rh-papelada', alt: 'Mesa de escritório com pilhas de pastas, relógio de ponto antigo, crachás e calendário',
-  },
-  {
-    area: 'Marketing',
-    dor: 'Posto todo dia, e o cliente novo não chega.',
-    solucao: 'Conteúdo, vídeo personalizado e tráfego pago apontando para uma página que transforma visita em conversa.',
-    href: '/marketing-e-redes/', rotulo: 'Ver o marketing',
-    foto: 'estudio-conteudo', alt: 'Estúdio de conteúdo com celular no tripé e luz de anel gravando tênis e roupas coloridas',
-  },
-  {
-    area: 'Consultorias',
-    dor: 'Meu método vale muito, mas a receita acaba quando o projeto acaba.',
-    solucao: 'Um sistema no nome da sua consultoria: você implanta nos clientes e cobra implementação e mensalidade — a gente constrói nos bastidores.',
-    href: '/para-consultorias/', rotulo: 'Ver para consultorias',
-    foto: 'consultoria-portal', alt: 'Portal de uma consultoria parceira com os indicadores de todos os projetos dos clientes, nomes desfocados',
+    chip: 'Quero vender meu sistema',
+    dor: 'Quero oferecer aos meus clientes um software com a minha marca.',
+    solucao: 'Transformamos o seu método ou a rotina do seu nicho em um aplicativo com a sua marca.',
+    href: '#sistemas', rotulo: 'Ver a Ala 03 · Sistemas', assunto: 'lançar um software com a minha marca',
   },
 ]
 
-/* Hero que se reescreve pelo problema do visitante (08/10): o chip troca a
-   manchete (na gramática da marca), mostra a dor na voz do dono, a solução
-   e manda o WhatsApp já com aquele problema. Sem chip, é a manchete de sempre. */
-const HERO_PROBLEMAS = [
-  { chip: 'Vendo pelo direct', manchete: ['sua loja', 'no ar,', 'vendendo.'], ...PROBLEMAS[0] },
-  { chip: 'Respondo o dia todo', manchete: ['seu WhatsApp', 'no ar,', 'respondendo.'], ...PROBLEMAS[1] },
-  { chip: 'Manutenção no caderno', manchete: ['sua manutenção', 'no ar,', 'planejada.'], ...PROBLEMAS[2] },
-  { chip: 'RH no papel', manchete: ['seu RH', 'no ar,', 'sem papel.'], ...PROBLEMAS[3] },
-  { chip: 'Posto e ninguém chega', manchete: ['seu conteúdo', 'no ar,', 'convertendo.'], ...PROBLEMAS[4] },
-  { chip: 'Sou consultoria', manchete: ['sua consultoria', 'no ar,', 'faturando.'], ...PROBLEMAS[5] },
-  {
-    chip: 'Quero vender meu sistema', manchete: ['seu método', 'no ar,', 'rendendo.'],
-    area: 'Sistema para revender',
-    dor: 'Sei fazer, mas só ganho quando eu mesmo atendo.',
-    solucao: 'Um sistema do seu nicho, no seu nome, que os seus colegas pagam para usar — a mensalidade é sua.',
-    href: '/sistema-para-revender/', rotulo: 'Ver o sistema para revender',
-  },
-]
-/* O saguão da Ala 2 (05/11): uma porta por dor. Na exposição 3D cada porta
-   leva a uma sala do tema; sem 3D, o botão leva até a obra da mesma dor. */
-const PORTAS = PROBLEMAS.map((p, k) => ({
-  ...p,
-  curto: ['Lojas de moda', 'Atendimento', 'Manutenção', 'RH no papel', 'Marketing', 'Consultorias'][k],
-  obra: ['p-loja', 'p-atend', 'p-manut', 'p-rh', 'p-mkt', 'p-cons'][k],
-  img: `/midia/fotos/${p.foto}-960.webp`,
-}))
-
-const whatsProblema = (dor) =>
-  `${WHATS_NUM}?text=${encodeURIComponent('Olá! Vim pelo site da Maintor Flow. Meu problema: ' + dor.charAt(0).toLowerCase() + dor.slice(1))}`
-
+/* Perguntas frequentes (10/11): cada resposta diz a condição de cada tipo
+   de projeto — sob medida, serviço contínuo e produto por assinatura não
+   têm as mesmas regras. O mesmo texto vai no FAQPage do index.html. */
 const PERGUNTAS = [
-  { p: "Quanto custa um site ou uma loja virtual?", r: "Depende do que o seu negócio precisa: o formato da loja, quem cadastra o catálogo, o número de páginas do site. O valor sai fechado na proposta, por escrito, depois de uma conversa. Site e loja são pagamento único, sem mensalidade.", href: "/loja-virtual/", rotulo: "Ver os formatos de loja →" },
-  { p: "Quanto tempo leva?", r: "De duas a quatro semanas, conforme o projeto, contando a partir do momento em que temos os textos e as fotos. Essa costuma ser a parte que atrasa, então vale começar a juntar cedo." },
-  { p: "Por que não usar uma plataforma pronta?", r: "Porque ela cobra todo mês — e, em vários planos, uma parte de cada venda. A loja própria é compra única: você paga uma vez, e depois disso não tem mensalidade nenhuma. E quando algo dá errado, lá você abre chamado; aqui você chama no WhatsApp e alguém resolve.", href: "/guias/loja-propria-ou-plataforma-pronta/", rotulo: "Ver a conta de dois anos →" },
-  { p: "Vocês entregam e vão embora?", r: "Entregamos, e a loja ou o site passa a ser seu: pagamento único, sem mensalidade, com treinamento e manual. Se você quiser alguém cuidando depois — conteúdo, campanha, ajustes —, é um serviço à parte, com valor próprio, e só se fizer sentido para você.", href: "/manutencao-mensal/", rotulo: "Como funciona a manutenção →" },
-  { p: "E se eu quiser sair?", r: "Você leva tudo. Domínio, pagamentos e dados ficam em contas no seu nome, e o código é entregue documentado. Nos serviços mensais, como conteúdo e campanha, sem fidelidade e sem multa: trinta dias de aviso e acabou." },
-  { p: "Por onde eu começo?", r: "Pela base: site ou loja que converte, depois o Google, os cadastros, o atendimento, o conteúdo — e só então o anúncio. Na ordem certa, cada real trabalha para o próximo.", href: "/por-onde-comecar/", rotulo: "Ver a trilha completa →" },
-  { p: "Atendem fora de São Paulo?", r: "Sim. O trabalho é remoto na maior parte do tempo; a distância não muda a entrega." },
+  { p: 'Quanto custa?', r: 'Depende do escopo: o tipo de projeto, as páginas ou funções, quem prepara o conteúdo e as integrações necessárias. O valor é formalizado na proposta, por escrito, depois de uma conversa.', href: '/guias/quanto-custa-uma-loja-virtual/', rotulo: 'O que pesa no valor de uma loja →' },
+  { p: 'Quanto tempo leva?', r: 'Sites e lojas virtuais costumam ficar prontos em duas a quatro semanas. O prazo começa a contar quando recebemos os materiais — textos, fotos e acessos —, que costumam ser a parte que mais atrasa. Sistemas sob medida recebem o prazo na proposta, conforme o escopo.' },
+  { p: 'Existe mensalidade?', r: 'Pelo desenvolvimento de um site ou de uma loja virtual, não: você paga o projeto, sem mensalidade da Maintor Flow pelo desenvolvimento. Custos de terceiros, como o registro do domínio e as taxas do meio de pagamento, são pagos diretamente a quem presta o serviço. Serviços contínuos, como conteúdo, campanhas e manutenção, são contratados à parte. Produtos por assinatura, como o Maintor CMMS, o Maintor FIT e o Horaqui, seguem as condições de cada produto.' },
+  { p: 'Quem fica com o domínio, os acessos, os dados e o código?', r: 'Em sites, lojas e sistemas sob medida, o domínio, as contas e os dados ficam no nome do cliente, e o que entra na entrega — inclusive o código — fica descrito na proposta. Nos produtos por assinatura, você contrata o uso do sistema: o código continua com a Maintor, e o acesso aos seus dados segue as condições de cada produto.' },
+  { p: 'Existe suporte depois da entrega?', r: 'Na entrega, a gente orienta a sua equipe a usar a solução, conforme o escopo contratado. O suporte previsto depois disso, quando houver, fica descrito na proposta. Cuidar do projeto no dia a dia — atualizações, conteúdo, campanhas — é um serviço recorrente, contratado à parte.', href: '/manutencao-mensal/', rotulo: 'Como funciona a manutenção mensal →' },
+  { p: 'Atendem fora de São Paulo?', r: 'Sim. O trabalho é remoto na maior parte do tempo; a distância não muda a entrega.' },
+  { p: 'Por onde começo?', r: 'Pense no que você precisa agora: vender ou se apresentar na internet (site ou loja), organizar a operação (sistema) ou atrair mais clientes (divulgação). Se ainda não tiver certeza, conte a sua situação no WhatsApp e a gente ajuda a definir.', href: WHATS, rotulo: 'Conversar no WhatsApp ↗', externo: true },
 ]
 
+/* Contato (10/11): quatro opções e o assunto que cada uma põe na mensagem. */
 const OBJETIVOS = [
-  'Loja virtual',
-  'Loja no Instagram',
-  'Site',
-  'Sistema sob medida (RH, manutenção…)',
-  'Sistema para revender (app do meu nicho)',
-  'Sistema para a minha consultoria',
-  'Automação de atendimento',
-  'Vídeos personalizados',
-  'Marketing e tráfego pago',
+  { rotulo: 'Site ou loja', assunto: 'um site ou uma loja virtual' },
+  { rotulo: 'Sistema', assunto: 'um sistema' },
+  { rotulo: 'Marketing', assunto: 'marketing e divulgação' },
+  { rotulo: 'Ainda estou definindo', assunto: 'o meu projeto (ainda estou definindo o formato)' },
+]
+
+/* O catálogo completo saiu da área de contato e mora no rodapé. */
+const CATALOGO = [
+  { href: '/loja-virtual/', rotulo: 'Loja virtual' },
+  { href: '/loja-no-instagram/', rotulo: 'Loja no Instagram' },
+  { href: '/sites/', rotulo: 'Site institucional' },
+  { href: '/automacao-de-atendimento/', rotulo: 'Automação de atendimento' },
+  { href: '/sistemas-sob-medida/', rotulo: 'Sistemas sob medida' },
+  { href: '/sistema-para-revender/', rotulo: 'Software com sua marca' },
+  { href: '/para-consultorias/', rotulo: 'Para consultorias' },
+  { href: '/marketing-e-redes/', rotulo: 'Marketing e redes' },
+  { href: '/trafego-pago/', rotulo: 'Tráfego pago' },
+  { href: '/videos-personalizados/', rotulo: 'Vídeos personalizados' },
+  { href: '/manutencao-mensal/', rotulo: 'Manutenção mensal' },
+]
+const CATALOGO_APOIO = [
+  { href: '/por-onde-comecar/', rotulo: 'Por onde começar' },
+  { href: '/site-para-clinica-odontologica/', rotulo: 'Site para clínica odontológica' },
+  { href: '/loja-virtual-moda-fitness/', rotulo: 'Loja de moda fitness' },
+  { href: '/casos/voke-wear/', rotulo: 'Case VOKE WEAR' },
+  { href: '/guias/', rotulo: 'Guias para decidir' },
 ]
 
 const SERVICOS_MARQUEE = [
@@ -203,7 +162,10 @@ export default function App() {
   const [perguntaAberta, setPerguntaAberta] = useState(false)
   const [sala, setSala] = useState(null) // porta do saguão em que o visitante entrou (null = no corredor)
   const salaTituloRef = useRef(null)
-  const atual = escolha == null ? null : HERO_PROBLEMAS[escolha]
+  /* 10/11: vídeo de cliente aberto no player em janela (null = fechado). Nada baixa antes do clique. */
+  const [video, setVideo] = useState(null)
+  const videoDialogoRef = useRef(null)
+  const atual = escolha == null ? null : HERO_ATALHOS[escolha]
   const progressoRef = useRef(0)
   const velocidadeRef = useRef(0)
   const [reduzido] = useState(
@@ -451,6 +413,25 @@ export default function App() {
     else el.scrollIntoView()
   }
   const abrirPergunta = useCallback(() => setPerguntaAberta(true), [])
+  // o player usa <dialog> nativo: prende o foco, fecha no Esc e devolve o foco ao botão da capa
+  useEffect(() => {
+    const d = videoDialogoRef.current
+    if (!d) return
+    if (video) { if (!d.open) d.showModal(); lenisRef.current?.stop() }
+    else { if (d.open) d.close(); lenisRef.current?.start() }
+  }, [video])
+  /* link de dentro da sala para outra parte da página (#obra-voke, #marketing):
+     sai da sala primeiro — lá dentro a página está parada — e depois anda até o destino */
+  const irDaSala = (e, href) => {
+    e.preventDefault(); e.stopPropagation()
+    setSala(null)
+    setTimeout(() => {
+      const alvo = document.querySelector(href); if (!alvo) return
+      if (lenisRef.current) lenisRef.current.scrollTo(alvo, { offset: -10 })
+      else alvo.scrollIntoView()
+      history.replaceState(null, '', href)
+    }, 650)
+  }
 
   // fecha o menu se a tela crescer e as âncoras do header voltarem
   useEffect(() => {
@@ -473,22 +454,17 @@ export default function App() {
         headers: { 'Content-Type': 'application/json', 'x-site-token': CRM_TOKEN },
         body: JSON.stringify({
           frente: 'flow', nome: nome.trim(), telefone: digitos,
-          mensagem: [objetivo && `Objetivo: ${objetivo}`, negocio.trim() && `Negócio: ${negocio.trim()}`].filter(Boolean).join(' · '),
+          mensagem: [objetivo && `Objetivo: ${objetivo.rotulo}`, negocio.trim() && `Negócio: ${negocio.trim()}`].filter(Boolean).join(' · '),
           origem: 'site · formulário home',
           utm_source: utm.get('utm_source') || sessionStorage.getItem('flow.origem') || '',
           utm_medium: utm.get('utm_medium') || '', utm_campaign: utm.get('utm_campaign') || '',
         }),
       }).catch(() => {})
     }
-    const partes = ['Olá! Vim pelo site da Maintor Flow.']
-    if (objetivo) partes.push(`Quero conversar sobre: ${objetivo}.`)
-    if (nome.trim() && negocio.trim()) {
-      partes.push(`Meu nome é ${nome.trim()}, do negócio ${negocio.trim()}.`)
-    } else if (nome.trim()) {
-      partes.push(`Meu nome é ${nome.trim()}.`)
-    } else if (negocio.trim()) {
-      partes.push(`Escrevo pelo negócio ${negocio.trim()}.`)
-    }
+    // "Olá! Vim pelo portfólio da Maintor Flow e quero conversar sobre [objetivo]." + nome e negócio, se houver
+    const partes = [msgWhats(objetivo?.assunto)]
+    if (nome.trim()) partes.push(`Meu nome é ${nome.trim()}.`)
+    if (negocio.trim()) partes.push(`Meu negócio: ${negocio.trim()}.`)
     // 'noopener' evita reverse tabnabbing: sem ele a aba aberta recebe
     // window.opener e pode reescrever a URL desta página
     const texto = typeof window.__flowComOrigem === 'function' ? window.__flowComOrigem(partes.join(' ')) : partes.join(' ')
@@ -596,16 +572,26 @@ export default function App() {
           <a href="/index.md" tabIndex={-1}>maintorflow.com.br/index.md</a>.
         </p>
 
-        {/* ============ A ENTRADA — o pórtico em 3D é a fachada; aqui só a pergunta ============ */}
+        {/* ============ A ABERTURA (10/11) — a oferta e o caminho até os projetos, antes de qualquer pergunta ============ */}
         <section className="cena cena-entrada" id="topo">
           <div className="wrap">
-            <h1 className="micro entrada-titulo">Sites, sistemas e marketing sob medida — São Paulo</h1>
+            <div className="entrada-oferta">
+              <p className="micro entrada-selo">Maintor Flow · portfólio</p>
+              <h1 className="serif entrada-h1">Sites, lojas virtuais e sistemas sob medida para o seu negócio</h1>
+              <p className="entrada-apoio">
+                A Maintor Flow desenvolve projetos para vender online, automatizar o atendimento e organizar a operação.
+                Veja o que já está no ar e encontre um projeto parecido com o seu.
+              </p>
+              <div className="entrada-ctas">
+                <a className="btn" href="#trabalhos" onMouseEnter={blipHover}>Ver projetos realizados</a>
+                <a className="btn btn-fantasma" href="#contato">Conversar sobre meu projeto</a>
+              </div>
+            </div>
             <div className="entrada-base">
-              {/* na exposição, a pergunta mora no totem em 3D; este botão é o mesmo
-                  convite para teclado e celular (no computador só aparece com foco) */}
+              {/* atalho opcional: na exposição a pergunta também mora no totem em 3D */}
               {expor && !perguntaAberta && (
                 <button type="button" className="pergunta-gatilho" onClick={() => setPerguntaAberta(true)}>
-                  <span className="micro">Comece por aqui</span> Qual é o seu problema? <i aria-hidden="true">→</i>
+                  <span className="micro">Atalho</span> Qual é o seu problema? <i aria-hidden="true">→</i>
                 </button>
               )}
               <div className={`hero-escolha${expor ? ' pergunta-painel' : ''}${perguntaAberta ? ' aberta' : ''}`} role="group" aria-label="Qual é o seu problema?">
@@ -616,8 +602,8 @@ export default function App() {
                   )}
                 </div>
                 <div className="hero-chips">
-                  {HERO_PROBLEMAS.map((p, i) => (
-                    <button type="button" className="hero-chip" key={p.href} aria-pressed={escolha === i} onClick={() => setEscolha(escolha === i ? null : i)}>
+                  {HERO_ATALHOS.map((p, i) => (
+                    <button type="button" className="hero-chip" key={p.chip} aria-pressed={escolha === i} onClick={() => setEscolha(escolha === i ? null : i)}>
                       {p.chip}
                     </button>
                   ))}
@@ -628,14 +614,14 @@ export default function App() {
                       <p className="hero-dor serif">“{atual.dor}”</p>
                       <p className="corpo-apoio">{atual.solucao}</p>
                       <div className="hero-links">
-                        <a className="btn" href={whatsProblema(atual.dor)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Contar esse problema no WhatsApp</a>
+                        <a className="btn" href={whatsDe(atual.assunto)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Conversar sobre isso no WhatsApp</a>
                         <a className="link-mostarda" href={atual.href}>{atual.rotulo} →</a>
                       </div>
                     </>
                   )}
                 </div>
               </div>
-              <a className="dica-scroll" href="#trabalhos">{expor ? 'Role para caminhar pela exposição ↓' : 'Trabalhos no ar ↓'}</a>
+              {expor && <p className="dica-scroll" aria-hidden="true">Role para caminhar pela exposição</p>}
             </div>
           </div>
         </section>
@@ -644,61 +630,122 @@ export default function App() {
         {!expor && <Marquee />}
 
         {/* ============ AS ALAS — cada obra se solta da parede quando a legenda dela está na tela ============ */}
-        {ALAS.map((ala) => (
-          <section className="cena cena-ala" id={ala.id} key={ala.id}>
-            <div className={`wrap ala-cabeca${ala.id === 'problemas' ? ' saguao' : ''}`}>
-              <Regua esquerda={ala.eyebrow} direita={ala.id === 'problemas' ? `${PORTAS.length} portas` : `${ala.obras.length} obras`} />
-              <h2 className="titulo-cena serif" data-palavras><Palavras texto={ala.titulo} /></h2>
-              <p className="corpo-apoio" data-reveal>{ala.lead}</p>
-              {ala.id === 'problemas' && (
-                <nav className="portas-lista" aria-label="Portas do saguão: escolha o seu problema">
-                  <span className="micro">{expor ? 'Clique numa porta ou escolha aqui' : 'Escolha a sua'}</span>
-                  <div>
-                    {PORTAS.map((p, k) => (
-                      <button type="button" key={p.obra} className="porta-btn" onClick={() => entrarPorta(k)}>
-                        <i aria-hidden="true">{String(k + 1).padStart(2, '0')}</i>{p.curto}
-                      </button>
+        {ALAS.map((ala) => {
+          let grupoAtual = null
+          return (
+            <section className="cena cena-ala" id={ala.id} key={ala.id}>
+              <div className={`wrap ala-cabeca${ala.id === 'problemas' ? ' saguao' : ''}`}>
+                <Regua esquerda={ala.eyebrow} direita={ala.contagem} />
+                <h2 className="titulo-cena serif" data-palavras><Palavras texto={ala.titulo} /></h2>
+                <p className="corpo-apoio" data-reveal>{ala.lead}</p>
+                {ala.id === 'trabalhos' && (
+                  <nav className="grupos-atalhos" aria-label="Grupos de projetos">
+                    {Object.values(GRUPOS).map((g) => (
+                      <a key={g.id} href={`#${g.id}`} className="porta-btn">{g.titulo} <i aria-hidden="true">↓</i></a>
                     ))}
-                  </div>
-                </nav>
-              )}
-            </div>
-            {ala.obras.map((o, i) => (
-              <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} key={o.id} data-img={o.img} data-img-hd={imagemHD(o.img)} data-w={o.w} data-lado={i % 2 ? 1 : -1}>
-                <div className="wrap">
-                  <div className="obra-legenda">
-                    <img src={o.img} alt="" width="720" height="450" loading="lazy" decoding="async" />
-                    <span className="micro">{o.tag}</span>
-                    <h3 className="serif">{o.titulo}</h3>
-                    {o.nicho && <p className="obra-nicho">{o.nicho}</p>}
-                    <p>{o.texto}</p>
-                    <div className="obra-links">
-                      {o.externo
-                        ? <a className="btn btn-fino" href={o.href} target="_blank" rel="noopener">{o.rotulo} ↗</a>
-                        : <a className="btn btn-fino" href={o.href}>{o.rotulo} →</a>}
-                      {o.extra && (o.extra.externo
-                        ? <a className="link-mostarda" href={o.extra.href} target="_blank" rel="noopener">{o.extra.rotulo} ↗</a>
-                        : <a className="link-mostarda" href={o.extra.href}>{o.extra.rotulo} →</a>)}
+                  </nav>
+                )}
+                {ala.id === 'problemas' && (
+                  <nav className="portas-lista" aria-label="Portas: escolha a sua necessidade">
+                    <span className="micro">{expor ? 'Clique numa porta ou escolha aqui' : 'Escolha a sua'}</span>
+                    <div>
+                      {PORTAS.map((p, k) => (
+                        <button type="button" key={p.obra} className="porta-btn" onClick={() => entrarPorta(k)}>
+                          <i aria-hidden="true">{String(k + 1).padStart(2, '0')}</i>{p.objetivo}
+                        </button>
+                      ))}
                     </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </section>
-        ))}
+                  </nav>
+                )}
+              </div>
+              {ala.obras.map((o, i) => {
+                const grupo = o.grupo && o.grupo !== grupoAtual ? GRUPOS[(grupoAtual = o.grupo)] : null
+                const Titulo = o.grupo ? 'h4' : 'h3' // na Ala 01 o título do grupo é o h3
+                const lnk = (l, cls) => (l.externo
+                  ? <a key={l.href} className={cls} href={l.href} target="_blank" rel="noopener">{l.rotulo} ↗</a>
+                  : <a key={l.href} className={cls} href={l.href}>{l.rotulo} {l.href.startsWith('#') ? '↓' : '→'}</a>)
+                return (
+                  <Fragment key={o.id}>
+                    {grupo && (
+                      <div className="obra-grupo" id={grupo.id}>
+                        <div className="wrap">
+                          <div className="grupo-painel">
+                            <span className="micro">{grupo === GRUPOS.clientes ? 'Grupo 1 de 2' : 'Grupo 2 de 2'}</span>
+                            <h3 className="serif">{grupo.titulo}</h3>
+                            <p>{grupo.lead}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} data-img={o.img} data-img-hd={imagemHD(o.img)} data-w={o.w} data-lado={i % 2 ? 1 : -1}>
+                      <div className="wrap">
+                        <div className="obra-legenda">
+                          <img src={o.img} className={o.amostras || o.videos ? 'so-3d' : undefined} alt={o.grupo ? `Tela do projeto ${o.titulo}` : ''} width="720" height="450" loading="lazy" decoding="async" />
+                          <span className="micro">{o.objetivo ? `Porta ${String(i + 1).padStart(2, '0')} · ${o.objetivo}` : o.selo}</span>
+                          <Titulo className="serif">{o.titulo}</Titulo>
+                          {o.categoria && <p className="obra-nicho">{o.categoria}</p>}
+                          <p>{o.objetivo ? <><b>O que a Maintor Flow oferece:</b> {o.texto}</> : o.texto}</p>
+                          {o.amostras && (
+                            <ul className="obra-amostras">
+                              {o.amostras.map((a) => (
+                                <li key={a.img}>
+                                  <img src={a.img} alt={a.alt} width="1080" height="1350" loading="lazy" decoding="async" />
+                                  <span>{a.legenda}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {o.videos && (
+                            <ul className="obra-videos">
+                              {o.videos.map((v) => (
+                                <li key={v.src}>
+                                  <button type="button" className="video-capa" onClick={() => setVideo(v)} aria-label={`Assistir ao vídeo ${v.titulo} (${v.duracao})`}>
+                                    <img src={v.capa} alt="" width="720" height="1280" loading="lazy" decoding="async" />
+                                    <span className="video-play" aria-hidden="true">▶</span>
+                                    <span className="video-dur" aria-hidden="true">{v.duracao}</span>
+                                  </button>
+                                  <b>{v.titulo}</b>
+                                  <span>{v.legenda}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {o.nota && <p className="obra-nota">{o.nota}</p>}
+                          <div className="obra-links">
+                            {lnk(o.acao, 'btn btn-fino')}
+                            {(o.mais || []).map((l) => lnk(l, 'link-mostarda'))}
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  </Fragment>
+                )
+              })}
+            </section>
+          )
+        })}
 
-        {/* ============ CENA 5 · SOB MEDIDA: COMO A GENTE CONSTRÓI ============ */}
+        {/* ============ COMO TRABALHAMOS — o processo, depois de Marketing ============ */}
         <section className="cena cena-curta" id="como">
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="04 · Totalmente sob medida" direita="Do problema à solução" />
+            <Regua esquerda="Como trabalhamos" direita="Processo em quatro etapas" />
             <h2 className="titulo-cena serif" data-palavras>
-              <Palavras texto="Do seu problema à solução que é sua." destaque={[5, 6, 7]} />
+              <Palavras texto="Da primeira conversa à entrega." destaque={[3, 4]} />
             </h2>
-            <div className="linhas" style={{ marginTop: 'var(--s4)' }} data-reveal>
-              <LinhaEd idx="01" rot="Conversa" val="você conta onde o dia trava — no seu negócio, em qualquer bairro de SP, ou por vídeo" />
-              <LinhaEd idx="02" rot="Proposta" val="escopo, prazo e preço por escrito; se uma ferramenta pronta resolver, a gente diz" />
-              <LinhaEd idx="03" rot="Construção" val="por etapas, com você vendo cada uma funcionando antes de seguir" />
-              <LinhaEd idx="04" rot="Entrega" val="treinamento, manual e tudo no seu nome: domínio, dados e código" />
+            <ol className="linhas linhas-processo" style={{ marginTop: 'var(--s4)' }} data-reveal>
+              <li><LinhaEd idx="01" rot="Conversa" val="Você conta o que precisa resolver. A gente entende sua rotina, seu objetivo e o que já existe." /></li>
+              <li><LinhaEd idx="02" rot="Proposta" val="Você recebe por escrito o escopo, o prazo, o investimento e o que cada parte precisa fornecer." /></li>
+              <li><LinhaEd idx="03" rot="Desenvolvimento" val="Você acompanha as etapas e valida as principais telas ou entregas durante o desenvolvimento." /></li>
+              <li><LinhaEd idx="04" rot="Entrega" val="Publicamos ou disponibilizamos o projeto e orientamos sua equipe a usar a solução, conforme o escopo contratado." /></li>
+            </ol>
+            {/* as condições mudam com o tipo de projeto: nada de prometer código ou dados de forma genérica */}
+            <div className="modalidades" data-reveal>
+              <h3 className="micro">O que muda conforme o tipo de projeto</h3>
+              <dl>
+                <div><dt>Projeto sob medida</dt><dd>Site, loja ou sistema. Você paga pelo desenvolvimento; domínio, contas e dados ficam no seu nome, e o que é entregue — código, treinamento, manual — fica descrito na proposta.</dd></div>
+                <div><dt>Serviço contínuo</dt><dd>Conteúdo, campanhas e manutenção mensal. Contratado à parte, com escopo e valor próprios.</dd></div>
+                <div><dt>Produto por assinatura</dt><dd>Maintor CMMS, Maintor FIT, Horaqui, Maintor RH e Maintor Task. Seguem as condições de cada produto.</dd></div>
+              </dl>
             </div>
           </div>
         </section>
@@ -723,7 +770,7 @@ export default function App() {
             opacity (nunca autoAlpha — elemento invisível não recebe foco) */}
         <section className="cena cena-curta" id="perguntas">
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="Perguntas frequentes" direita="O que todo dono pergunta primeiro" />
+            <Regua esquerda="Perguntas frequentes" direita="Valores, prazos e condições" />
             <h2 className="titulo-cena serif" data-palavras>
               <Palavras texto="Antes de chamar, o que a maioria quer saber." destaque={[7, 8]} />
             </h2>
@@ -733,7 +780,9 @@ export default function App() {
                   <summary>{q.p}</summary>
                   <p>
                     {q.r}
-                    {q.href && <> <a href={q.href}>{q.rotulo}</a></>}
+                    {q.href && <> {q.externo
+                      ? <a href={q.href} target="_blank" rel="noopener">{q.rotulo}</a>
+                      : <a href={q.href}>{q.rotulo}</a>}</>}
                   </p>
                 </details>
               ))}
@@ -741,70 +790,41 @@ export default function App() {
           </div>
         </section>
 
-        {/* ============ CENA 5 · CONTATO ============ */}
+        {/* ============ CONTATO — a conversa em primeiro lugar ============ */}
         <section className="cena" id="contato">
           <figure className="painel-foto solto-direita" data-reveal>
             <img
               src="/midia/contato-balao.webp"
-              alt="Balão de conversa em cerâmica — a conversa começa no WhatsApp"
+              alt=""
               loading="lazy" width="760" height="760"
             />
           </figure>
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="Contato" direita="Sem compromisso — sem reunião de uma hora" />
-            {/* a 375px "vamos tirar a ideia" quebrava em 3 linhas e deixava
-                "ideia" órfã; as linhas curtas cabem em 2 no celular */}
-            <h2 className="manchete serif manchete-cta" data-palavras>
-              <span className="linha"><Palavras texto="vamos tirar" /></span>
-              <span className="linha recuo"><Palavras texto="a ideia" /></span>
-              <span className="linha direita"><Palavras texto="do papel?" destaque={[0, 1]} /></span>
+            <Regua esquerda="Contato" direita="Primeira conversa sem compromisso" />
+            <h2 className="titulo-cena serif" data-palavras>
+              <Palavras texto="Conte o que você quer colocar no ar" destaque={[5, 6, 7]} />
             </h2>
-
-            {/* Lista de serviços em texto lido. O marquee é decorativo
-                (aria-hidden), então sem isto marketing, tráfego pago e
-                manutenção mensal não existiam para leitor de tela nem
-                para buscador — só apareciam nos chips do formulário. */}
-            <div className="servicos-lista" data-reveal>
-              <h3 className="micro servicos-titulo">O que a Flow faz</h3>
-              <ul>
-                <li><a href="/loja-virtual/"><b>Loja virtual</b><span>catálogo, Pix, cartão, frete e painel do dono</span></a></li>
-                <li><a href="/loja-no-instagram/"><b>Loja no Instagram</b><span>produtos marcados nos posts, pagamento no seu site</span></a></li>
-                <li><a href="/sites/"><b>Site institucional</b><span>rápido no celular, com texto que vende</span></a></li>
-                <li><a href="/manutencao-mensal/"><b>Manutenção mensal</b><span>atualização, correção e acompanhamento</span></a></li>
-                <li><a href="/marketing-e-redes/"><b>Marketing e redes</b><span>conteúdo, publicação e SEO</span></a></li>
-                <li><a href="/videos-personalizados/"><b>Vídeos personalizados</b><span>Reels, comercial do produto, depoimento de cliente</span></a></li>
-                <li><a href="/trafego-pago/"><b>Tráfego pago</b><span>Google Ads e Meta, criativos e otimização</span></a></li>
-                <li><a href="/automacao-de-atendimento/"><b>Automação de atendimento</b><span>WhatsApp e e-mail respondendo sozinhos</span></a></li>
-                <li><a href="/sistemas-sob-medida/"><b>Sistemas sob medida</b><span>gestão de RH, de manutenção e o que o seu processo pedir</span></a></li>
-                <li><a href="/sistema-para-revender/"><b>Sistema para revender</b><span>o app do seu nicho, no seu nome; seus colegas pagam por mês</span></a></li>
-                <li><a href="/para-consultorias/"><b>Para consultorias</b><span>sistema no nome da consultoria: implementação e mensalidade dos seus clientes</span></a></li>
-              </ul>
-              {/* páginas por segmento: URL, título e texto próprios (SEO) */}
-              <p className="servicos-nichos">
-                <span className="micro">Por onde começar</span>
-                <a href="/por-onde-comecar/">A trilha, na ordem certa</a>
-                <a href="/site-para-clinica-odontologica/">Clínica odontológica</a>
-                <a href="/loja-virtual-moda-fitness/">Moda fitness</a>
-                <a href="/casos/voke-wear/">Case VOKE</a>
-                <a href="/guias/">Guias para decidir</a>
-              </p>
-            </div>
+            <p className="corpo-apoio contato-apoio" data-reveal>
+              Diga o que seu negócio faz e o que você precisa resolver. A gente conversa sobre o formato do projeto e os próximos passos.
+            </p>
 
             <form className="form-flow" onSubmit={abrirWhats} data-reveal>
-              <label className="micro">Qual é o seu objetivo hoje?</label>
-              <div className="opcoes">
-                {OBJETIVOS.map((o) => (
-                  <button
-                    type="button"
-                    key={o}
-                    className={`opcao${objetivo === o ? ' ativa' : ''}`}
-                    aria-pressed={objetivo === o}
-                    onClick={() => setObjetivo(o)}
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
+              <fieldset className="form-objetivo">
+                <legend className="micro">O que você quer conversar?</legend>
+                <div className="opcoes">
+                  {OBJETIVOS.map((o) => (
+                    <button
+                      type="button"
+                      key={o.rotulo}
+                      className={`opcao${objetivo === o ? ' ativa' : ''}`}
+                      aria-pressed={objetivo === o}
+                      onClick={() => setObjetivo(objetivo === o ? null : o)}
+                    >
+                      {o.rotulo}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
               <label className="micro" htmlFor="campo-nome">Seu nome</label>
               <input
                 id="campo-nome"
@@ -814,34 +834,34 @@ export default function App() {
                 onChange={(e) => setNome(e.target.value)}
                 autoComplete="name"
               />
+              <label className="micro" htmlFor="campo-negocio">O que o seu negócio faz (opcional)</label>
+              <input
+                id="campo-negocio"
+                type="text"
+                placeholder="ex.: loja de roupas, clínica, indústria"
+                value={negocio}
+                onChange={(e) => setNegocio(e.target.value)}
+                autoComplete="organization"
+              />
               <label className="micro" htmlFor="campo-whats">Seu WhatsApp (opcional)</label>
               <input
                 id="campo-whats"
                 type="tel"
                 inputMode="tel"
-                placeholder="(11) 99999-9999 — para a gente te achar se a conversa não abrir"
+                placeholder="(11) 99999-9999"
+                aria-describedby="obs-whats"
                 value={whats}
                 onChange={(e) => setWhats(e.target.value)}
                 autoComplete="tel"
               />
-              <label className="micro" htmlFor="campo-negocio">Seu negócio (opcional)</label>
-              <input
-                id="campo-negocio"
-                type="text"
-                placeholder="nome da loja, clínica ou empresa"
-                value={negocio}
-                onChange={(e) => setNegocio(e.target.value)}
-                autoComplete="organization"
-              />
               <div>
                 <button className="btn" type="submit" onMouseEnter={blipHover}>
-                  Iniciar conversa no WhatsApp
+                  Conversar no WhatsApp
                 </button>
               </div>
-              <p className="form-obs">
-                Abre direto no WhatsApp (11) 94661-0634 — sem formulário perdido
-                em caixa de entrada. Se deixar o seu WhatsApp, guardamos o contato
-                para retornar caso a conversa não abra.
+              <p className="form-obs" id="obs-whats">
+                Abre a conversa no WhatsApp (11) 94661-0634 com a mensagem pronta. Se deixar o seu número,
+                guardamos o contato só para retornar caso a conversa não abra.
               </p>
             </form>
           </div>
@@ -855,13 +875,15 @@ export default function App() {
       {sala != null && (() => {
         const p = PORTAS[sala]
         return (
-          <aside className="sala-painel" aria-label={`Sala: ${p.area}`} key={sala}>
-            <span className="micro">Porta {String(sala + 1).padStart(2, '0')} de {String(PORTAS.length).padStart(2, '0')} · {p.area}</span>
-            <h2 className="serif" tabIndex={-1} ref={salaTituloRef}>“{p.dor}”</h2>
-            <p className="sala-solucao"><b>A gente constrói:</b> {p.solucao}</p>
+          <aside className="sala-painel" aria-label={`Porta ${sala + 1}: ${p.objetivo}`} key={sala}>
+            <span className="micro">Porta {String(sala + 1).padStart(2, '0')} de {String(PORTAS.length).padStart(2, '0')} · {p.objetivo}</span>
+            <h2 className="serif" tabIndex={-1} ref={salaTituloRef}>“{p.frase}”</h2>
+            <p className="sala-solucao"><b>O que a Maintor Flow oferece:</b> {p.texto}</p>
             <div className="sala-ctas">
-              <a className="btn" href={whatsProblema(p.dor)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Contar esse problema no WhatsApp</a>
-              <a className="link-mostarda" href={p.href}>{p.rotulo} →</a>
+              <a className="btn" href={whatsDe(p.assunto)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Conversar sobre isso no WhatsApp</a>
+              {[p.acao, ...(p.mais || [])].map((l) => (l.href.startsWith('#')
+                ? <a key={l.href} className="link-mostarda" href={l.href} onClick={(e) => irDaSala(e, l.href)}>{l.rotulo} ↓</a>
+                : <a key={l.href} className="link-mostarda" href={l.href}>{l.rotulo} →</a>))}
             </div>
             <div className="sala-nav">
               <button type="button" className="sala-voltar" onClick={() => setSala(null)}>← Voltar ao saguão</button>
@@ -874,7 +896,38 @@ export default function App() {
         )
       })()}
 
+      {/* player dos vídeos de clientes: só monta o <video> depois do clique; toca porque a pessoa pediu */}
+      <dialog
+        className="video-dialogo"
+        ref={videoDialogoRef}
+        aria-label={video ? `Vídeo: ${video.titulo}` : 'Vídeo'}
+        onClose={() => setVideo(null)}
+        onClick={(e) => { if (e.target === e.currentTarget) setVideo(null) }}
+      >
+        {video && (
+          <div className="video-corpo">
+            <div className="video-topo">
+              <span className="micro">{video.titulo}</span>
+              <button type="button" className="pergunta-fechar" onClick={() => setVideo(null)} aria-label="Fechar o vídeo">✕</button>
+            </div>
+            <video src={video.src} poster={video.capa} controls autoPlay playsInline preload="metadata" width="720" height="1280" />
+            <p>{video.legenda}</p>
+          </div>
+        )}
+      </dialog>
+
       <footer>
+        {/* o catálogo completo de serviços: saiu da área de contato (10/11) e mora aqui */}
+        <nav className="wrap rodape-servicos" aria-label="Todos os serviços">
+          <div>
+            <h2 className="micro">Serviços</h2>
+            <ul>{CATALOGO.map((s) => <li key={s.href}><a href={s.href}>{s.rotulo}</a></li>)}</ul>
+          </div>
+          <div>
+            <h2 className="micro">Para decidir</h2>
+            <ul>{CATALOGO_APOIO.map((s) => <li key={s.href}><a href={s.href}>{s.rotulo}</a></li>)}</ul>
+          </div>
+        </nav>
         <div className="wrap rodape-linhas">
           <div>
             <span className="serif" style={{ color: 'var(--creme)' }}>
