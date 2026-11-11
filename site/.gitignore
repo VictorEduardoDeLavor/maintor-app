@@ -5,3 +5,6 @@ dist/
 testes/boneco/*.webp
 testes/boneco/*.png
 testes/boneco/*.jpg
+
+# saída do aceite da limpeza visual (prints e medições: se regeneram com node testes/aceite-limpeza.mjs)
+testes/limpeza/
