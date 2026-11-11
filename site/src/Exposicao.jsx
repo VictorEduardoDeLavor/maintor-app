@@ -544,7 +544,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       luz.rotation.x = -Math.PI / 2; luz.position.set(0, 0.015, 0.5); g.add(luz)
       return { g, vao, placa, luz, base: new THREE.Vector3(), hover: 0 }
     })
-    let saguao = { topo: 0, alt: 1 }, saguaoVivo = false
+    let saguao = { topo: 0, base: 0 }, saguaoVivo = false
 
     // 4) a SALA de cada tema: um cômodo fora do corredor, para onde se entra pela porta
     const SX = 140
@@ -659,8 +659,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         o.grupo.position.copy(o.parede.pos); o.grupo.quaternion.copy(o.parede.quat); o.grupo.scale.setScalar(1)
       }
       montarSaguao()
-      // as cabeças (o saguão da Ala 02 tem coreografia própria, com as portas)
-      cabecas = [...document.querySelectorAll('main#conteudo .ala-cabeca:not(.saguao), main#conteudo .grupo-painel')].map((el) => {
+      // as cabeças (Fase 3: inclui a do saguão — as portas só sobem depois que ela foi lida)
+      cabecas = [...document.querySelectorAll('main#conteudo .ala-cabeca, main#conteudo .grupo-painel')].map((el) => {
         const filhos = el.classList.contains('ala-cabeca') ? [...el.children] : [el]
         const ultimo = filhos[filhos.length - 1]
         return { topo: yDoc(filhos[0]), base: yDoc(ultimo) + ultimo.offsetHeight }
@@ -674,9 +674,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     function montarSaguao() {
       const cab = document.querySelector('#problemas .ala-cabeca')
       if (cab && portas3d.length) {
-        const r = cab.getBoundingClientRect(); saguao = { topo: window.scrollY + r.top, alt: Math.max(r.height, 1) }
-        // a fileira fica à frente de onde a câmera está quando o saguão está no meio da tela
-        const uS = uDe(alaDe(saguao.topo + saguao.alt * 0.45))
+        // 11/11 (Fase 3): o que conta é o BLOCO de texto da cabeça (régua → lista), não a caixa inteira
+        const filhos = [...cab.children], ultimo = filhos[filhos.length - 1]
+        saguao = { topo: yDoc(filhos[0]), base: yDoc(ultimo) + ultimo.offsetHeight }
+        // a fileira fica à frente de onde a câmera está no meio do "palco" das portas (o bloco já saiu por cima)
+        const uS = uDe(alaDe(saguao.base + window.innerHeight * 0.72))
         const c = new THREE.Vector3()
         caminho.getPointAt(uS, c)
         /* 10/11: com sete portas o arco por ângulo batia nas paredes (11,5 m de corredor) e a última
@@ -684,8 +686,12 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
            caminho, à frente da divisória (5–7 m de quem chega), cada porta virada para o visitante;
            se não couberem em tamanho cheio, as portas encolhem por igual. */
         const n = portas3d.length, MEIO = 4.2
-        let zFila = c.z - 7
-        for (let i = 0; i < N - 1; i++) { const zd = -i * PASSO - 27; if (zd < c.z - 2 && zd > zFila - 1) zFila = Math.max(zFila, zd + 0.6) }
+        /* 11/11 (Fase 3): com o palco depois do título, quem chega está a ~2 m de uma divisória; a regra antiga
+           puxava a fileira para a frente dela e as portas ficavam a 1,5 m do rosto (uma porta enchia a tela).
+           Agora a fileira fica 10 m à frente — passa da divisória, cabe mais porta na tela do celular e as sete
+           aparecem no computador; se cair em cima de uma divisória, vai para logo depois dela. */
+        let zFila = c.z - 10
+        for (let i = 0; i < N - 1; i++) { const zd = -i * PASSO - 27; if (Math.abs(zd - zFila) < 2) zFila = zd - 2.5 }
         const cx = THREE.MathUtils.clamp(c.x, -1.2, 1.2)
         const passoX = n > 1 ? (2 * MEIO) / (n - 1) : 0
         const esc = n > 1 ? Math.min(1, passoX / 1.78) : 1
@@ -714,6 +720,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const dirOlhar = new THREE.Vector3(), dirObra = new THREE.Vector3(), ctrl = new THREE.Vector3()
     const balanco = new THREE.Quaternion(), eixoZ = new THREE.Vector3(0, 0, 1)
     let prog = 0, raf, visivel = true, primeiro = true, emFoco = false, abre = -1, bonecoSome = 0
+    let fPortas = 0 // quanto as portas do saguão estão de pé (0..1), do quadro anterior
     let ler = 0, lado = -1, legendaCel = false, focoId = null, luzBaixa = false, frentePc = 0
     const guiaRumo = new THREE.Vector3()
     const aoVis = () => { visivel = document.visibilityState === 'visible'; if (visivel) quadro() }
@@ -775,7 +782,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         o.fs += (fAlvo - o.fs) * Math.min(1, dt * 6)
         if (Math.abs(fAlvo - o.fs) < 0.0005) o.fs = fAlvo
         // o olhar para o próximo começa quando o anterior volta para a parede (os dois gestos se encadeiam)
-        const wAlvo = (p < -1 || p > 1 ? 0 : suave(-0.45, -0.15, p) * (1 - suave(0, 0.3, p))) * (1 - ler)
+        const wAlvo = (p < -1 || p > 1 ? 0 : suave(-0.45, -0.15, p) * (1 - suave(0, 0.3, p))) * (1 - ler) * (1 - fPortas) // (Fase 3: nem enquanto as portas estão de pé)
         o.ws += (wAlvo - o.ws) * Math.min(1, dt * 4)
         if (o.ws > olharPeso) { olharPeso = o.ws; olharObra = o }
       }
@@ -825,8 +832,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       totem.position.y = (fTotem - 1) * 2.6
       anel.material.opacity = 1; anel.scale.setScalar(1 + Math.sin(t * 3) * 0.08)
       luzTotem.intensity = 2.2 + Math.sin(t * 3) * 0.8
-      const pS = (yTela - saguao.topo) / saguao.alt
-      const fS = suave(-0.55, 0.05, pS) * (1 - suave(0.95, 1.45, pS))
+      /* 11/11 (Fase 3): as portas sobem DEPOIS que o título e a lista foram lidos — quando a base do bloco passa
+         de 30% para 10% da altura da tela —, ficam de pé por ~55% de tela de rolagem (o "palco" delas, sem
+         texto por cima) e descem antes de o primeiro quadro da ala se soltar. Antes subiam enquanto a
+         cabeça estava na tela, e as placas ficavam atrás do título e dos botões. */
+      const bS = (saguao.base - syTela) / vhTela
+      const fS = suave(0.3, 0.1, bS) * (1 - suave(-0.45, -0.62, bS))
+      fPortas = fS
       if (fS > 0 && !saguaoVivo) montarSaguao() // as portas vão começar a subir: posiciona com o layout final
       saguaoVivo = fS > 0
       portas3d.forEach((p, k) => {
@@ -889,7 +901,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const dist = retrato ? 7.2 : 4.6
       const largVisivel = 2 * dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect
       // modo LER: os quadros se recolhem na parede enquanto um título é lido e voltam quando ele passa
-      const presAlvo = 1 - suave(0.25, 0.75, ler)
+      // (Fase 3: e enquanto as portas do saguão estão de pé — o palco é só delas)
+      const presAlvo = (1 - suave(0.25, 0.75, ler)) * (1 - suave(0.05, 0.6, fPortas))
       for (const o of obras) {
         const f = o.fs
         // na abertura do computador, a parede do lado do texto (a esquerda) fica livre: os quadros dela surgem quando o passeio começa

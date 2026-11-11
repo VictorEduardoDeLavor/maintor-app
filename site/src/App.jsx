@@ -650,7 +650,7 @@ export default function App() {
                 )}
                 {ala.id === 'problemas' && (
                   <nav className="portas-lista" aria-label="Portas: escolha a sua necessidade">
-                    <span className="micro">{expor ? 'Clique numa porta ou escolha aqui' : 'Escolha a sua'}</span>
+                    <span className="micro">{expor ? 'Escolha aqui ou nas portas, logo à frente' : 'Escolha a sua'}</span>
                     <div>
                       {PORTAS.map((p, k) => (
                         <button type="button" key={p.obra} className="porta-btn" onClick={() => entrarPorta(k)}>

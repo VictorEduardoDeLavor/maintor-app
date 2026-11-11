@@ -1578,3 +1578,22 @@ html.expo-pronta .ala-cabeca:not(.saguao):has(+ .obra) { margin-bottom: 16vh; }
     -webkit-mask-composite: source-in; mask-composite: intersect;
   }
 }
+/* Fase 3 — o saguão das 7 portas. A cabeça (título + lista) é lida em fundo calmo; as portas sobem depois,
+   num trecho de rolagem só delas (o "palco"): por isso a caixa de 118vh sai e entra o espaço depois do bloco. */
+html.expo-pronta .ala-cabeca.saguao { min-height: 0; margin-bottom: 120vh; }
+/* R8: no celular a lista vira uma grade de duas colunas em painel de vidro (antes: 7 botões empilhados sobre o 3D) */
+@media (max-width: 820px) {
+  html.expo-pronta .portas-lista {
+    margin-top: 22px; padding: 14px 14px 16px; border-radius: 18px; background: rgba(13, 38, 38, .66); border: var(--hairline);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  }
+  html.expo-pronta .portas-lista > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  html.expo-pronta .portas-lista .porta-btn { min-height: 52px; padding: 8px 10px; gap: 8px; font-size: 13.5px; line-height: 1.2; text-align: left; white-space: normal; }
+  html.expo-pronta .portas-lista .porta-btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}/* no computador a lista fica na coluna do texto (antes os botões iam até a direita, para a faixa do boneco) */
+@media (min-width: 821px) { html.expo-pronta .portas-lista { max-width: 700px; } }/* no computador a legenda acompanha o quadro, como no celular: aparece quando ele chega na posição de leitura
+   e some quando volta para a parede. Antes entrava rolando sozinha, sobre as portas ou sobre os quadros da parede. */
+@media (min-width: 821px) {
+  html.expo-pronta .obra-legenda { opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+  html.expo-pronta .obra.em-foco .obra-legenda { opacity: 1; pointer-events: auto; }
+}
