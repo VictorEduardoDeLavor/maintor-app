@@ -126,7 +126,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       if (srgb) t.colorSpace = THREE.SRGBColorSpace
       return t
     }
-    const cam = new THREE.PerspectiveCamera(52, 1, 0.1, 160)
+    /* 11/11: o alcance era 160 m num corredor de ~290 m. O que ficava além não era desenhado e, no lugar, aparecia
+       a cor de fundo SEM névoa: um retângulo claro no ponto de fuga, atrás do texto em quase todas as telas. */
+    const cam = new THREE.PerspectiveCamera(52, 1, 0.1, 340)
     const acab = criarAcabamento(renderer, cena, cam, { celular })
 
     const secoes = [...document.querySelectorAll('main#conteudo > section.cena')]
@@ -181,6 +183,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     })
     const matTeto = new THREE.MeshStandardMaterial({ color: 0x0a1c1c, roughness: 1 })
     const matLatao = new THREE.MeshStandardMaterial({ color: COR.mostarda, roughness: 0.3, metalness: 0.9 })
+    // rodapés e quinas das divisórias: somem no modo LER (11/11). Só escurecer não basta — metal polido visto de
+    // raspão reflete o foco do boneco mesmo preto (um risco claro atrás dos rótulos pequenos); por isso esmaecem
+    const matLataoArq = matLatao.clone(); matLataoArq.transparent = true
     const matLuzTeto = new THREE.MeshStandardMaterial({ color: COR.bege, emissive: COR.bege, emissiveIntensity: 1.6, roughness: 1 })
     const matFio = new THREE.MeshStandardMaterial({ color: COR.mostarda, emissive: COR.mostarda, emissiveIntensity: 1.4, roughness: 0.6 })
     const matVidro = new THREE.MeshPhysicalMaterial({ color: COR.creme, roughness: 0.08, transmission: 0.85, thickness: 0.6, ior: 1.45, transparent: true, opacity: 0.9 })
@@ -198,9 +203,12 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const p = new THREE.Mesh(uvEscala(new THREE.PlaneGeometry(COMP, ALT), COMP / 2.4, 1), matParede)
       p.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
       p.position.set(lado * LARG / 2, ALT / 2, zMeio); p.receiveShadow = true; cena.add(p)
-      const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, COMP), matLatao)
+      const r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, COMP), matLataoArq)
       r.position.set(lado * (LARG / 2 - 0.03), 0.06, zMeio); cena.add(r)
     }
+    // 11/11: o fim do corredor é uma parede (antes ficava aberto para a cor de fundo)
+    const paredeFim = new THREE.Mesh(uvEscala(new THREE.PlaneGeometry(LARG, ALT), LARG / 2.4, 1), matParede)
+    paredeFim.position.set(0, ALT / 2, zMeio - COMP / 2 + 0.05); cena.add(paredeFim)
     // 09/11: cada luminária ganha um halo suave no teto (o brilho de luz real, sem custo de pós-processo)
     const texHalo = (() => {
       const c = document.createElement('canvas'); c.width = 256; c.height = 64
@@ -210,6 +218,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t
     })()
     const matHalo = new THREE.MeshBasicMaterial({ map: texHalo, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true })
+    // 11/11: num material ADITIVO a névoa leva ao preto, não à cor da névoa (senão cada halo distante soma um pouco de verde)
+    matHalo.onBeforeCompile = (s) => {
+      s.fragmentShader = s.fragmentShader.replace('#include <fog_fragment>', '#ifdef USE_FOG\n\tfloat fogHalo = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );\n\tgl_FragColor.rgb *= 1.0 - fogHalo;\n#endif')
+    }
+    matHalo.customProgramCacheKey = () => 'halo-nevoa-preta'
     const luzesTeto = []
     for (let i = 0; i < N * 2; i++) {
       const l = new THREE.Mesh(new THREE.BoxGeometry(LARG * 0.5, 0.05, 0.18), matLuzTeto)
@@ -224,7 +237,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const d = new THREE.Mesh(new THREE.BoxGeometry(DIV, ALT, 0.35), matParede)
       d.position.set(lado * (LARG / 2 - DIV / 2), ALT / 2, -i * PASSO - 27)
       d.castShadow = !celular; d.receiveShadow = true; cena.add(d)
-      const q = new THREE.Mesh(new THREE.BoxGeometry(0.06, ALT, 0.37), matLatao)
+      const q = new THREE.Mesh(new THREE.BoxGeometry(0.06, ALT, 0.37), matLataoArq)
       q.position.set(lado * (LARG / 2 - DIV), ALT / 2, d.position.z); cena.add(q)
     }
 
@@ -244,7 +257,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     if (navigator.webdriver) window.__guia = guia.raiz // só para a bateria de aceite (robôs): conferir que ele anda
     // 11/11: sonda da limpeza visual (só robôs) — testes/aceite-limpeza.mjs lê daqui os objetos da cena e projeta os retângulos de tela.
     // Só as classes usadas, nunca o módulo THREE inteiro: passar o módulo como valor desliga o tree-shaking (+45 KB em gzip)
-    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, caixaLetreiro, totem, portas3d, obras, guia, pecasAla, prog })
+    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, caixaLetreiro, totem, portas3d, obras, guia, pecasAla, prog, ler, lado })
     const guiaPos = new THREE.Vector3(), guiaAnt = new THREE.Vector3(), guiaTan = new THREE.Vector3(), guiaDelta = new THREE.Vector3()
     let guiaComecou = false
 
@@ -385,7 +398,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const obras = [...document.querySelectorAll('article.obra[data-img]')].map((el) => ({
       // no computador a HD (1920 px); no celular a de 1280 (06/11: a de 720 ficava borrada na tela 2x)
       el, src: (celular ? el.dataset.imgHd?.replace('-1920.webp', '-1280.webp') : el.dataset.imgHd) || el.dataset.img, w: parseFloat(el.dataset.w || '5'), lado: parseInt(el.dataset.lado || '1', 10),
-      hd: celular ? el.dataset.imgHd : null, tela: null, grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0, fs: 0, ws: 0, foco: false,
+      hd: celular ? el.dataset.imgHd : null, tela: null, grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0, fs: 0, ws: 0, foco: false, ps: 1,
     }))
     for (const o of obras) {
       cena.add(o.grupo)
@@ -621,6 +634,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const po = new THREE.Points(pg, new THREE.PointsMaterial({ color: COR.mostarda, size: 0.035, transparent: true, opacity: 0.55, depthWrite: false })); cena.add(po)
 
     let centros = []
+    /* 11/11 — MODO LER (limpeza visual, Fase 2). As "cabeças" são os blocos de leitura do passeio: o título
+       de cada ala e o painel de cada grupo. Enquanto uma cabeça está na zona de leitura, o 3D recua —
+       os quadros se recolhem na parede, o corredor escurece, o olhar sobe (celular) e o boneco muda de
+       faixa. Só depois que o título sai é que os quadros voltam e o primeiro se solta (o "respiro"). */
+    let cabecas = []
+    const yDoc = (el) => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y } // sem as transformações das animações de entrada
+    const LER = { nevoa: 0.035, luz: 1, fio: 0.96, cena: 0.82, latao: 0.75, lataoArq: 1, bonecoPc: 0.34, fora: 1.55, parede: 0.7, piso: 0.85, abrePcLado: 0.1, abrePcFrente: 3.4 }
     const alaDe = (y) => {
       if (!centros.length || y <= centros[0]) return 0
       for (let i = 1; i < centros.length; i++) if (y <= centros[i]) return i - 1 + (y - centros[i - 1]) / Math.max(centros[i] - centros[i - 1], 1)
@@ -639,6 +659,12 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         o.grupo.position.copy(o.parede.pos); o.grupo.quaternion.copy(o.parede.quat); o.grupo.scale.setScalar(1)
       }
       montarSaguao()
+      // as cabeças (o saguão da Ala 02 tem coreografia própria, com as portas)
+      cabecas = [...document.querySelectorAll('main#conteudo .ala-cabeca:not(.saguao), main#conteudo .grupo-painel')].map((el) => {
+        const filhos = el.classList.contains('ala-cabeca') ? [...el.children] : [el]
+        const ultimo = filhos[filhos.length - 1]
+        return { topo: yDoc(filhos[0]), base: yDoc(ultimo) + ultimo.offsetHeight }
+      })
       const w = host.clientWidth, h = host.clientHeight
       renderer.setSize(w, h, false); acab.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix()
       posicionarLockup()
@@ -688,6 +714,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const dirOlhar = new THREE.Vector3(), dirObra = new THREE.Vector3(), ctrl = new THREE.Vector3()
     const balanco = new THREE.Quaternion(), eixoZ = new THREE.Vector3(0, 0, 1)
     let prog = 0, raf, visivel = true, primeiro = true, emFoco = false, abre = -1, bonecoSome = 0
+    let ler = 0, lado = -1, legendaCel = false, focoId = null, luzBaixa = false, frentePc = 0
+    const guiaRumo = new THREE.Vector3()
     const aoVis = () => { visivel = document.visibilityState === 'visible'; if (visivel) quadro() }
     document.addEventListener('visibilitychange', aoVis)
     const quadro = () => {
@@ -697,6 +725,20 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const alvo = alaDe(yTela) / Math.max(N - 1, 1)
       prog += (alvo - prog) * Math.min(1, dt * 4.5)
       mouse.sx += (mouse.x - mouse.sx) * Math.min(1, dt * 4); mouse.sy += (mouse.y - mouse.sy) * Math.min(1, dt * 4)
+
+      // modo LER: liga quando o topo de uma cabeça passa de 90% para 76% da altura da tela (entrando por baixo)
+      // e desliga quando a base dela sobe de 26% para 12% (saindo por cima). cantoLivre: nenhuma cabeça
+      // ocupa a faixa de baixo da tela (onde o boneco para, no celular).
+      const vhTela = window.innerHeight, syTela = window.scrollY
+      let lerAlvo = 0, cantoLivre = true
+      for (const c of cabecas) {
+        const tc = c.topo - syTela, bc = c.base - syTela
+        if (bc < 0 || tc > vhTela) continue
+        lerAlvo = Math.max(lerAlvo, suave(vhTela * 0.9, vhTela * 0.76, tc) * suave(vhTela * 0.12, vhTela * 0.26, bc))
+        if (bc > vhTela * 0.77) cantoLivre = false
+      }
+      ler += (lerAlvo - ler) * Math.min(1, dt * 5)
+      if (Math.abs(lerAlvo - ler) < 0.0005) ler = lerAlvo
 
       // a porta escolhida no site (estado do React) chega por referência: entra, troca ou sai da sala
       const pedida = salaRef.current
@@ -727,11 +769,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       let olharPeso = 0, olharObra = null
       for (const o of obras) {
         const p = (yTela - o.topo) / o.alt
-        const fAlvo = p < -0.9 || p > 1.5 ? 0 : suave(-0.1, 0.38, p) * (1 - suave(0.56, 0.9, p))
+        // 11/11: o quadro volta um pouco antes (0,84 em vez de 0,9) e não se solta enquanto um título está em
+        // leitura — o título nunca divide a tela com um quadro em destaque
+        const fAlvo = (p < -0.9 || p > 1.5 ? 0 : suave(-0.1, 0.38, p) * (1 - suave(0.56, 0.84, p))) * (1 - suave(0.05, 0.4, ler))
         o.fs += (fAlvo - o.fs) * Math.min(1, dt * 6)
         if (Math.abs(fAlvo - o.fs) < 0.0005) o.fs = fAlvo
         // o olhar para o próximo começa quando o anterior volta para a parede (os dois gestos se encadeiam)
-        const wAlvo = p < -1 || p > 1 ? 0 : suave(-0.45, -0.15, p) * (1 - suave(0, 0.3, p))
+        const wAlvo = (p < -1 || p > 1 ? 0 : suave(-0.45, -0.15, p) * (1 - suave(0, 0.3, p))) * (1 - ler)
         o.ws += (wAlvo - o.ws) * Math.min(1, dt * 4)
         if (o.ws > olharPeso) { olharPeso = o.ws; olharObra = o }
       }
@@ -749,15 +793,34 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const abreAlvo = retrato ? 1 - suave(0.02, 0.5, pTopo) : 0
       abre = abre < 0 ? abreAlvo : abre + (abreAlvo - abre) * Math.min(1, dt * 5)
       if (Math.abs(abreAlvo - abre) < 0.0005) abre = abreAlvo
-      if (abre > 0) { dirOlhar.y += ABRE.inclina * abre; dirOlhar.normalize() }
-      cena.fog.density = 0.028 + ABRE.nevoa * abre
+      // no celular o olhar também sobe enquanto se lê uma cabeça: o chão (e o boneco) descem para a faixa de baixo
+      const sobe = retrato ? Math.max(abre, ler) : 0
+      if (sobe > 0) { dirOlhar.y += ABRE.inclina * sobe; dirOlhar.normalize() }
+      // modo LER: as luzes da galeria baixam (névoa, luminárias, fio, focos) — fica aceso o foco do boneco
+      cena.fog.density = 0.028 + ABRE.nevoa * abre + LER.nevoa * ler
+      matLuzTeto.emissiveIntensity = 1.6 * (1 - LER.luz * ler); matHalo.opacity = 1 - 0.97 * ler
+      matLuzTeto.color.setHex(COR.bege).multiplyScalar(1 - 0.98 * ler)
+      // o latão (rodapés, quinas das divisórias) também apaga: riscos brilhantes atrás de rótulos pequenos
+      matLatao.color.setHex(COR.mostarda).multiplyScalar(1 - LER.latao * ler); matLatao.envMapIntensity = 1 - LER.latao * ler
+      matLataoArq.opacity = 1 - LER.lataoArq * ler
+      matParede.color.setScalar(1 - LER.parede * ler) // a parede tem um friso pintado a 1 m do chão: escurece junto
+      // o piso de taco tem desenho miúdo: escurece junto, para não vibrar atrás das letras; as partículas somem
+      matChao.color.setHex(0x2c2925).multiplyScalar(1 - LER.piso * ler)
+      po.material.opacity = 0.55 * (1 - ler)
+      if (introAcabou && (ler > 0.001 || luzBaixa)) {
+        const k = 1 - LER.cena * ler
+        matFio.emissiveIntensity = INT.fio * (1 - LER.fio * ler)
+        hemi.intensity = INT.hemi * k; sol.intensity = INT.sol * k; spotA.intensity = INT.spotA * k; spotB.intensity = INT.spotB * k; luzPortico.intensity = INT.portico * k
+        cena.environmentIntensity = INT.env * (1 - 0.6 * ler)
+        luzBaixa = ler > 0.001
+      }
       olhar.copy(pos).add(dirOlhar)
       cam.lookAt(olhar)
       cam.getWorldDirection(fwd); right.crossVectors(fwd, up).normalize()
 
       // o letreiro corre; o totem fica na entrada e afunda quando se segue; as portas sobem no saguão
       if (letreiro.tex) letreiro.tex.offset.x += dt * 0.025
-      const fTotem = (1 - suave(0.35, 0.9, pTopo)) * entrada.v
+      const fTotem = (1 - suave(0.35, 0.9, pTopo)) * entrada.v * (1 - ler) // 11/11: afunda também quando um título entra em leitura
       totem.visible = fTotem > 0.01 && !retrato // 10/11: no celular em pé o totem ficava atrás do título; lá o atalho é o botão em HTML
       totem.position.y = (fTotem - 1) * 2.6
       anel.material.opacity = 1; anel.scale.setScalar(1 + Math.sin(t * 3) * 0.08)
@@ -781,25 +844,59 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       // (negativa = o visitante voltou, ele se vira); olha para o quadro que se soltou da parede
       const uG = Math.min(u + 0.02, 0.999)
       fioCurva.getPointAt(uG, guiaPos); fioCurva.getTangentAt(uG, guiaTan); guiaPos.y = 0
+      /* 11/11 — o boneco nunca fica atrás de texto nem de botão: quando um bloco de leitura ocupa o lugar dele,
+         ele muda de faixa (o alvo é uma fração da meia-largura da tela, à direita do fio):
+           celular    · canto de baixo, à direita, na abertura e nas cabeças (o olhar sobe e abre essa faixa)
+                      · sai de cena pela direita quando o canto está ocupado (título entrando por baixo) ou há
+                        uma legenda de obra aberta; volta para o fio quando o texto passa
+           computador · anda pela faixa da direita enquanto o título está na coluna da esquerda */
+      const lendo = lerAlvo > 0.3
+      const foraCel = retrato && ((lendo && !cantoLivre) || legendaCel)
+      // abertura no computador: ele espera mais à frente e um passo à direita do fio — fora do título e do parágrafo
+      const abrePc = retrato ? 0 : 1 - suave(0.02, 0.5, pTopo)
+      const ladoAlvo = retrato ? (foraCel ? LER.fora : Math.max(ABRE.bonecoLado * abre, lendo ? ABRE.bonecoLado : 0)) : Math.max(lendo ? LER.bonecoPc : 0, LER.abrePcLado * abrePc)
+      lado = lado < 0 ? ladoAlvo : lado + (ladoAlvo - lado) * Math.min(1, dt * 3.2)
+      if (Math.abs(ladoAlvo - lado) < 0.0005) lado = ladoAlvo
+      frentePc += (LER.abrePcFrente * abrePc - frentePc) * Math.min(1, dt * 3.2)
+      if (lado > 0.0005 || frentePc > 0.001) {
+        guiaPos.addScaledVector(guiaTan, retrato ? ABRE.bonecoFrente * Math.min(1, lado / ABRE.bonecoLado) : frentePc).addScaledVector(right, lado * 0.4877 * cam.aspect * ABRE.bonecoProf).setY(0)
+        // não atravessa parede nem divisória entre alas
+        guiaPos.x = THREE.MathUtils.clamp(guiaPos.x, -(LARG / 2 - 0.7), LARG / 2 - 0.7)
+        for (let i = 0; i < N - 1; i++) {
+          if (Math.abs(guiaPos.z - (-i * PASSO - 27)) > 1.2) continue
+          const livre = LARG / 2 - DIV - 0.55
+          if (-ladoAla(i + 1) > 0) guiaPos.x = Math.min(guiaPos.x, livre); else guiaPos.x = Math.max(guiaPos.x, -livre)
+        }
+      }
+      // a passada acompanha o deslocamento real: para a frente no fio, ou de lado quando troca de faixa
       if (!guiaComecou) { guiaAnt.copy(guiaPos); guiaComecou = true }
-      const vGuia = dt > 0 ? THREE.MathUtils.clamp(guiaDelta.subVectors(guiaPos, guiaAnt).dot(guiaTan) / dt, -6, 6) : 0
-      guiaAnt.copy(guiaPos)
-      // abertura no celular: ele espera ao lado do fio, na faixa livre de baixo (fora do texto e dos botões),
-      // e vem para o fio andando quando a rolagem começa
-      if (abre > 0.001) guiaPos.addScaledVector(guiaTan, ABRE.bonecoFrente * abre).addScaledVector(right, ABRE.bonecoLado * 0.4877 * cam.aspect * ABRE.bonecoProf * abre).setY(0)
+      guiaDelta.subVectors(guiaPos, guiaAnt); guiaAnt.copy(guiaPos)
+      const vLong = dt > 0 ? guiaDelta.dot(guiaTan) / dt : 0, vLat = dt > 0 ? guiaDelta.dot(right) / dt : 0
+      const deLado = Math.abs(vLat) > Math.abs(vLong)
+      const vGuia = THREE.MathUtils.clamp(deLado ? Math.abs(vLat) : vLong, -6, 6)
+      if (deLado) guiaRumo.copy(right).multiplyScalar(Math.sign(vLat)); else guiaRumo.copy(guiaTan)
       guia.raiz.position.copy(guiaPos)
       guiaDelta.subVectors(cam.position, guiaPos).setY(0).setLength(1.1)
       luzGuia.position.copy(guiaPos).add(guiaDelta).setY(1.5)
-      // no celular, o painel de opções abre na faixa do boneco: ele sai de cena enquanto o painel está aberto
-      bonecoSome += ((perguntaRef.current && retrato ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
+      // no celular ele some de cena enquanto o painel de opções está aberto (abre na faixa dele) e quando sai pela direita
+      bonecoSome += (((perguntaRef.current && retrato) || foraCel ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
       guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v) * (1 - bonecoSome)))
-      guia.atualizar(dt, { v: vGuia, tangente: guiaTan, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t })
+      // no modo LER o foco dele fecha: ilumina o boneco e o chão em volta, sem acender a parede atrás dos rótulos
+      luzGuia.intensity = 5.5 * (1 - bonecoSome) * (1 - 0.3 * ler); luzGuia.distance = 7 - 3.5 * ler
+      guia.atualizar(dt, { v: vGuia, tangente: guiaRumo, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t })
 
       let maior = 0, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
       const dist = retrato ? 7.2 : 4.6
       const largVisivel = 2 * dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect
+      // modo LER: os quadros se recolhem na parede enquanto um título é lido e voltam quando ele passa
+      const presAlvo = 1 - suave(0.25, 0.75, ler)
       for (const o of obras) {
         const f = o.fs
+        // na abertura do computador, a parede do lado do texto (a esquerda) fica livre: os quadros dela surgem quando o passeio começa
+        const presObra = !retrato && o.lado > 0 ? Math.min(presAlvo, 1 - suave(0.3, 0.8, abrePc)) : presAlvo
+        o.ps += (presObra - o.ps) * Math.min(1, dt * 4); if (Math.abs(presObra - o.ps) < 0.001) o.ps = presObra
+        const pe = Math.max(0.001, o.ps * o.ps * (3 - 2 * o.ps))
+        o.grupo.visible = pe > 0.02
         const focoObra = f > 0.72
         if (focoObra !== o.foco) { o.foco = focoObra; o.el.classList.toggle('em-foco', focoObra) }
         // 09/11: no celular, o quadro que chega na leitura troca para a imagem grande (1920 px) — só ele
@@ -811,7 +908,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
             const velha = o.tela.material.map; o.tela.material.map = t2; o.tela.material.needsUpdate = true; velha?.dispose()
           })
         }
-        if (f <= 0.001) { if (o.f) { o.grupo.position.copy(o.parede.pos); o.grupo.quaternion.copy(o.parede.quat); o.grupo.scale.setScalar(1); o.f = 0 } continue }
+        if (f <= 0.001) { if (o.f) { o.grupo.position.copy(o.parede.pos); o.grupo.quaternion.copy(o.parede.quat); o.f = 0 } o.grupo.scale.setScalar(pe); continue }
         o.f = f
         const e = easeInOut(f)
         alvoPos.copy(cam.position).addScaledVector(fwd, dist).addScaledVector(right, retrato ? 0 : -o.lado * 1.75).addScaledVector(up, (retrato ? 0.85 : 0.05) + Math.sin(t * 1.1) * 0.04)
@@ -823,13 +920,20 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         o.grupo.quaternion.slerpQuaternions(o.parede.quat, cam.quaternion, suave(0, 0.85, e))
         balanco.setFromAxisAngle(eixoZ, Math.sin(Math.PI * e) * 0.07 * o.lado); o.grupo.quaternion.multiply(balanco)
         const escAlvo = Math.min(1, (largVisivel * (retrato ? 0.9 : 0.5)) / o.w)
-        o.grupo.scale.setScalar(1 + (escAlvo - 1) * e)
+        o.grupo.scale.setScalar((1 + (escAlvo - 1) * e) * pe)
         if (f > maior) maior = f
         if (f > maiorLuz) { maiorLuz = f; atual = o }
       }
+      // quem está em foco: o guia (barra "Quero algo assim") só aparece com obra em foco; no celular, a legenda
+      // aberta ocupa a faixa do boneco
+      const emLeitura = obras.find((o) => o.foco)
+      legendaCel = retrato && !!emLeitura
+      if ((emLeitura?.el.id || null) !== focoId) { focoId = emLeitura?.el.id || null; window.dispatchEvent(new CustomEvent('flow:obra-foco', { detail: focoId })) }
       // no celular o quadro sobe à frente do pórtico: o logo esmaece enquanto se lê
       // (11/11: e também quando o passeio começa — ele sai por cima sem virar uma mancha atrás do cabeçalho)
-      const opPortico = retrato ? (1 - 0.85 * suave(0.2, 0.8, maior)) * suave(0.5, 0.9, abre) : 1
+      // (11/11, Fase 2: no computador ele esmaece quando o título da Ala 01 entra em leitura e não volta — o logo
+      // é a fachada da abertura; antes reaparecia gigante atrás das legendas das primeiras obras)
+      const opPortico = retrato ? (1 - 0.85 * suave(0.2, 0.8, maior)) * suave(0.5, 0.9, abre) : (1 - suave(0.1, 0.6, ler)) * (1 - suave(0.7, 1.15, pTopo))
       // 09/11: com o buffer em alta faixa, o reflexo forte do latão atravessava a transparência —
       // o reflexo esmaece junto (e a opacidade cai em curva) para o logo sumir de verdade atrás do quadro
       matCreme.opacity = matLataoL.opacity = opPortico * opPortico
@@ -874,6 +978,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       document.removeEventListener('visibilitychange', aoVis)
       acab.dispose(); pmrem.dispose(); renderer.dispose(); host.innerHTML = ''
       document.documentElement.classList.remove('obra-em-foco')
+      window.dispatchEvent(new CustomEvent('flow:obra-foco', { detail: null }))
       obras.forEach((o) => o.el.classList.remove('em-foco'))
       if (pularRef) pularRef.current = null
     }

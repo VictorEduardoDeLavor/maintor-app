@@ -125,11 +125,14 @@ function Palavras({ texto, destaque = [] }) {
   ))
 }
 
-function Regua({ esquerda, direita }) {
+/* 11/11 (limpeza visual): no celular a régua cabe em UMA linha. Quando o rótulo inteiro não cabe em
+   360 px, entra a versão curta (só muda o que aparece; o rótulo inteiro continua no computador). */
+function Regua({ esquerda, direita, esquerdaCurta, direitaCurta }) {
+  const rotulo = (cheio, curto) => (curto ? <><span className="so-largo">{cheio}</span><span className="so-estreito">{curto}</span></> : cheio)
   return (
     <div className="regua" data-reveal>
-      <span className="micro">{esquerda}</span>
-      <span className="micro">{direita}</span>
+      <span className="micro">{rotulo(esquerda, esquerdaCurta)}</span>
+      <span className="micro">{rotulo(direita, direitaCurta)}</span>
     </div>
   )
 }
@@ -635,7 +638,7 @@ export default function App() {
           return (
             <section className="cena cena-ala" id={ala.id} key={ala.id}>
               <div className={`wrap ala-cabeca${ala.id === 'problemas' ? ' saguao' : ''}`}>
-                <Regua esquerda={ala.eyebrow} direita={ala.contagem} />
+                <Regua esquerda={ala.eyebrow} direita={ala.contagem} esquerdaCurta={ala.eyebrowCurto} />
                 <h2 className="titulo-cena serif" data-palavras><Palavras texto={ala.titulo} /></h2>
                 <p className="corpo-apoio" data-reveal>{ala.lead}</p>
                 {ala.id === 'trabalhos' && (
@@ -728,7 +731,7 @@ export default function App() {
         {/* ============ COMO TRABALHAMOS — o processo, depois de Marketing ============ */}
         <section className="cena cena-curta" id="como">
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="Como trabalhamos" direita="Processo em quatro etapas" />
+            <Regua esquerda="Como trabalhamos" direita="Processo em quatro etapas" direitaCurta="4 etapas" />
             <h2 className="titulo-cena serif" data-palavras>
               <Palavras texto="Da primeira conversa à entrega." destaque={[3, 4]} />
             </h2>
@@ -770,7 +773,7 @@ export default function App() {
             opacity (nunca autoAlpha — elemento invisível não recebe foco) */}
         <section className="cena cena-curta" id="perguntas">
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="Perguntas frequentes" direita="Valores, prazos e condições" />
+            <Regua esquerda="Perguntas frequentes" direita="Valores, prazos e condições" direitaCurta={`${PERGUNTAS.length} respostas`} />
             <h2 className="titulo-cena serif" data-palavras>
               <Palavras texto="Antes de chamar, o que a maioria quer saber." destaque={[7, 8]} />
             </h2>
@@ -800,7 +803,7 @@ export default function App() {
             />
           </figure>
           <div className="wrap" style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-            <Regua esquerda="Contato" direita="Primeira conversa sem compromisso" />
+            <Regua esquerda="Contato" direita="Primeira conversa sem compromisso" direitaCurta="Sem compromisso" />
             <h2 className="titulo-cena serif" data-palavras>
               <Palavras texto="Conte o que você quer colocar no ar" destaque={[5, 6, 7]} />
             </h2>

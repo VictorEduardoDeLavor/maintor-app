@@ -134,6 +134,7 @@ export const ALAS = [
   {
     id: 'problemas',
     eyebrow: 'Ala 02 · Soluções por necessidade',
+    eyebrowCurto: 'Ala 02 · Soluções', // no celular a régua cabe em uma linha
     contagem: '7 portas',
     titulo: 'O que você precisa resolver hoje?',
     lead: 'Escolha uma situação parecida com a sua e veja o que podemos construir.',

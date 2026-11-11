@@ -29,7 +29,18 @@ export default function Guia({ lenisRef, ativo }) {
     }
   })), [])
   const [atual, setAtual] = useState(-1)
-  const [visivel, setVisivel] = useState(false)
+  const [naFaixa, setNaFaixa] = useState(false) // a rolagem está entre a Ala 01 e o processo
+  /* 11/11 (limpeza visual): a barra só aparece quando há uma OBRA EM FOCO — nunca na abertura nem nas
+     cabeças de ala, onde cobria botões. Quem avisa é a exposição 3D (evento flow:obra-foco, com o id da
+     obra que chegou na posição de leitura, ou null). Sem 3D não há foco: vale a faixa de rolagem. */
+  const [foco, setFoco] = useState(null)
+  useEffect(() => {
+    const aoFoco = (e) => setFoco(e.detail || null)
+    window.addEventListener('flow:obra-foco', aoFoco)
+    return () => window.removeEventListener('flow:obra-foco', aoFoco)
+  }, [])
+  const sem3d = typeof document !== 'undefined' && document.documentElement.classList.contains('sem-3d')
+  const visivel = naFaixa && (sem3d || !!foco)
 
   useEffect(() => {
     if (!ativo) return
@@ -50,7 +61,7 @@ export default function Guia({ lenisRef, ativo }) {
       setAtual(melhor)
       const a = inicio?.getBoundingClientRect().top ?? 0
       const b = fim?.getBoundingClientRect().top ?? Infinity
-      setVisivel(a < window.innerHeight * 0.6 && b > window.innerHeight * 0.4)
+      setNaFaixa(a < window.innerHeight * 0.6 && b > window.innerHeight * 0.4)
     }
     const agendar = () => { if (!raf) raf = requestAnimationFrame(medir) }
     window.addEventListener('scroll', agendar, { passive: true })

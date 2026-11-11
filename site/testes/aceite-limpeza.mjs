@@ -299,7 +299,7 @@ async function abrir(tela, altura = tela.h) {
 // comparar por tempo veria o mesmo quadro duas vezes e daria a cena por parada cedo demais).
 async function assentar(p) {
   await p.waitForTimeout(500)
-  const ler = () => p.evaluate(() => { const e = window.__expoSonda?.(); if (!e) return null; let q = 0; for (const o of e.obras) q += o.fs * 10 + o.grupo.position.x + o.grupo.position.z * 0.02; let d = 0; for (const x of e.portas3d) d += x.g.position.y; return [window.__quadros, e.cam.position.x, e.cam.position.z, q, d, e.prog * 100] })
+  const ler = () => p.evaluate(() => { const e = window.__expoSonda?.(); if (!e) return null; let q = 0; for (const o of e.obras) q += o.fs * 10 + o.grupo.position.x + o.grupo.position.z * 0.02; let d = 0; for (const x of e.portas3d) d += x.g.position.y; for (const o of e.obras) q += o.grupo.scale.x; return [window.__quadros, e.cam.position.x, e.cam.position.z, q, d, e.prog * 100, e.guia.raiz.position.x, e.guia.raiz.position.z, e.guia.raiz.scale.x, (e.ler || 0) * 10, e.cam.rotation.x * 10] })
   let ant = await ler(), estavel = 0
   if (!ant) { await p.waitForTimeout(6000); return false }
   const fim = Date.now() + 120000
@@ -319,7 +319,8 @@ async function medir(p, tela, arquivo) {
   const dom = await p.evaluate(coletar)
   if (arquivo) await p.screenshot({ path: arquivo, type: 'jpeg', quality: 84 })
   await p.evaluate(() => document.documentElement.classList.add('medindo')); await p.waitForTimeout(250)
-  const b64 = (await p.screenshot({ type: 'png' })).toString('base64')
+  const fundo = await p.screenshot({ type: 'png' }); if (arquivo && arg('guardar-fundo')) writeFileSync(arquivo.replace(/\.jpg$/, '-fundo.png'), fundo) // --guardar-fundo=1: guarda a foto sem texto (depuração)
+  const b64 = fundo.toString('base64')
   await p.evaluate(() => document.documentElement.classList.remove('medindo'))
   const fundos = await laboratorio.evaluate(analisar, { b64, rects: dom.blocos.map((x) => x.rt), dsf: tela.dsf, limBorda: LIM.borda })
   const s3d = await p.evaluate(sondar, { rects: dom.blocos.map((x) => x.rc), nevoaMin: LIM.nevoa })
