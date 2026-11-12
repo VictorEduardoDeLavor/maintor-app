@@ -40,7 +40,9 @@ export default function Guia({ lenisRef, ativo }) {
     return () => window.removeEventListener('flow:obra-foco', aoFoco)
   }, [])
   const sem3d = typeof document !== 'undefined' && document.documentElement.classList.contains('sem-3d')
-  const visivel = naFaixa && (sem3d || !!foco)
+  // 12/11: com o foco do teclado dentro da barra ela continua à vista (nunca aria-hidden com foco dentro)
+  const [focoDentro, setFocoDentro] = useState(false)
+  const visivel = naFaixa && (sem3d || !!foco || focoDentro)
 
   useEffect(() => {
     if (!ativo) return
@@ -84,7 +86,8 @@ export default function Guia({ lenisRef, ativo }) {
   useEffect(() => {
     if (!ativo) return
     const tecla = (e) => {
-      if (!visivel || e.altKey || e.ctrlKey || e.metaKey) return
+      // 12/11: as setas valem em toda a faixa das obras, com ou sem obra em foco (antes dependiam da barra à vista)
+      if (!naFaixa || e.altKey || e.ctrlKey || e.metaKey) return
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '')) return
       if (e.key === 'ArrowRight') { e.preventDefault(); irPara(atual + 1) }
       if (e.key === 'ArrowLeft') { e.preventDefault(); irPara(atual - 1) }
@@ -99,7 +102,8 @@ export default function Guia({ lenisRef, ativo }) {
   const texto = typeof window !== 'undefined' && typeof window.__flowComOrigem === 'function' ? window.__flowComOrigem(msg) : msg
 
   return (
-    <nav className={`guia${visivel ? ' guia-on' : ''}`} aria-label="Guia da exposição" aria-hidden={!visivel}>
+    <nav className={`guia${visivel ? ' guia-on' : ''}`} aria-label="Guia da exposição" aria-hidden={!visivel}
+      onFocus={() => setFocoDentro(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setFocoDentro(false) }}>
       <button type="button" className="guia-seta" onClick={() => irPara(atual - 1)} disabled={atual === 0} aria-label="Obra anterior" tabIndex={visivel ? 0 : -1}>‹</button>
       <div className="guia-meio">
         <div className="guia-onde" aria-live="polite">

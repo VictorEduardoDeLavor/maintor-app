@@ -329,15 +329,22 @@ export default function App() {
 
     // deep link: abrir /#tecnologia direto tem de rolar até lá.
     // Espera o layout assentar (fontes + imagens lazy) antes de medir.
-    let deepId = null
+    let deepId = null, refazer = null, mexeu = false
+    const marcarMexeu = () => { mexeu = true }
     if (location.hash.length > 1) {
       const alvoInicial = document.querySelector(location.hash)
       if (alvoInicial) {
-        deepId = setTimeout(() => {
+        const pular = () => {
           ScrollTrigger.refresh()
           if (lenis) lenis.scrollTo(alvoInicial, { offset: -10, immediate: true })
           else alvoInicial.scrollIntoView()
-        }, 350)
+        }
+        deepId = setTimeout(pular, 350)
+        /* 12/11: quando a exposição desenha o 1º quadro (classe expo-pronta), a aparência da página ainda muda um
+           pouco; se a pessoa ainda não rolou, o salto é refeito — /#contato chega no formulário, e não acima */
+        refazer = () => { if (!mexeu) setTimeout(pular, 60) }
+        window.addEventListener('flow:expo-pronta', refazer)
+        for (const ev of ['wheel', 'touchstart', 'keydown']) window.addEventListener(ev, marcarMexeu, { passive: true })
       }
     }
 
@@ -345,6 +352,8 @@ export default function App() {
       ctx.revert()
       gsap.ticker.remove(tickAudio)
       if (deepId) clearTimeout(deepId)
+      if (refazer) window.removeEventListener('flow:expo-pronta', refazer)
+      for (const ev of ['wheel', 'touchstart', 'keydown']) window.removeEventListener(ev, marcarMexeu)
       document.removeEventListener('click', onClickAncora)
       if (aoMover) window.removeEventListener('pointermove', aoMover)
       if (aoHover) window.removeEventListener('pointerover', aoHover)

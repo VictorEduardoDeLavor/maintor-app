@@ -1,7 +1,7 @@
 // Aceite da LIMPEZA VISUAL da exposição 3D (11/11/2026) — "uma coisa por vez": texto HTML nunca
 // disputa a tela com o 3D (logo, letreiro, placas das portas, quadros, boneco).
 //
-// Mede 11 telas (abertura; cabeça da Ala 01; grupos 1 e 2; entrada da Ala 02; lista das portas;
+// Mede 11 telas do pedido (abertura; cabeça da Ala 01; grupos 1 e 2; entrada da Ala 02; lista das portas;
 // cabeças das Alas 03 e 04; Como trabalhamos; Perguntas; Contato) em 390×844, 360×740 e 1440×900.
 // Cada tela é fotografada em duas posições de rolagem: LEITURA (o bloco na zona de leitura) e
 // TRANSIÇÃO (o título entrando, com o 3D da ala anterior ainda na tela).
@@ -20,6 +20,7 @@
 //   node testes/aceite-limpeza.mjs                    → roda tudo, grava em testes/limpeza/antes/
 //   node testes/aceite-limpeza.mjs --rotulo=depois    → outra pasta (para comparar)
 //   node testes/aceite-limpeza.mjs --so=c390 --pontos=abertura,ala02   → só um recorte
+//   node testes/aceite-limpeza.mjs --dist=1           → contra o build de produção (site/dist, depois de npm run build)
 //   BASE=http://localhost:4175 node testes/aceite-limpeza.mjs          → contra um servidor já no ar
 //
 // Sem BASE, o teste sobe o Vite sozinho e injeta a SONDA (os retângulos do 3D, só para robôs) no
@@ -49,16 +50,22 @@ const TELAS = [
 // âncora = primeiro elemento do bloco; leitura/transicao = a que fração da altura da tela fica o topo dele
 const PONTOS = [
   { id: 'abertura', nome: 'Abertura', topo: true },
-  { id: 'ala01', nome: 'Cabeça da Ala 01', ancora: '#trabalhos .regua', secao: 'trabalhos', leitura: 0.16, transicao: 0.58 },
-  { id: 'grupo1', nome: 'Grupo 1 · Projetos para clientes', ancora: '#projetos-clientes .grupo-painel', leitura: 0.36, transicao: 0.66 },
-  { id: 'grupo2', nome: 'Grupo 2 · Produtos da Maintor', ancora: '#produtos-maintor .grupo-painel', leitura: 0.36, transicao: 0.66 },
-  { id: 'ala02', nome: 'Entrada da Ala 02', ancora: '#problemas .regua', secao: 'problemas', leitura: 0.16, transicao: 0.58 },
+  { id: 'ala01', nome: 'Cabeça da Ala 01', ancora: '#trabalhos .regua', secao: 'trabalhos', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
+  { id: 'grupo1', nome: 'Grupo 1 · Projetos para clientes', ancora: '#projetos-clientes .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'grupo2', nome: 'Grupo 2 · Produtos da Maintor', ancora: '#produtos-maintor .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'ala02', nome: 'Entrada da Ala 02', ancora: '#problemas .regua', secao: 'problemas', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
   { id: 'portas', nome: 'Lista das 7 portas', ancora: '#problemas .portas-lista', leitura: 0.2 },
-  { id: 'ala03', nome: 'Cabeça da Ala 03', ancora: '#sistemas .regua', secao: 'sistemas', leitura: 0.16, transicao: 0.58 },
-  { id: 'ala04', nome: 'Cabeça da Ala 04', ancora: '#marketing .regua', secao: 'marketing', leitura: 0.16, transicao: 0.58 },
-  { id: 'como', nome: 'Como trabalhamos', ancora: '#como .regua', secao: 'como', leitura: 0.16, transicao: 0.58 },
-  { id: 'perguntas', nome: 'Perguntas frequentes', ancora: '#perguntas .regua', secao: 'perguntas', leitura: 0.16, transicao: 0.58 },
-  { id: 'contato', nome: 'Contato', ancora: '#contato .regua', secao: 'contato', leitura: 0.16, transicao: 0.58 },
+  { id: 'ala03', nome: 'Cabeça da Ala 03', ancora: '#sistemas .regua', secao: 'sistemas', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
+  { id: 'ala04', nome: 'Cabeça da Ala 04', ancora: '#marketing .regua', secao: 'marketing', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
+  { id: 'como', nome: 'Como trabalhamos', ancora: '#como .regua', secao: 'como', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
+  { id: 'perguntas', nome: 'Perguntas frequentes', ancora: '#perguntas .regua', secao: 'perguntas', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
+  { id: 'contato', nome: 'Contato', ancora: '#contato .regua', secao: 'contato', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
+  // 12/11: obras em leitura (modo VER), uma por trecho — o quadro em foco, a legenda e a barra do guia à vista
+  { id: 'obra-voke', nome: 'Obra · VOKE WEAR', ancora: '#obra-voke', centro: true },
+  { id: 'obra-cmms', nome: 'Obra · Maintor CMMS', ancora: '#obra-cmms', centro: true },
+  { id: 'obra-p-loja', nome: 'Obra · Porta 01 (Vender online)', ancora: '#obra-p-loja', centro: true },
+  { id: 'obra-s-oficio', nome: 'Obra · Sistema para minha operação', ancora: '#obra-s-oficio', centro: true },
+  { id: 'obra-m-conteudo', nome: 'Obra · Conteúdo e redes', ancora: '#obra-m-conteudo', centro: true },
 ].filter((p) => !arg('pontos') || arg('pontos').split(',').includes(p.id))
 const REFERENCIA = '#obra-voke' // a tela que hoje lê bem: legenda de obra em painel de vidro
 
@@ -261,6 +268,12 @@ const num = (v, d = 1) => v.toFixed(d).replace('.', ',')
 
 /* ------------------------------------------------------------------ servidor e navegador */
 let BASE = process.env.BASE || arg('base'), servidor = null
+if (!BASE && arg('dist')) {
+  const { preview } = await import(pathToFileURL(path.join(SITE, 'node_modules/vite/dist/node/index.js')).href)
+  const pv = await preview({ root: SITE, configFile: path.join(SITE, 'vite.config.js'), logLevel: 'error', preview: { port: 4398, host: '127.0.0.1' } })
+  servidor = { close: () => new Promise((ok) => pv.httpServer.close(ok)) }
+  BASE = pv.resolvedUrls.local[0].replace(/\/$/, '')
+}
 if (!BASE) {
   const { createServer } = await import(pathToFileURL(path.join(SITE, 'node_modules/vite/dist/node/index.js')).href)
   servidor = await createServer({ root: SITE, configFile: path.join(SITE, 'vite.config.js'), logLevel: 'error', plugins: [pluginSonda()], server: { port: 4391, host: '127.0.0.1' } })
@@ -373,7 +386,8 @@ for (const tela of TELAS) {
   const ref = await p.evaluate(topoLayout, REFERENCIA)
   await rolarAte(p, ref.y + ref.alt / 2 - ref.vh / 2)
   const mRef = await medir(p, tela, path.join(pasta, '00-referencia.jpg'))
-  const blocosRef = mRef.blocos.filter((x) => x.obra === REFERENCIA.slice(1) && x.desvio != null)
+  // só calibra com os blocos da legenda que passam em contraste e colisão (a legenda boa de verdade)
+  const blocosRef = mRef.blocos.filter((x) => x.obra === REFERENCIA.slice(1) && x.desvio != null && (x.contraste == null || x.contraste >= LIM.contraste) && !x.colisoes.some((c) => c.tipo === 'boneco' || c.tipo === 'texto3d'))
   if (!blocosRef.length) erros.push(`${tela.id}: a legenda de referência (${REFERENCIA}) não apareceu — limites ficaram no piso`)
   const refDesvio = Math.max(0, ...blocosRef.map((x) => x.desvio)), refBordas = Math.max(0, ...blocosRef.map((x) => x.bordas))
   T.limite = { desvio: +Math.max(LIM.desvioPiso, refDesvio * LIM.desvioFator).toFixed(2), bordas: +Math.max(LIM.bordasPiso, refBordas * LIM.bordasFator).toFixed(4), refDesvio, refBordas, blocosRef: blocosRef.length }
@@ -384,10 +398,12 @@ for (const tela of TELAS) {
   let n = 0
   for (const ponto of PONTOS) {
     n++
-    for (const pos of ponto.topo ? ['leitura'] : ['leitura', 'transicao']) {
-      if (ponto[pos] == null && !ponto.topo) continue
+    // posições: leitura (o bloco na zona de leitura), transição (o título entrando, a 58% da tela) e entrada (o título
+    // surgindo pela borda de baixo, a ~88%: é a rampa do modo LER, com o 3D da ala anterior ainda saindo)
+    for (const pos of ponto.topo || ponto.centro ? ['leitura'] : ['leitura', 'transicao', 'entrada']) {
+      if (ponto[pos] == null && !ponto.topo && !ponto.centro) continue
       let y = 0
-      if (!ponto.topo) { const a = await p.evaluate(topoLayout, ponto.ancora); if (!a) { erros.push(`${tela.id}: âncora ${ponto.ancora} não existe`); continue } y = a.y - ponto[pos] * a.vh }
+      if (!ponto.topo) { const a = await p.evaluate(topoLayout, ponto.ancora); if (!a) { erros.push(`${tela.id}: âncora ${ponto.ancora} não existe`); continue } y = ponto.centro ? a.y + a.alt / 2 - a.vh / 2 : a.y - ponto[pos] * a.vh }
       await rolarAte(p, y)
       const print = `${String(PONTOS.indexOf(ponto) + 1).padStart(2, '0')}-${ponto.id}-${pos}.jpg`
       const m = julgar(await medir(p, tela, path.join(pasta, print)), T.limite)
@@ -448,7 +464,7 @@ const detalhe = (telaId, ponto, k) => {
 const ids = TELAS.map((t) => t.id)
 let md = `# Limpeza visual da exposição 3D — linha de base (${ROTULO})\n\n`
 md += `Medido em ${new Date().toLocaleString('pt-BR')} · commit \`${R.commit || '?'}\` · \`node testes/aceite-limpeza.mjs\` · 3D desenhado por ${Object.values(R.telas)[0]?.render || '?'}.\n\n`
-md += `Cada tela é medida em duas posições de rolagem: **leitura** (o bloco na zona de leitura) e **transição** (o título entrando). A tabela mostra a união das duas.\n\n`
+md += `Cada tela é medida em até três posições de rolagem: **leitura** (o bloco na zona de leitura), **transição** (o título entrando, a 58% da tela) e **entrada** (o título surgindo pela borda de baixo, a ~88%). As obras são medidas em leitura, com o quadro em foco. A tabela mostra a união das posições.\n\n`
 md += `## Resumo — verificações que falham em cada tela\n\n| # | Tela | ${TELAS.map((t) => t.nome).join(' | ')} |\n|---|---|${ids.map(() => '---').join('|')}|\n`
 PONTOS.forEach((pt, i) => { md += `| ${i + 1} | ${pt.nome} | ${ids.map((id) => { const c = codigos(id, pt); return c.length ? '❌ ' + c.join(' · ') : '✅' }).join(' | ')} |\n` })
 md += `\nLegenda: ${Object.entries(NOME).map(([k, v]) => `**${k}** ${v}`).join(' · ')}.\n\n`
@@ -489,7 +505,7 @@ figcaption{display:flex;flex-direction:column;gap:2px;padding:8px 2px 0;font-siz
 .ruim{color:#ff8a80}.bom{color:#7fd69b}
 </style><h1>Prancha "${ROTULO}" · ${tela.nome} <small>commit ${R.commit || '?'} · ${new Date().toLocaleDateString('pt-BR')}</small></h1>
 <p class="leg">Vermelho cheio: bloco de texto ou botão com boneco ou texto 3D atrás (colisão). Laranja tracejado: fundo agitado ou contraste abaixo de 4,5:1.</p>
-${fila('leitura', 'Leitura — o bloco na zona de leitura')}${fila('transicao', 'Transição — o título entrando na tela')}`
+${fila('leitura', 'Leitura — o bloco na zona de leitura')}${fila('transicao', 'Transição — o título entrando na tela')}${fila('entrada', 'Entrada — o título surgindo pela borda de baixo')}`
   const arq = path.join(SAIDA, `prancha-${tela.id}.html`); writeFileSync(arq, html)
   const pg = await (await b.newContext({ viewport: { width: 1200, height: 800 }, deviceScaleFactor: 1 })).newPage()
   await pg.goto(pathToFileURL(arq).href); await pg.waitForLoadState('networkidle')

@@ -18,6 +18,7 @@ const telas = (arg('so') || Object.keys(colunas[1].R.telas).join(',')).split(','
 const pontos = arg('pontos') ? arg('pontos').split(',') : [...new Set(Object.values(colunas[1].R.telas)[0].estados.map((e) => e.ponto))]
 const posicoes = (arg('pos') || 'leitura,transicao').split(',')
 const NOME = { 1: 'fundo calmo', 2: 'contraste', 3: 'colisão', 4: 'guia' }
+const PONTOS_NOMES = Object.fromEntries(Object.values(colunas[1].R.telas).flatMap((T) => T.estados.map((e) => [e.ponto, e.nome])))
 
 let html = `<!doctype html><meta charset="utf-8"><title>Antes × depois</title><style>
 body{margin:0;padding:28px 32px 36px;background:#0b1616;color:#e9e4da;font:14px/1.4 Inter,Segoe UI,Arial,sans-serif;width:max-content}
@@ -27,7 +28,25 @@ h1{font-size:24px;margin:0 0 4px}p.leg{margin:0 0 4px;color:#9fb1ad}h2{font-size
 figcaption{display:flex;flex-direction:column;gap:2px;padding:8px 2px 0;font-size:13px}figcaption span{font-size:12px}.ruim{color:#ff8a80}.bom{color:#7fd69b}
 </style><h1>Limpeza visual · antes × depois <small style="font-weight:400;color:#9fb1ad;font-size:14px">${DE} → ${PARA} · ${new Date().toLocaleDateString('pt-BR')}</small></h1>
 <p class="leg">Vermelho cheio: boneco ou texto 3D atrás do bloco. Laranja tracejado: fundo agitado ou contraste abaixo de 4,5:1. Sem marca: bloco limpo.</p>`
-for (const id of telas) for (const ponto of pontos) for (const pos of posicoes) {
+// --grade=1: uma linha por coluna (Antes, Depois…) com as telas lado a lado — a prancha final compacta
+const GRADE = !!arg('grade')
+if (GRADE) for (const id of telas) for (const pos of posicoes) {
+  const T0 = colunas[1].R.telas[id]; if (!T0) continue
+  const [w, h] = T0.nome.split('×').map(Number), lw = w > 800 ? 300 : 150, esc = lw / w, lh = Math.round(h * esc)
+  html += `<h2>${T0.nome} · ${pos === 'leitura' ? 'leitura' : 'transição'}</h2><div style="display:grid;grid-template-columns:90px repeat(${pontos.length},${lw}px);gap:8px 8px;align-items:start">`
+  html += '<div></div>' + pontos.map((pt) => `<div style="font-size:11px;color:#9fb1ad;height:30px">${String(Object.values(colunas[1].R.telas)[0].estados.findIndex((e) => e.ponto === pt) >= 0 ? PONTOS_NOMES[pt] || pt : pt)}</div>`).join('')
+  for (const c of colunas) {
+    const T = c.R.telas[id]
+    html += `<div style="font-weight:700;padding-top:6px">${c.titulo}</div>`
+    for (const pt of pontos) {
+      const e = T?.estados.find((x) => x.ponto === pt && x.pos === pos)
+      if (!e) { html += '<div></div>'; continue }
+      html += `<figure><div class="img" style="width:${lw}px;height:${lh}px"><img src="${pathToFileURL(path.join(RAIZ, c.rodada, e.print)).href}" width="${lw}" height="${lh}">${e.blocos.filter((x) => x.f.length).map((x) => `<i class="${x.f.includes(3) ? 'c3' : 'c1'}" style="left:${x.rc.x * esc}px;top:${x.rc.y * esc}px;width:${x.rc.w * esc}px;height:${x.rc.h * esc}px"></i>`).join('')}</div><figcaption><span class="${e.falhas.length ? 'ruim' : 'bom'}">${e.falhas.length ? 'falha: ' + e.falhas.map((k) => NOME[k]).join(', ') : 'limpa'}</span></figcaption></figure>`
+    }
+  }
+  html += '</div>'
+}
+for (const id of GRADE ? [] : telas) for (const ponto of pontos) for (const pos of posicoes) {
   const celulas = colunas.map((c) => ({ c, T: c.R.telas[id], e: c.R.telas[id]?.estados.find((x) => x.ponto === ponto && x.pos === pos) })).filter((x) => x.e)
   if (celulas.length < 2) continue
   const [w, h] = celulas[0].T.nome.split('×').map(Number), lw = w > 800 ? 620 : 300, esc = lw / w, lh = Math.round(h * esc)

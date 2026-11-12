@@ -46,6 +46,23 @@ const centros = (p) => p.evaluate(() => {
   return e.portas3d.map((x, k) => { x.vao.getWorldPosition(v); v.project(e.cam); return { k, x: (v.x + 1) / 2 * innerWidth, y: (1 - v.y) / 2 * innerHeight } }).filter((c) => c.x > 24 && c.x < innerWidth - 24 && c.y > topo + 20 && c.y < innerHeight - 24)
 })
 
+// placas das portas (projetadas na tela) que cruzam um bloco de texto da cabeça do saguão
+function placasSobreTexto() {
+  const e = window.__expoSonda(), T = e.T, cx = new T.Box3(), v = new T.Vector3(); e.cam.updateMatrixWorld()
+  const textos = [...document.querySelectorAll('#problemas .ala-cabeca .regua .micro, #problemas .ala-cabeca h2, #problemas .ala-cabeca > p, #problemas .portas-lista')]
+    .map((el) => ({ nome: (el.innerText || '').replace(/\s+/g, ' ').slice(0, 24), r: el.getBoundingClientRect() })).filter((t) => t.r.bottom > 0 && t.r.top < innerHeight)
+  const achados = []
+  e.portas3d.forEach((pt, k) => {
+    if (!pt.g.visible) return
+    const plaq = pt.g.children.find((c) => c.material?.map === pt.placa.tex); if (!plaq) return
+    cx.setFromObject(plaq); let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity
+    for (let i = 0; i < 8; i++) { v.set(i & 1 ? cx.max.x : cx.min.x, i & 2 ? cx.max.y : cx.min.y, i & 4 ? cx.max.z : cx.min.z).project(e.cam); const px = (v.x + 1) / 2 * innerWidth, py = (1 - v.y) / 2 * innerHeight; x1 = Math.min(x1, px); x2 = Math.max(x2, px); y1 = Math.min(y1, py); y2 = Math.max(y2, py) }
+    if (y2 < 0 || y1 > innerHeight || x2 < 0 || x1 > innerWidth) return
+    for (const t of textos) if (x1 < t.r.right && x2 > t.r.left && y1 < t.r.bottom && y2 > t.r.top) achados.push(`placa ${k + 1} atrás de «${t.nome}»`)
+  })
+  return achados
+}
+
 // ---------- celular ----------
 {
   const { ctx, p, erros } = await abrir({ w: 390, h: 844, celular: true })
@@ -75,6 +92,14 @@ const centros = (p) => p.evaluate(() => {
   await p.locator('.sala-nav .guia-seta[aria-label="Porta anterior"]').tap(); ok((await esperarSala(p, 0))?.startsWith('Porta 1:'), 'celular · sala: botão ‹ volta para a porta 1')
   await p.keyboard.press('Escape'); ok(await esperarFechar(p), 'celular · sala: Esc volta ao saguão')
   // o palco das portas: tocar numa porta em 3D
+  // 12/11: enquanto as portas SOBEM (a base da lista a 30%, 22%, 15% e 10% da tela), nenhuma placa passa por
+  // trás do texto da cabeça — antes o teste só olhava o ponto em que, por construção, já não havia lista na tela
+  for (const frac of [0.3, 0.22, 0.15, 0.1]) {
+    await p.evaluate((f) => { const lista = document.querySelector('#problemas .portas-lista'); let y = 0; for (let e = lista; e; e = e.offsetParent) y += e.offsetTop; window.scrollTo(0, y + lista.offsetHeight - f * innerHeight) }, frac)
+    await p.waitForTimeout(2500)
+    const choque = await p.evaluate(placasSobreTexto)
+    ok(choque.length === 0, `celular · subida das portas (base da lista a ${Math.round(frac * 100)}% da tela): nenhuma placa atrás do texto${choque.length ? ' — ' + choque.join('; ') : ''}`)
+  }
   await irPara(p, 'palco'); ok(await portasDePe(p), 'celular · palco: as 7 portas ficam de pé depois que o título e a lista saem'); await p.waitForTimeout(1500)
   const texto = await p.evaluate(() => { const lista = document.querySelector('#problemas .portas-lista').getBoundingClientRect(); return lista.bottom })
   ok(texto < 0, `celular · palco: nenhum texto da cabeça na tela enquanto as portas estão de pé (base da lista em ${Math.round(texto)} px)`)

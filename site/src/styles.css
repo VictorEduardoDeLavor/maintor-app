@@ -1528,48 +1528,55 @@ html.sem-3d .obra-legenda img.so-3d { display: none; }
 @media (min-width: 821px) { .obra:has(.obra-amostras) .obra-legenda, .obra:has(.obra-videos) .obra-legenda { transform: none; } }
 
 /* ================================================================
-   LIMPEZA VISUAL (11/11) — "uma coisa por vez": texto HTML nunca
+   LIMPEZA VISUAL (11–12/11) — "uma coisa por vez": texto HTML nunca
    disputa a tela com o 3D. Medido por testes/aceite-limpeza.mjs.
+
+   Duas condições:
+   · html:not(.sem-3d) — regras de LAYOUT (alturas, margens, larguras). Valem desde o primeiro quadro da
+     página, antes de o 3D carregar: link direto (/#contato) rola com o layout final. A classe sem-3d entra
+     no primeiro efeito do App, quando não há WebGL ou há pedido de movimento reduzido.
+   · html.expo-pronta — o que é só APARÊNCIA e depende da cena já desenhada (legendas, fundos).
    ================================================================ */
 /* Fase 1 — abertura no celular em pé. A primeira tela tem três faixas (a cena 3D acompanha, ver ABRE em
    Exposicao.jsx): no alto o letreiro e o logo 3D; no meio o título, a proposta e as duas ações; embaixo,
    à direita, o boneco. O bloco é ancorado pelo TOPO e medido pela altura pequena da tela (svh): com as
    barras do navegador à vista, os dois botões continuam inteiros. */
 @media (orientation: portrait) {
-  html.expo-pronta .cena-entrada { justify-content: flex-start; min-height: 100svh; padding-top: 212px; padding-top: max(212px, 32svh); padding-bottom: 24px; }
+  html:not(.sem-3d) .cena-entrada { justify-content: flex-start; min-height: 100svh; padding-top: 212px; padding-top: max(212px, 32svh); padding-bottom: 24px; }
   /* uma marca por tela: o logo 3D acima do título já assina a abertura */
-  html.expo-pronta .entrada-selo { display: none; }
-  html.expo-pronta .entrada-oferta { margin-bottom: 16px; max-width: none; }
-  /* fundo calmo atrás do texto: uma faixa escura e desfocada, de borda a borda, que some nas pontas */
-  html.expo-pronta .entrada-oferta::before {
-    inset: -40px calc(-1 * clamp(20px, 4vw, 56px)) -18px; border-radius: 0; background: rgba(9, 27, 27, .66);
-    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  html:not(.sem-3d) .entrada-selo { display: none; }
+  html:not(.sem-3d) .entrada-oferta { margin-bottom: 16px; max-width: none; }
+  /* fundo calmo atrás do texto: uma faixa escura, de borda a borda, que some nas pontas. Sem desfoque: desfocar
+     uma área desse tamanho por cima do 3D custava ~7% dos quadros por segundo num aparelho de CPU lenta. */
+  html:not(.sem-3d) .entrada-oferta::before {
+    inset: -40px calc(-1 * clamp(20px, 4vw, 56px)) -18px; border-radius: 0; background: rgba(8, 24, 24, .84);
     -webkit-mask-image: linear-gradient(180deg, transparent, #000 40px, #000 calc(100% - 18px), transparent);
     mask-image: linear-gradient(180deg, transparent, #000 40px, #000 calc(100% - 18px), transparent);
   }
-  html.expo-pronta .entrada-ctas { margin-top: 20px; gap: 10px; }
+  html:not(.sem-3d) .entrada-ctas { margin-top: 20px; gap: 10px; }
 }
 @media (max-width: 820px) and (orientation: portrait) {
-  html.expo-pronta .entrada-h1 { font-size: 30px; }
-  html.expo-pronta .entrada-apoio { font-size: 15px; line-height: 1.5; margin-top: 14px; }
+  html:not(.sem-3d) .entrada-h1 { font-size: 30px; }
+  html:not(.sem-3d) .entrada-apoio { font-size: 15px; line-height: 1.5; margin-top: 14px; }
 }
 
-/* Fase 2 — réguas em uma linha no celular (rótulo curto quando o inteiro não cabe em 360 px) */
+/* Fase 2 — réguas em uma linha no celular: rótulo curto quando o inteiro não cabe em 360 px.
+   12/11: SEM white-space: nowrap — a regra valia para todas as páginas do site e cortava a régua das páginas
+   de serviço; abaixo de 360 px (iPhone SE 1ª geração, tela ampliada) a régua volta a quebrar, legível. */
 .so-estreito { display: none; }
 @media (max-width: 520px) {
   .so-largo { display: none; }
   .so-estreito { display: inline; }
-  .regua { white-space: nowrap; }
 }
 /* Fase 2 — respiro: entre a última obra de um trecho e o título seguinte, e entre o título e a primeira
    obra, sobra rolagem para o 3D sair antes de o título entrar e só voltar depois que ele passou */
-html.expo-pronta .obra + .obra-grupo { margin-top: 14vh; }
-html.expo-pronta .obra-grupo { margin-bottom: 14vh; }
-html.expo-pronta .ala-cabeca:not(.saguao):has(+ .obra) { margin-bottom: 16vh; }
+html:not(.sem-3d) .obra + .obra-grupo { margin-top: 14vh; }
+html:not(.sem-3d) .obra-grupo { margin-bottom: 14vh; }
+html:not(.sem-3d) .ala-cabeca:not(.saguao):has(+ .obra) { margin-bottom: 16vh; }
 /* Fase 2 — abertura no computador: uma marca por tela (o selo sai, como no celular) e fundo calmo atrás
    do bloco (faixa escura e desfocada com as bordas esfumadas, cobrindo também a dica de rolagem) */
 @media (orientation: landscape) and (min-width: 821px) {
-  html.expo-pronta .entrada-selo { display: none; }
+  html:not(.sem-3d) .entrada-selo { display: none; }
   html.expo-pronta .entrada-oferta::before {
     inset: -36px -56px -100px -64px; border-radius: 0; background: rgba(9, 27, 27, .74);
     -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
@@ -1580,29 +1587,36 @@ html.expo-pronta .ala-cabeca:not(.saguao):has(+ .obra) { margin-bottom: 16vh; }
 }
 /* Fase 3 — o saguão das 7 portas. A cabeça (título + lista) é lida em fundo calmo; as portas sobem depois,
    num trecho de rolagem só delas (o "palco"): por isso a caixa de 118vh sai e entra o espaço depois do bloco. */
-html.expo-pronta .ala-cabeca.saguao { min-height: 0; margin-bottom: 120vh; }
+html:not(.sem-3d) .ala-cabeca.saguao { min-height: 0; margin-bottom: 120vh; }
 /* R8: no celular a lista vira uma grade de duas colunas em painel de vidro (antes: 7 botões empilhados sobre o 3D) */
 @media (max-width: 820px) {
-  html.expo-pronta .portas-lista {
+  html:not(.sem-3d) .portas-lista {
     margin-top: 22px; padding: 14px 14px 16px; border-radius: 18px; background: rgba(13, 38, 38, .66); border: var(--hairline);
     -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   }
-  html.expo-pronta .portas-lista > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  html.expo-pronta .portas-lista .porta-btn { min-height: 52px; padding: 8px 10px; gap: 8px; font-size: 13.5px; line-height: 1.2; text-align: left; white-space: normal; }
-  html.expo-pronta .portas-lista .porta-btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
-}/* no computador a lista fica na coluna do texto (antes os botões iam até a direita, para a faixa do boneco) */
-@media (min-width: 821px) { html.expo-pronta .portas-lista { max-width: 700px; } }/* no computador a legenda acompanha o quadro, como no celular: aparece quando ele chega na posição de leitura
+  html:not(.sem-3d) .portas-lista > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  html:not(.sem-3d) .portas-lista .porta-btn { min-height: 52px; padding: 8px 10px; gap: 8px; font-size: 13.5px; line-height: 1.2; text-align: left; white-space: normal; }
+  html:not(.sem-3d) .portas-lista .porta-btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* 12/11: no tablet em pé (701–820 px) a legenda presa embaixo também precisa de recuo para a barra do guia
+     (antes só até 700 px) — senão "Ver case" e "Visitar loja" ficavam sob a barra */
+  html:not(.sem-3d) .obra { padding-bottom: 96px; }
+}
+/* botões sobre o 3D (portas e atalhos de grupo): fundo mais fechado e desfocado — nada "passa" por trás de um botão
+   (o fio no chão deixava a medida de bordas no limite) */
+html.expo-pronta .porta-btn { background: rgba(13, 38, 38, .72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+/* no computador a legenda acompanha o quadro, como no celular: aparece quando ele chega na posição de leitura
    e some quando volta para a parede. Antes entrava rolando sozinha, sobre as portas ou sobre os quadros da parede. */
 @media (min-width: 821px) {
   html.expo-pronta .obra-legenda { opacity: 0; pointer-events: none; transition: opacity .45s ease; }
   html.expo-pronta .obra.em-foco .obra-legenda { opacity: 1; pointer-events: auto; }
-}/* botões sobre o 3D (portas e atalhos de grupo): fundo mais fechado e desfocado — nada "passa" por trás de um botão
-   (o fio no chão deixava a medida de bordas no limite) */
-html.expo-pronta .porta-btn { background: rgba(13, 38, 38, .72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-/* Fase 4 — Como trabalhamos, Perguntas e Contato: lidas em fundo calmo (modo LER). No computador o texto fica
-   na coluna da esquerda; à direita ficam a peça da ala e o boneco. */
+}
+/* 12/11: quem navega pelo teclado nunca fica com o foco num link invisível — com o foco dentro, a legenda aparece
+   (no celular e no computador), mesmo que o quadro ainda não tenha chegado na posição de leitura */
+html.expo-pronta .obra-legenda:focus-within { opacity: 1; transform: none; pointer-events: auto; }
+/* Fase 3 e 4 — no computador o texto fica numa coluna à esquerda; à direita, a peça da ala e o boneco.
+   12/11: a coluna é no máximo 56% da tela — entre 821 e ~1250 px de largura os 700 px chegavam à faixa do boneco */
 @media (min-width: 821px) {
-  html.expo-pronta #como .linhas, html.expo-pronta #como .modalidades, html.expo-pronta .faq-home { max-width: 700px; }
-  /* a régua dessas seções também fica na coluna (o rótulo da direita ia até a faixa do boneco) */
-  html.expo-pronta #como .regua, html.expo-pronta #perguntas .regua, html.expo-pronta #contato .regua { max-width: 700px; }
+  html:not(.sem-3d) .portas-lista,
+  html:not(.sem-3d) #como .linhas, html:not(.sem-3d) #como .modalidades, html:not(.sem-3d) .faq-home,
+  html:not(.sem-3d) #como .regua, html:not(.sem-3d) #perguntas .regua, html:not(.sem-3d) #contato .regua { max-width: min(700px, 56vw); }
 }

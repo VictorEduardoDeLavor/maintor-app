@@ -232,6 +232,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       luzesTeto.push([l, halo])
     }
     const DIV = LARG * 0.3
+    const divisorias = [] // (11/11) guardadas para esconder por distância, como as luminárias e os quadros
     for (let i = 0; i < N - 1; i++) {
       const lado = -ladoAla(i + 1)
       const d = new THREE.Mesh(new THREE.BoxGeometry(DIV, ALT, 0.35), matParede)
@@ -239,6 +240,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       d.castShadow = !celular; d.receiveShadow = true; cena.add(d)
       const q = new THREE.Mesh(new THREE.BoxGeometry(0.06, ALT, 0.37), matLataoArq)
       q.position.set(lado * (LARG / 2 - DIV), ALT / 2, d.position.z); cena.add(q)
+      divisorias.push(d, q)
     }
 
     const fioCurva = new THREE.CatmullRomCurve3(pontos.map((p) => new THREE.Vector3(p.x, 0.03, p.z)), false, 'centripetal', 0.6)
@@ -257,7 +259,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     if (navigator.webdriver) window.__guia = guia.raiz // só para a bateria de aceite (robôs): conferir que ele anda
     // 11/11: sonda da limpeza visual (só robôs) — testes/aceite-limpeza.mjs lê daqui os objetos da cena e projeta os retângulos de tela.
     // Só as classes usadas, nunca o módulo THREE inteiro: passar o módulo como valor desliga o tree-shaking (+45 KB em gzip)
-    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, caixaLetreiro, totem, portas3d, obras, guia, pecasAla, prog, ler, lado })
+    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, totem, portas3d, obras, guia, pecasAla, prog, ler, lado, get caixaLetreiro() { return letreiroAtual.grupo } })
     const guiaPos = new THREE.Vector3(), guiaAnt = new THREE.Vector3(), guiaTan = new THREE.Vector3(), guiaDelta = new THREE.Vector3()
     let guiaComecou = false
 
@@ -271,6 +273,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     luzPortico.position.set(1.2, ALT - 0.1, -14); luzPortico.target.position.set(1.2, 5.2, -24)
     cena.add(luzPortico); cena.add(luzPortico.target)
     const retratoIni = window.innerWidth < window.innerHeight
+    const TOTEM_RETRATO = new THREE.Vector3(0.35, 0, -9.5), TOTEM_PAISAGEM = new THREE.Vector3(2.05, 0, -7)
     /* 11/11 — ABERTURA NO CELULAR (limpeza visual, Fase 1): "uma coisa por vez". Na primeira tela em pé,
        cada elemento tem a sua faixa e nenhum passa atrás do texto:
          · no alto, entre o cabeçalho e o título: o letreiro e, logo abaixo, o logo 3D (mais perto e menor)
@@ -281,7 +284,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
        ângulos (frações da altura da tela), então valem de 664 a 844 px de altura. */
     const ABRE = { inclina: 0.235, nevoa: 0.03, logoD: 10, logoY: 6.19, logoLarg: 3.5, letD: 8, letY: 6.06, letLarg: 3.3, letAlt: 0.46, bonecoFrente: 0.8, bonecoLado: 0.6, bonecoProf: 6 }
     const p0 = caminho.getPointAt(0), dir0 = caminho.getPointAt(0.012).sub(p0).setY(0).normalize()
-    const INT = { hemi: 0.55, sol: 0.5, spotA: 60, spotB: 42, portico: retratoIni ? 55 : 140, fio: 1.4, env: 0.42 }
+    const INT = { hemi: 0.55, sol: 0.5, spotA: 60, spotB: 42, portico: retratoIni ? 55 : 140, fio: 1.4, env: 0.42 } // portico: ver posicionarLockup
+    let luzBaixa = false // as luzes estão rebaixadas pelo modo LER (ver aplicarLer)
     // a abertura começa no escuro: a luz da galeria (foto 360°) acende junto com as outras
     if (intro) cena.environmentIntensity = 0.04
     if (intro) { hemi.intensity = 0.06; sol.intensity = 0; spotA.intensity = 0; spotB.intensity = 0; luzPortico.intensity = 0; matFio.emissiveIntensity = 0.05 }
@@ -297,6 +301,15 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const posicionarLockup = () => {
       // a luminária do teto que ficaria logo abaixo do logo (lida como um risco cinza) sai no retrato
       luzesTeto[1]?.forEach((o) => { o.visible = !(cam.aspect < 1) })
+      /* 12/11 (Fase 5): o letreiro, o totem e o foco do pórtico seguem a orientação ATUAL (antes ficavam presos à
+         do carregamento: virar o aparelho deixava o letreiro do computador atrás do título do celular) */
+      const retr = cam.aspect < 1
+      letreiroAtual = letreiros[retr ? 0 : 1]
+      for (const lt of letreiros) lt.grupo.visible = lt === letreiroAtual
+      const tp = retr ? TOTEM_RETRATO : TOTEM_PAISAGEM
+      totem.position.set(tp.x, totem.position.y, tp.z); totem.rotation.y = Math.atan2(-1.6 - tp.x, -tp.z)
+      INT.portico = retr ? 55 : 140
+      if (introAcabou && !luzBaixa) luzPortico.intensity = INT.portico
       if (!lockupCaixa) return
       if (cam.aspect < 1) {
         const e = ABRE.logoLarg / lockupCaixa.larg
@@ -408,6 +421,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         tex.anisotropy = renderer.capabilities.getMaxAnisotropy()
         tex.generateMipmaps = true; tex.minFilter = THREE.LinearMipmapLinearFilter; tex.magFilter = THREE.LinearFilter
         const h = o.w * (tex.image.height / tex.image.width)
+        o.h = h // (12/11) para caber entre o cabeçalho e a legenda no celular
         const moldura = new THREE.Mesh(new THREE.BoxGeometry(o.w + 0.18, h + 0.18, 0.09), matLatao)
         moldura.position.z = -0.045; moldura.castShadow = !celular
         const passe = new THREE.Mesh(new THREE.BoxGeometry(o.w + 0.08, h + 0.08, 0.06), new THREE.MeshStandardMaterial({ color: 0x0b1f1f, roughness: 0.9 }))
@@ -459,7 +473,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
 
     // 1) o TOTEM da entrada: "Qual é o seu problema?" — clicar abre as opções
     const totem = new THREE.Group(); cena.add(totem)
-    const totemPos = retratoIni ? new THREE.Vector3(0.35, 0, -9.5) : new THREE.Vector3(2.05, 0, -7)
+    const totemPos = retratoIni ? TOTEM_RETRATO : TOTEM_PAISAGEM
     totem.position.copy(totemPos)
     totem.rotation.y = Math.atan2(-1.6 - totemPos.x, -totemPos.z)
     const placaTotem = placaCanvas(1024, 440, (g, c, hover = false) => {
@@ -487,10 +501,27 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
        chega mais perto e encolhe na largura — as letras ficam do mesmo tamanho na tela. */
     /* 11/11: no retrato ele sobe para junto do teto e chega ainda mais perto — fica na faixa do alto da
        primeira tela, acima do logo, e nunca atrás do título (a câmera olha para cima na abertura). */
-    const LET = retratoIni ? { x: p0.x + dir0.x * ABRE.letD, y: ABRE.letY, z: p0.z + dir0.z * ABRE.letD } : { x: 0, y: 6.35, z: -15 }
-    const ALTL = retratoIni ? ABRE.letAlt : 0.62, LARGL = retratoIni ? ABRE.letLarg : LARG * 0.84
-    // a textura é recriada quando a fonte carrega (a largura do texto muda e o WebGL não redimensiona textura já enviada)
-    const telaLetreiro = new THREE.Mesh(new THREE.PlaneGeometry(LARGL, ALTL), new THREE.MeshBasicMaterial({ color: 0x081a1a, toneMapped: false }))
+    /* 12/11 (Fase 5): há DOIS letreiros, um por orientação, e aparece o da orientação atual — virar o celular
+       ou o tablet depois de abrir a página não deixa mais o letreiro do outro modo atrás do título.
+       Os dois usam a mesma imagem (a textura do segundo é uma cópia que divide a mesma imagem na placa). */
+    const CFG_LET = {
+      retrato: { x: p0.x + dir0.x * ABRE.letD, y: ABRE.letY, z: p0.z + dir0.z * ABRE.letD, alt: ABRE.letAlt, larg: ABRE.letLarg, giro: Math.atan2(-dir0.x, -dir0.z) },
+      paisagem: { x: 0, y: 6.35, z: -15, alt: 0.62, larg: LARG * 0.84, giro: 0 },
+    }
+    const letreiros = Object.entries(CFG_LET).map(([nome, L]) => {
+      const grupo = new THREE.Group(); grupo.position.set(L.x, L.y, L.z); grupo.rotation.y = L.giro; cena.add(grupo)
+      // a textura é recriada quando a fonte carrega (a largura do texto muda e o WebGL não redimensiona textura já enviada)
+      const tela = new THREE.Mesh(new THREE.PlaneGeometry(L.larg, L.alt), new THREE.MeshBasicMaterial({ color: 0x081a1a, toneMapped: false }))
+      tela.position.z = 0.04; grupo.add(tela)
+      grupo.add(new THREE.Mesh(new THREE.BoxGeometry(L.larg + 0.12, L.alt + 0.12, 0.06), matLatao))
+      for (const x of [-L.larg / 2 + 0.4, L.larg / 2 - 0.4]) {
+        const cabo = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, ALT - L.y, 6), matLatao)
+        cabo.position.set(x, (ALT - L.y) / 2 + L.alt / 2, 0); grupo.add(cabo)
+      }
+      return { nome, L, grupo, tela, tex: null }
+    })
+    let letreiroAtual = letreiros[retratoIni ? 0 : 1]
+    for (const lt of letreiros) lt.grupo.visible = lt === letreiroAtual
     const letreiro = { tex: null }
     const montarLetreiro = () => {
       if (!vivo) return
@@ -502,23 +533,20 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       g = c.getContext('2d'); g.font = F; g.fillStyle = '#081a1a'; g.fillRect(0, 0, c.width, H)
       let x = 0
       for (const [t, cor] of pedacos) { g.fillStyle = cor; g.fillText(t, x, 112); x += g.measureText(t).width }
-      const tex = new THREE.CanvasTexture(c)
-      tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; tex.wrapS = THREE.RepeatWrapping
-      tex.repeat.x = LARGL / ((c.width / H) * ALTL)
-      if (letreiro.tex) { tex.offset.x = letreiro.tex.offset.x; letreiro.tex.dispose() }
-      letreiro.tex = tex
-      telaLetreiro.material.map = tex; telaLetreiro.material.color.set(0xffffff); telaLetreiro.material.needsUpdate = true
+      const base = new THREE.CanvasTexture(c)
+      base.colorSpace = THREE.SRGBColorSpace; base.anisotropy = 8; base.wrapS = THREE.RepeatWrapping
+      const offset = letreiro.tex ? letreiro.tex.offset.x : 0
+      letreiros.forEach((lt, i) => {
+        const tex = i === 0 ? base : base.clone()
+        tex.repeat.x = lt.L.larg / ((c.width / H) * lt.L.alt); tex.offset.x = offset
+        lt.tex?.dispose(); lt.tex = tex
+        lt.tela.material.map = tex; lt.tela.material.color.set(0xffffff); lt.tela.material.needsUpdate = true
+      })
+      letreiro.tex = base
     }
     montarLetreiro()
     document.fonts?.load(F_LETREIRO).then(montarLetreiro).catch(() => {})
-    const caixaLetreiro = new THREE.Group(); caixaLetreiro.position.set(LET.x, LET.y, LET.z); cena.add(caixaLetreiro)
-    if (retratoIni) caixaLetreiro.rotation.y = Math.atan2(-dir0.x, -dir0.z)
-    telaLetreiro.position.z = 0.04; caixaLetreiro.add(telaLetreiro)
-    const moldL = new THREE.Mesh(new THREE.BoxGeometry(LARGL + 0.12, ALTL + 0.12, 0.06), matLatao); caixaLetreiro.add(moldL)
-    for (const x of [-LARGL / 2 + 0.4, LARGL / 2 - 0.4]) {
-      const cabo = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, ALT - LET.y, 6), matLatao)
-      cabo.position.set(x, (ALT - LET.y) / 2 + ALTL / 2, 0); caixaLetreiro.add(cabo)
-    }
+    const correrLetreiro = (dt) => { for (const lt of letreiros) if (lt.tex) lt.tex.offset.x += dt * 0.025 }
 
     // 3) o SAGUÃO da Ala 2: uma porta por necessidade (sete desde 10/11); sobem do chão quando se chega
     const portas3d = portasRef.current.map((pt, k) => {
@@ -642,6 +670,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
        os quadros se recolhem na parede, o corredor escurece, o olhar sobe (celular) e o boneco muda de
        faixa. Só depois que o título sai é que os quadros voltam e o primeiro se solta (o "respiro"). */
     let cabecas = []
+    const LONGE = 150 // além disso a névoa já apagou tudo: não se desenha
     const yDoc = (el) => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y } // sem as transformações das animações de entrada
     const LER = { nevoa: 0.035, luz: 1, fio: 0.985, cena: 0.82, latao: 0.75, lataoArq: 1, bonecoPc: 0.34, fora: 1.55, parede: 0.7, piso: 0.85, abrePcLado: 0.1, abrePcFrente: 3.4 }
     const alaDe = (y) => {
@@ -651,8 +680,10 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     }
     const uDe = (a) => THREE.MathUtils.clamp(a / N, 0, 0.995)
     const tmp = new THREE.Vector3()
+    let topoUtil = 0 // base do cabeçalho, em px
     const medir = () => {
       const sy = window.scrollY
+      topoUtil = document.querySelector('header')?.getBoundingClientRect().bottom || 0
       centros = secoes.map((s) => { const r = s.getBoundingClientRect(); return sy + r.top + r.height / 2 })
       for (const o of obras) {
         const r = o.el.getBoundingClientRect(); o.topo = sy + r.top; o.alt = Math.max(r.height, 1)
@@ -725,7 +756,32 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const balanco = new THREE.Quaternion(), eixoZ = new THREE.Vector3(0, 0, 1)
     let prog = 0, raf, visivel = true, primeiro = true, emFoco = false, abre = -1, bonecoSome = 0
     let fPortas = 0 // quanto as portas do saguão estão de pé (0..1), do quadro anterior
-    let ler = 0, lado = -1, legendaCel = false, focoId = null, luzBaixa = false, frentePc = 0
+    let ler = 0, lado = -1, legendaCel = false, focoId = null, frentePc = 0, focoAnt = null
+    /* modo LER: as luzes da galeria baixam (névoa, luminárias, fio, focos) — fica aceso o foco do boneco.
+       12/11 (Fase 5): virou função porque a SALA de cada porta usa os mesmos materiais: lá dentro ela é chamada
+       com (0, 0) — sem isso a sala ficava presa no LER do momento em que se entrou pela lista (escura e enevoada). */
+    const aplicarLer = (l, a) => {
+      cena.fog.density = 0.028 + ABRE.nevoa * a + LER.nevoa * l
+      matLuzTeto.emissiveIntensity = 1.6 * (1 - LER.luz * l); matHalo.opacity = 1 - 0.97 * l
+      matLuzTeto.color.setHex(COR.bege).multiplyScalar(1 - 0.98 * l)
+      // o latão (rodapés, quinas das divisórias) também apaga: riscos brilhantes atrás de rótulos pequenos
+      matLatao.color.setHex(COR.mostarda).multiplyScalar(1 - LER.latao * l); matLatao.envMapIntensity = 1 - LER.latao * l
+      matLataoArq.opacity = 1 - LER.lataoArq * l
+      matParede.color.setScalar(1 - LER.parede * l) // a parede tem um friso pintado a 1 m do chão: escurece junto
+      // o piso de taco tem desenho miúdo: escurece junto, para não vibrar atrás das letras; as partículas somem
+      matChao.color.setHex(0x2c2925).multiplyScalar(1 - LER.piso * l)
+      po.material.opacity = 0.55 * (1 - l)
+      if (introAcabou && (l > 0.001 || luzBaixa)) {
+        const k = 1 - LER.cena * l
+        matFio.emissiveIntensity = INT.fio * (1 - LER.fio * l); matFio.color.setHex(COR.mostarda).multiplyScalar(1 - 0.85 * l)
+        hemi.intensity = INT.hemi * k; sol.intensity = INT.sol * k; spotA.intensity = INT.spotA * k; spotB.intensity = INT.spotB * k; luzPortico.intensity = INT.portico * k
+        cena.environmentIntensity = INT.env * (1 - 0.85 * l) // o reflexo da galeria no verniz do piso também desenha o taco
+        luzBaixa = l > 0.001
+      }
+    }
+    // o painel "Qual é o seu problema?" (no celular abre na faixa do boneco)
+    const painelEl = document.querySelector('.pergunta-painel')
+    const painelNaTela = () => { const r = painelEl?.getBoundingClientRect(); return !!r && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight }
     const guiaRumo = new THREE.Vector3()
     const aoVis = () => { visivel = document.visibilityState === 'visible'; if (visivel) quadro() }
     document.addEventListener('visibilitychange', aoVis)
@@ -737,7 +793,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       prog += (alvo - prog) * Math.min(1, dt * 4.5)
       mouse.sx += (mouse.x - mouse.sx) * Math.min(1, dt * 4); mouse.sy += (mouse.y - mouse.sy) * Math.min(1, dt * 4)
 
-      // modo LER: liga quando o topo de uma cabeça passa de 90% para 76% da altura da tela (entrando por baixo)
+      // modo LER: liga quando o topo de uma cabeça passa de 102% para 90% da altura da tela (entrando por baixo)
+      // (12/11: antes 90%→76% — o título surgia na borda de baixo sobre o chão aceso, o fio e a luz do boneco;
+      // agora o fundo já está calmo quando ele aparece. Nesse ponto a obra anterior já voltava para a parede.)
       // e desliga quando a base dela sobe de 26% para 12% (saindo por cima). cantoLivre: nenhuma cabeça
       // ocupa a faixa de baixo da tela (onde o boneco para, no celular).
       const vhTela = window.innerHeight, syTela = window.scrollY
@@ -745,7 +803,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       for (const c of cabecas) {
         const tc = c.topo - syTela, bc = c.base - syTela
         if (bc < 0 || tc > vhTela) continue
-        lerAlvo = Math.max(lerAlvo, suave(vhTela * 0.9, vhTela * 0.76, tc) * suave(vhTela * 0.12, vhTela * 0.26, bc))
+        lerAlvo = Math.max(lerAlvo, suave(vhTela * 1.02, vhTela * 0.9, tc) * suave(vhTela * 0.12, vhTela * 0.26, bc))
         if (bc > vhTela * 0.77) cantoLivre = false
       }
       ler += (lerAlvo - ler) * Math.min(1, dt * 5)
@@ -764,12 +822,16 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         // no celular, de mais longe e olhando um pouco para baixo: a obra fica na metade de cima, acima do painel
         cam.position.set(SX + (retr ? 1.2 : -1.6) + mouse.sx * 0.3, OLHO + 0.1 + Math.sin(t * 1.2) * 0.02, retr ? 6.9 : 3.6)
         cam.lookAt(SX + (retr ? 1.2 : -0.2) + mouse.sx * 1.2, (retr ? 0.6 : 2.9) - mouse.sy * 0.4, -SD / 2)
-        letreiro.tex && (letreiro.tex.offset.x += dt * 0.025)
+        correrLetreiro(dt)
+        aplicarLer(0, 0) // a sala é sempre a galeria acesa, venha-se de onde vier
         acab.foco(5, 0); acab.desenhar(dt)
         raf = requestAnimationFrame(quadro)
         return
       }
       const retrato = cam.aspect < 1
+      const pTopo = (yTela - window.innerHeight * 0.5) / Math.max(window.innerHeight, 1)
+      // abertura no computador: o boneco espera mais à frente e um passo à direita do fio (ver lado/frentePc)
+      const abrePc = retrato ? 0 : 1 - suave(0.02, 0.5, pTopo)
 
       // 06/11 — cada quadro tem o seu trecho de rolagem, em três tempos:
       //  1. quem anda VIRA O ROSTO para o quadro na parede (no celular a parede fica fora da tela estreita;
@@ -792,7 +854,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
 
       cam.position.copy(pos)
-      olhar.copy(frente); olhar.y = OLHO - 0.18 + mouse.sy * -0.35; olhar.x += mouse.sx * 1.6
+      // 12/11: na abertura e no modo LER o mouse quase não gira o olhar — girando, o boneco (que fica ao lado do
+      // fio) voltava para trás da coluna do texto
+      olhar.copy(frente); olhar.y = OLHO - 0.18 + mouse.sy * -0.35; olhar.x += mouse.sx * 1.6 * (1 - 0.85 * Math.max(ler, abrePc))
       dirOlhar.copy(olhar).sub(pos).normalize()
       if (olharObra && olharPeso > 0.002) {
         dirObra.copy(olharObra.parede.pos).sub(pos); dirObra.y *= 0.5; dirObra.normalize()
@@ -800,37 +864,20 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
       // abertura no celular: quem chega olha para o pórtico, no alto; o olhar desce quando a rolagem começa
       // (amortecido: o toque rola aos trancos). Enquanto se lê a abertura, o fundo do corredor escurece.
-      const pTopo = (yTela - window.innerHeight * 0.5) / Math.max(window.innerHeight, 1)
       const abreAlvo = retrato ? 1 - suave(0.02, 0.5, pTopo) : 0
       abre = abre < 0 ? abreAlvo : abre + (abreAlvo - abre) * Math.min(1, dt * 5)
       if (Math.abs(abreAlvo - abre) < 0.0005) abre = abreAlvo
       // no celular o olhar também sobe enquanto se lê uma cabeça: o chão (e o boneco) descem para a faixa de baixo
       const sobe = retrato ? Math.max(abre, ler) : 0
       if (sobe > 0) { dirOlhar.y += ABRE.inclina * sobe; dirOlhar.normalize() }
-      // modo LER: as luzes da galeria baixam (névoa, luminárias, fio, focos) — fica aceso o foco do boneco
-      cena.fog.density = 0.028 + ABRE.nevoa * abre + LER.nevoa * ler
-      matLuzTeto.emissiveIntensity = 1.6 * (1 - LER.luz * ler); matHalo.opacity = 1 - 0.97 * ler
-      matLuzTeto.color.setHex(COR.bege).multiplyScalar(1 - 0.98 * ler)
-      // o latão (rodapés, quinas das divisórias) também apaga: riscos brilhantes atrás de rótulos pequenos
-      matLatao.color.setHex(COR.mostarda).multiplyScalar(1 - LER.latao * ler); matLatao.envMapIntensity = 1 - LER.latao * ler
-      matLataoArq.opacity = 1 - LER.lataoArq * ler
-      matParede.color.setScalar(1 - LER.parede * ler) // a parede tem um friso pintado a 1 m do chão: escurece junto
-      // o piso de taco tem desenho miúdo: escurece junto, para não vibrar atrás das letras; as partículas somem
-      matChao.color.setHex(0x2c2925).multiplyScalar(1 - LER.piso * ler)
-      po.material.opacity = 0.55 * (1 - ler)
-      if (introAcabou && (ler > 0.001 || luzBaixa)) {
-        const k = 1 - LER.cena * ler
-        matFio.emissiveIntensity = INT.fio * (1 - LER.fio * ler); matFio.color.setHex(COR.mostarda).multiplyScalar(1 - 0.85 * ler)
-        hemi.intensity = INT.hemi * k; sol.intensity = INT.sol * k; spotA.intensity = INT.spotA * k; spotB.intensity = INT.spotB * k; luzPortico.intensity = INT.portico * k
-        cena.environmentIntensity = INT.env * (1 - 0.85 * ler) // o reflexo da galeria no verniz do piso também desenha o taco
-        luzBaixa = ler > 0.001
-      }
+      aplicarLer(ler, abre)
+
       olhar.copy(pos).add(dirOlhar)
       cam.lookAt(olhar)
       cam.getWorldDirection(fwd); right.crossVectors(fwd, up).normalize()
 
       // o letreiro corre; o totem fica na entrada e afunda quando se segue; as portas sobem no saguão
-      if (letreiro.tex) letreiro.tex.offset.x += dt * 0.025
+      correrLetreiro(dt)
       const fTotem = (1 - suave(0.35, 0.9, pTopo)) * entrada.v * (1 - ler) // 11/11: afunda também quando um título entra em leitura
       totem.visible = fTotem > 0.01 && !retrato // 10/11: no celular em pé o totem ficava atrás do título; lá o atalho é o botão em HTML
       totem.position.y = (fTotem - 1) * 2.6
@@ -868,8 +915,6 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
            computador · anda pela faixa da direita enquanto o título está na coluna da esquerda */
       const lendo = lerAlvo > 0.3
       const foraCel = retrato && ((lendo && !cantoLivre) || legendaCel)
-      // abertura no computador: ele espera mais à frente e um passo à direita do fio — fora do título e do parágrafo
-      const abrePc = retrato ? 0 : 1 - suave(0.02, 0.5, pTopo)
       const ladoAlvo = retrato ? (foraCel ? LER.fora : Math.max(ABRE.bonecoLado * abre, lendo ? ABRE.bonecoLado : 0)) : Math.max(lendo ? LER.bonecoPc : 0, LER.abrePcLado * abrePc)
       lado = lado < 0 ? ladoAlvo : lado + (ladoAlvo - lado) * Math.min(1, dt * 3.2)
       if (Math.abs(ladoAlvo - lado) < 0.0005) lado = ladoAlvo
@@ -897,25 +942,33 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       // no computador, em modo LER, o foco dele fica do lado de fora (direita): a luz não cai na coluna do texto
       if (!retrato && ler > 0.001) luzGuia.position.addScaledVector(right, 1.0 * ler)
       // no celular ele some de cena enquanto o painel de opções está aberto (abre na faixa dele) e quando sai pela direita
-      bonecoSome += (((perguntaRef.current && retrato) || foraCel ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
+      bonecoSome += (((perguntaRef.current && retrato && painelNaTela()) || foraCel ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
       guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v) * (1 - bonecoSome)))
       // no modo LER o foco dele fecha: ilumina o boneco e o chão em volta, sem acender a parede atrás dos rótulos
       luzGuia.intensity = 5.5 * (1 - bonecoSome) * (1 - 0.3 * ler); luzGuia.distance = 7 - (retrato ? 3.5 : 4.2) * ler
       guia.atualizar(dt, { v: vGuia, tangente: guiaRumo, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t })
 
-      let maior = 0, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
+      let maior = 0, maiorObra = null, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
       const dist = retrato ? 7.2 : 4.6
       const largVisivel = 2 * dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect
+      /* 11/11 (Fase 5): com o alcance da câmera em 340 m, o que a névoa já apagou deixa de ser desenhado por
+         distância (a 150 m a névoa não deixa nada visível). Assim o corredor inteiro não entra na conta do
+         celular: o número de objetos desenhados volta a ser o de antes. */
+      for (let i = 0; i < luzesTeto.length; i++) { const v = Math.abs(luzesTeto[i][0].position.z - cam.position.z) < LONGE && !(i === 1 && retrato); luzesTeto[i][0].visible = luzesTeto[i][1].visible = v }
+      for (const d of divisorias) d.visible = Math.abs(d.position.z - cam.position.z) < LONGE
       // modo LER: os quadros se recolhem na parede enquanto um título é lido e voltam quando ele passa
       // (Fase 3: e enquanto as portas do saguão estão de pé — o palco é só delas)
       const presAlvo = (1 - suave(0.25, 0.75, ler)) * (1 - suave(0.05, 0.6, fPortas))
       for (const o of obras) {
         const f = o.fs
         // na abertura do computador, a parede do lado do texto (a esquerda) fica livre: os quadros dela surgem quando o passeio começa
-        const presObra = !retrato && o.lado > 0 ? Math.min(presAlvo, 1 - suave(0.3, 0.8, abrePc)) : presAlvo
+        let presObra = !retrato && o.lado > 0 ? Math.min(presAlvo, 1 - suave(0.3, 0.8, abrePc)) : presAlvo
+        // 12/11 (modo VER): com uma obra em foco, os quadros da parede atrás da legenda se recolhem — no computador a
+        // parede do lado da legenda; no celular, onde a legenda ocupa a largura toda, as duas (usa o foco do quadro anterior)
+        if (focoAnt && focoAnt.o !== o && (retrato || o.lado !== focoAnt.o.lado) && o.fs <= 0.001) presObra = Math.min(presObra, 1 - suave(0.35, 0.8, focoAnt.f))
         o.ps += (presObra - o.ps) * Math.min(1, dt * 4); if (Math.abs(presObra - o.ps) < 0.001) o.ps = presObra
         const pe = Math.max(0.001, o.ps * o.ps * (3 - 2 * o.ps))
-        o.grupo.visible = pe > 0.02
+        o.grupo.visible = pe > 0.02 && (f > 0.001 || Math.abs(o.parede.pos.z - cam.position.z) < LONGE)
         const focoObra = f > 0.72
         if (focoObra !== o.foco) { o.foco = focoObra; o.el.classList.toggle('em-foco', focoObra) }
         // 09/11: no celular, o quadro que chega na leitura troca para a imagem grande (1920 px) — só ele
@@ -938,13 +991,33 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         // vira de frente um pouco antes de chegar, com um leve balanço de quem foi tirado da parede
         o.grupo.quaternion.slerpQuaternions(o.parede.quat, cam.quaternion, suave(0, 0.85, e))
         balanco.setFromAxisAngle(eixoZ, Math.sin(Math.PI * e) * 0.07 * o.lado); o.grupo.quaternion.multiply(balanco)
-        const escAlvo = Math.min(1, (largVisivel * (retrato ? 0.9 : 0.5)) / o.w)
+        let escAlvo = Math.min(1, (largVisivel * (retrato ? 0.9 : 0.5)) / o.w)
+        /* 12/11 (Fase 5): no celular o quadro em leitura cabe INTEIRO entre o cabeçalho e o topo da legenda (antes
+           a legenda podia cobrir a base do quadro, em telas mais baixas como 360×740): centro e altura saem da faixa
+           livre medida a cada quadro, com amortecimento */
+        if (retrato && o.h) {
+          const leg = o.leg || (o.leg = o.el.querySelector('.obra-legenda'))
+          const rl = leg?.getBoundingClientRect(), vh = window.innerHeight
+          if (rl && rl.height > 0) {
+            const Hv = 2 * dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2))
+            const cima = topoUtil + 12, baixo = Math.max(cima + vh * 0.1, Math.min(vh, rl.top) - 12) // legenda alta (portas): quadro menor, mas inteiro
+            const hTot = o.h + 0.5 // moldura em cima, placa embaixo
+            const escAlt = (((baixo - cima) / vh) * Hv * 0.96) / hTot
+            const subirAlvo = ((vh / 2 - (cima + baixo) / 2) / vh) * Hv
+            o.esc2 = o.esc2 == null ? escAlt : o.esc2 + (escAlt - o.esc2) * Math.min(1, dt * 6)
+            o.sub2 = o.sub2 == null ? subirAlvo : o.sub2 + (subirAlvo - o.sub2) * Math.min(1, dt * 6)
+            escAlvo = Math.min(escAlvo, o.esc2)
+            alvoPos.addScaledVector(up, o.sub2 + 0.155 * escAlvo - 0.85) // troca o 0,85 fixo pela faixa livre
+            o.grupo.position.set(0, 0, 0).addScaledVector(o.parede.pos, a).addScaledVector(ctrl, b).addScaledVector(alvoPos, c)
+          }
+        }
         o.grupo.scale.setScalar((1 + (escAlvo - 1) * e) * pe)
-        if (f > maior) maior = f
+        if (f > maior) { maior = f; maiorObra = o }
         if (f > maiorLuz) { maiorLuz = f; atual = o }
       }
       // quem está em foco: o guia (barra "Quero algo assim") só aparece com obra em foco; no celular, a legenda
       // aberta ocupa a faixa do boneco
+      focoAnt = maiorObra ? { o: maiorObra, f: maior } : null
       const emLeitura = obras.find((o) => o.foco)
       legendaCel = retrato && !!emLeitura
       if ((emLeitura?.el.id || null) !== focoId) { focoId = emLeitura?.el.id || null; window.dispatchEvent(new CustomEvent('flow:obra-foco', { detail: focoId })) }
@@ -960,7 +1033,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       matCreme.emissiveIntensity = 0.14 * opPortico
       // o totem e o letreiro entram depois da abertura
       // (11/11: no retrato ele também se recolhe no teto quando o passeio começa — não passa por trás do cabeçalho)
-      caixaLetreiro.position.y = LET.y + (1 - entrada.v) * 2.2 + (retratoIni && retrato ? (1 - abre) * 2 : 0)
+      letreiroAtual.grupo.position.y = letreiroAtual.L.y + (1 - entrada.v) * 2.2 + (letreiroAtual.nome === 'retrato' ? (1 - abre) * 2 : 0)
 
       // com uma obra flutuando, o grão de filme quase some (ele sujava o print)
       const foco = maior > 0.35
@@ -979,7 +1052,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         if (d > -3 && d < 28 && d < dPeca) { dPeca = d; peca = g }
         const alvoP = retrato ? 1 - suave(0.1, 0.6, ler) : 1
         g.userData.pres = (g.userData.pres ?? 1) + (alvoP - (g.userData.pres ?? 1)) * Math.min(1, dt * 4)
-        g.visible = g.userData.pres > 0.02; g.scale.setScalar(Math.max(0.001, g.userData.pres))
+        g.visible = g.userData.pres > 0.02 && d < LONGE && d > -20; g.scale.setScalar(Math.max(0.001, g.userData.pres))
       }
       if (introAcabou) {
         if (peca && !retrato) { spotB.position.set(peca.position.x - 0.5, ALT - 0.3, peca.position.z + 2.4); spotB.target.position.set(peca.position.x, peca.position.y > 1 ? peca.position.y : 1.4, peca.position.z); spotB.angle = Math.PI / 11; spotB.intensity = INT.spotB * 1.7 }
@@ -994,7 +1067,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       // foco de câmera no quadro em leitura (o fundo desfoca)
       acab.foco(retrato ? 7.2 : 4.6, suave(0.5, 0.95, maior))
       acab.desenhar(dt)
-      if (primeiro) { primeiro = false; document.documentElement.classList.add('expo-pronta') }
+      if (primeiro) { primeiro = false; document.documentElement.classList.add('expo-pronta'); window.dispatchEvent(new Event('flow:expo-pronta')) }
       // a abertura só começa depois de uns quadros já desenhados: o 1º quadro compila os shaders (trava),
       // e se a queda das letras começasse ali o visitante via só o fim dela
       if (!renderizou && ++quadrosDesenhados >= 4) { renderizou = true; if (introTl && introTl.paused()) introTl.play() }
