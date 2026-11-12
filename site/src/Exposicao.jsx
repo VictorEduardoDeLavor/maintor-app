@@ -640,7 +640,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
        faixa. Só depois que o título sai é que os quadros voltam e o primeiro se solta (o "respiro"). */
     let cabecas = []
     const yDoc = (el) => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y } // sem as transformações das animações de entrada
-    const LER = { nevoa: 0.035, luz: 1, fio: 0.96, cena: 0.82, latao: 0.75, lataoArq: 1, bonecoPc: 0.34, fora: 1.55, parede: 0.7, piso: 0.85, abrePcLado: 0.1, abrePcFrente: 3.4 }
+    const LER = { nevoa: 0.035, luz: 1, fio: 0.985, cena: 0.82, latao: 0.75, lataoArq: 1, bonecoPc: 0.34, fora: 1.55, parede: 0.7, piso: 0.85, abrePcLado: 0.1, abrePcFrente: 3.4 }
     const alaDe = (y) => {
       if (!centros.length || y <= centros[0]) return 0
       for (let i = 1; i < centros.length; i++) if (y <= centros[i]) return i - 1 + (y - centros[i - 1]) / Math.max(centros[i] - centros[i - 1], 1)

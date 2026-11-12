@@ -1571,8 +1571,8 @@ html.expo-pronta .ala-cabeca:not(.saguao):has(+ .obra) { margin-bottom: 16vh; }
 @media (orientation: landscape) and (min-width: 821px) {
   html.expo-pronta .entrada-selo { display: none; }
   html.expo-pronta .entrada-oferta::before {
-    inset: -36px -56px -100px -64px; border-radius: 0; background: rgba(9, 27, 27, .62);
-    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    inset: -36px -56px -100px -64px; border-radius: 0; background: rgba(9, 27, 27, .74);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
     -webkit-mask-image: linear-gradient(180deg, transparent, #000 36px, #000 calc(100% - 36px), transparent), linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
     mask-image: linear-gradient(180deg, transparent, #000 36px, #000 calc(100% - 36px), transparent), linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent);
     -webkit-mask-composite: source-in; mask-composite: intersect;
@@ -1596,4 +1596,6 @@ html.expo-pronta .ala-cabeca.saguao { min-height: 0; margin-bottom: 120vh; }
 @media (min-width: 821px) {
   html.expo-pronta .obra-legenda { opacity: 0; pointer-events: none; transition: opacity .45s ease; }
   html.expo-pronta .obra.em-foco .obra-legenda { opacity: 1; pointer-events: auto; }
-}
+}/* botões sobre o 3D (portas e atalhos de grupo): fundo mais fechado e desfocado — nada "passa" por trás de um botão
+   (o fio no chão deixava a medida de bordas no limite) */
+html.expo-pronta .porta-btn { background: rgba(13, 38, 38, .72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
