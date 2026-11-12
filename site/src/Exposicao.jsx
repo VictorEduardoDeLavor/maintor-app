@@ -422,11 +422,14 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       })
     }
 
+    /* 11/11 (Fase 4): as peças das alas de texto ficam todas do lado DIREITO do corredor, fora da coluna do texto
+       (o nó das Perguntas ficava à esquerda, atrás da régua e do título); os degraus viram de lado, em
+       perspectiva, para caber na faixa livre. No celular elas se recolhem enquanto o texto é lido. */
     const pecasAla = []
     const idx = (n) => nomes.indexOf(n)
     const zAla = (i) => -i * PASSO - 9
     if (idx('como') >= 0) {
-      const g = new THREE.Group(); g.position.set(3.4, 0, zAla(idx('como'))); cena.add(g); pecasAla.push(g)
+      const g = new THREE.Group(); g.position.set(4.3, 0, zAla(idx('como'))); g.rotation.y = -0.95; cena.add(g); pecasAla.push(g)
       for (let k = 0; k < 4; k++) {
         const l = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.9 + k * 0.55, 0.12), matVidro)
         l.position.set(k * 1.25 - 1.9, (0.9 + k * 0.55) / 2, 0); l.castShadow = !celular; g.add(l)
@@ -434,13 +437,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
     }
     if (idx('perguntas') >= 0) {
-      const g = new THREE.Group(); g.position.set(-3.4, 2.1, zAla(idx('perguntas'))); cena.add(g); pecasAla.push(g)
+      const g = new THREE.Group(); g.position.set(3.9, 2.1, zAla(idx('perguntas'))); cena.add(g); pecasAla.push(g)
       const no = new THREE.Mesh(new THREE.TorusKnotGeometry(0.75, 0.22, 160, 24, 2, 3), new THREE.MeshPhysicalMaterial({ color: COR.mostarda, roughness: 0.25, metalness: 0.85, clearcoat: 0.5 }))
       no.castShadow = !celular; g.add(no)
       const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 2.1, 32), matParede); ped.position.y = -2.1; g.add(ped)
     }
     if (idx('contato') >= 0) {
-      const g = new THREE.Group(); g.position.set(3.2, 0, zAla(idx('contato'))); cena.add(g); pecasAla.push(g)
+      const g = new THREE.Group(); g.position.set(4.6, 0, zAla(idx('contato'))); cena.add(g); pecasAla.push(g)
       loader.load('/midia/contato-balao.webp', (tex) => {
         if (!vivo) return
         tex.colorSpace = THREE.SRGBColorSpace
@@ -660,8 +663,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
       montarSaguao()
       // as cabeças (Fase 3: inclui a do saguão — as portas só sobem depois que ela foi lida)
-      cabecas = [...document.querySelectorAll('main#conteudo .ala-cabeca, main#conteudo .grupo-painel')].map((el) => {
-        const filhos = el.classList.contains('ala-cabeca') ? [...el.children] : [el]
+      // (Fase 4: e as seções de texto — processo, perguntas, contato —, lidas inteiras em fundo calmo)
+      cabecas = [...document.querySelectorAll('main#conteudo .ala-cabeca, main#conteudo .grupo-painel, main#conteudo > section.cena:not(.cena-entrada):not(.cena-ala) > .wrap')].map((el) => {
+        const filhos = el.classList.contains('grupo-painel') ? [el] : [...el.children]
         const ultimo = filhos[filhos.length - 1]
         return { topo: yDoc(filhos[0]), base: yDoc(ultimo) + ultimo.offsetHeight }
       })
@@ -816,9 +820,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       po.material.opacity = 0.55 * (1 - ler)
       if (introAcabou && (ler > 0.001 || luzBaixa)) {
         const k = 1 - LER.cena * ler
-        matFio.emissiveIntensity = INT.fio * (1 - LER.fio * ler)
+        matFio.emissiveIntensity = INT.fio * (1 - LER.fio * ler); matFio.color.setHex(COR.mostarda).multiplyScalar(1 - 0.85 * ler)
         hemi.intensity = INT.hemi * k; sol.intensity = INT.sol * k; spotA.intensity = INT.spotA * k; spotB.intensity = INT.spotB * k; luzPortico.intensity = INT.portico * k
-        cena.environmentIntensity = INT.env * (1 - 0.6 * ler)
+        cena.environmentIntensity = INT.env * (1 - 0.85 * ler) // o reflexo da galeria no verniz do piso também desenha o taco
         luzBaixa = ler > 0.001
       }
       olhar.copy(pos).add(dirOlhar)
@@ -890,11 +894,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       guia.raiz.position.copy(guiaPos)
       guiaDelta.subVectors(cam.position, guiaPos).setY(0).setLength(1.1)
       luzGuia.position.copy(guiaPos).add(guiaDelta).setY(1.5)
+      // no computador, em modo LER, o foco dele fica do lado de fora (direita): a luz não cai na coluna do texto
+      if (!retrato && ler > 0.001) luzGuia.position.addScaledVector(right, 1.0 * ler)
       // no celular ele some de cena enquanto o painel de opções está aberto (abre na faixa dele) e quando sai pela direita
       bonecoSome += (((perguntaRef.current && retrato) || foraCel ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
       guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v) * (1 - bonecoSome)))
       // no modo LER o foco dele fecha: ilumina o boneco e o chão em volta, sem acender a parede atrás dos rótulos
-      luzGuia.intensity = 5.5 * (1 - bonecoSome) * (1 - 0.3 * ler); luzGuia.distance = 7 - 3.5 * ler
+      luzGuia.intensity = 5.5 * (1 - bonecoSome) * (1 - 0.3 * ler); luzGuia.distance = 7 - (retrato ? 3.5 : 4.2) * ler
       guia.atualizar(dt, { v: vGuia, tangente: guiaRumo, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t })
 
       let maior = 0, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
@@ -964,6 +970,21 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       else { spotA.position.set(0, ALT - 0.2, alaZ(ala) - 4); spotA.target.position.set(0, 1.4, alaZ(ala) - 14) }
       const prox = Math.min(ala + 1, N - 1)
       spotB.position.set(0, ALT - 0.2, alaZ(prox) - 4); spotB.target.position.set(0, 1.4, alaZ(prox) - 14)
+      /* 11/11 (Fase 4): nas alas de texto as luzes baixam, mas a peça da ala ganha o foco dela (no computador):
+         um facho fechado, de cima, que acende a peça e o chão em volta sem chegar à coluna do texto.
+         No celular a peça se recolhe enquanto o texto está na tela (não há faixa livre para ela). */
+      let peca = null, dPeca = Infinity
+      for (const g of pecasAla) {
+        const d = cam.position.z - g.position.z
+        if (d > -3 && d < 28 && d < dPeca) { dPeca = d; peca = g }
+        const alvoP = retrato ? 1 - suave(0.1, 0.6, ler) : 1
+        g.userData.pres = (g.userData.pres ?? 1) + (alvoP - (g.userData.pres ?? 1)) * Math.min(1, dt * 4)
+        g.visible = g.userData.pres > 0.02; g.scale.setScalar(Math.max(0.001, g.userData.pres))
+      }
+      if (introAcabou) {
+        if (peca && !retrato) { spotB.position.set(peca.position.x - 0.5, ALT - 0.3, peca.position.z + 2.4); spotB.target.position.set(peca.position.x, peca.position.y > 1 ? peca.position.y : 1.4, peca.position.z); spotB.angle = Math.PI / 11; spotB.intensity = INT.spotB * 1.7 }
+        else { spotB.angle = Math.PI / 5; spotB.intensity = INT.spotB * (1 - LER.cena * ler) }
+      }
       sol.position.set(pos.x + 3, pos.y + 7, pos.z + 4); sol.target.position.set(pos.x, 0, pos.z - 10)
 
       lockup.rotation.y = lockupGiro + Math.sin(t * 0.5) * (retrato ? 0.04 : 0.08)

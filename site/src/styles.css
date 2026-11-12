@@ -1599,3 +1599,10 @@ html.expo-pronta .ala-cabeca.saguao { min-height: 0; margin-bottom: 120vh; }
 }/* botões sobre o 3D (portas e atalhos de grupo): fundo mais fechado e desfocado — nada "passa" por trás de um botão
    (o fio no chão deixava a medida de bordas no limite) */
 html.expo-pronta .porta-btn { background: rgba(13, 38, 38, .72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+/* Fase 4 — Como trabalhamos, Perguntas e Contato: lidas em fundo calmo (modo LER). No computador o texto fica
+   na coluna da esquerda; à direita ficam a peça da ala e o boneco. */
+@media (min-width: 821px) {
+  html.expo-pronta #como .linhas, html.expo-pronta #como .modalidades, html.expo-pronta .faq-home { max-width: 700px; }
+  /* a régua dessas seções também fica na coluna (o rótulo da direita ia até a faixa do boneco) */
+  html.expo-pronta #como .regua, html.expo-pronta #perguntas .regua, html.expo-pronta #contato .regua { max-width: 700px; }
+}
