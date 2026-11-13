@@ -113,3 +113,13 @@ O `aceite-rolagem` confere:
 - que o quadro em pé cabe entre o cabeçalho e a barra do guia;
 - as 21 legendas entre o cabeçalho e a barra do guia;
 - que não há erro de página.
+
+### Quadros por segundo (`testes/medir-fps.mjs --vezes=3`, publicado × novo)
+
+| Situação | VOKE em leitura (rolando) | Porta 04 em leitura (telas) |
+|---|---|---|
+| Celular, CPU 6× mais lenta | 127,1 → 127,0 | 127,0 → 126,9 |
+| Computador, CPU 6× mais lenta | 42,6 → 43,7 | 43,6 → 44,7 |
+| Celular sem placa de vídeo (caso extremo) | 2,60 → 2,60 | 1,45 → 1,33 (−8%) |
+
+A rolagem não pesa no JavaScript. Só o caso extremo, com tudo desenhado pela CPU, perde 8% com a pilha de telas: é o custo de uma textura a mais.
