@@ -1,0 +1,232 @@
+{
+ "voke-home": {
+  "nome": "voke-home",
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://www.vokewear.com.br",
+  "alturaCss": 6144,
+  "fatias": 7,
+  "r960": 4096,
+  "r640": 2731,
+  "capturado": "2026-11-12"
+ },
+ "voke-produto": {
+  "nome": "voke-produto",
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://www.vokewear.com.br/p/conjunto-aura-halter-flare-preto",
+  "alturaCss": 3208,
+  "fatias": 4,
+  "r960": 2139,
+  "r640": 1426,
+  "capturado": "2026-11-12"
+ },
+ "bendita-home": {
+  "nome": "bendita-home",
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://benditaacessorios.com",
+  "alturaCss": 6144,
+  "fatias": 7,
+  "r960": 4096,
+  "r640": 2731,
+  "capturado": "2026-11-12"
+ },
+ "bendita-produto": {
+  "nome": "bendita-produto",
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://benditaacessorios.com/product/anel-aurora-tamanho-20",
+  "alturaCss": 1968,
+  "fatias": 3,
+  "r960": 1312,
+  "r640": 875,
+  "capturado": "2026-11-12"
+ },
+ "besten-home": {
+  "nome": "besten-home",
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://besten-site.vercel.app",
+  "alturaCss": 6144,
+  "fatias": 7,
+  "r960": 4096,
+  "r640": 2731,
+  "capturado": "2026-11-12"
+ },
+ "besten-servicos": {
+  "nome": "besten-servicos",
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://besten-site.vercel.app/servicos",
+  "alturaCss": 2170,
+  "fatias": 3,
+  "r960": 1447,
+  "r640": 964,
+  "capturado": "2026-11-12"
+ },
+ "techtrainer-home": {
+  "nome": "techtrainer-home",
+  "tipo": "telas",
+  "telas": 6,
+  "url": "https://studiotechtrainer.com.br",
+  "alturaCss": 12600,
+  "fatias": 14,
+  "r960": 3780,
+  "r640": 2520,
+  "capturado": "2026-11-12"
+ },
+ "cmms-site": {
+  "nome": "cmms-site",
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://maintor.com.br",
+  "alturaCss": 6144,
+  "fatias": 7,
+  "r960": 4096,
+  "r640": 2731,
+  "capturado": "2026-11-12"
+ },
+ "fit-site": {
+  "nome": "fit-site",
+  "tipo": "telas",
+  "telas": 6,
+  "url": "https://maintorfit.com",
+  "alturaCss": 12600,
+  "fatias": 14,
+  "r960": 3780,
+  "r640": 2520,
+  "capturado": "2026-11-12"
+ },
+ "horaqui-site": {
+  "nome": "horaqui-site",
+  "tipo": "telas",
+  "telas": 6,
+  "url": "https://www.horaqui.com.br",
+  "alturaCss": 12600,
+  "fatias": 14,
+  "r960": 3780,
+  "r640": 2520,
+  "capturado": "2026-11-12"
+ },
+ "rh-telas": {
+  "nome": "rh-telas",
+  "tipo": "telas",
+  "telas": 2,
+  "aspecto": 1.6,
+  "r960": [
+   960,
+   1236
+  ],
+  "r640": [
+   640,
+   824
+  ],
+  "capturado": "2026-11-12"
+ },
+ "task-telas": {
+  "nome": "task-telas",
+  "tipo": "telas",
+  "telas": 2,
+  "aspecto": 1.6,
+  "r960": [
+   960,
+   1236
+  ],
+  "r640": [
+   640,
+   824
+  ],
+  "capturado": "2026-11-12"
+ },
+ "cmms-telas": {
+  "nome": "cmms-telas",
+  "tipo": "telas",
+  "telas": 5,
+  "aspecto": 1.6,
+  "r960": [
+   960,
+   3144
+  ],
+  "r640": [
+   640,
+   2096
+  ],
+  "capturado": "2026-11-12"
+ },
+ "besten-portal": {
+  "nome": "besten-portal",
+  "tipo": "telas",
+  "telas": 3,
+  "aspecto": 1.6,
+  "r960": [
+   960,
+   1872
+  ],
+  "r640": [
+   640,
+   1248
+  ],
+  "capturado": "2026-11-12"
+ },
+ "sistemas-telas": {
+  "nome": "sistemas-telas",
+  "tipo": "telas",
+  "telas": 5,
+  "aspecto": 1.6,
+  "r960": [
+   960,
+   3144
+  ],
+  "r640": [
+   640,
+   2096
+  ],
+  "capturado": "2026-11-12"
+ },
+ "fit-app": {
+  "nome": "fit-app",
+  "tipo": "telas",
+  "telas": 4,
+  "aspecto": 0.4621,
+  "r960": [
+   452,
+   4089
+  ],
+  "r640": [
+   452,
+   4089
+  ],
+  "capturado": "2026-11-12"
+ },
+ "flow-posts": {
+  "nome": "flow-posts",
+  "tipo": "telas",
+  "telas": 4,
+  "aspecto": 0.8,
+  "r960": [
+   783,
+   4093
+  ],
+  "r640": [
+   640,
+   3344
+  ],
+  "capturado": "2026-11-12"
+ },
+ "flow-feed": {
+  "nome": "flow-feed",
+  "tipo": "feed",
+  "telas": null,
+  "aspecto": 1,
+  "r960": [
+   960,
+   1932
+  ],
+  "r640": [
+   640,
+   1288
+  ],
+  "capturado": "2026-11-12"
+ }
+}
