@@ -1609,6 +1609,10 @@ html.expo-pronta .porta-btn { background: rgba(13, 38, 38, .72); -webkit-backdro
 @media (min-width: 821px) {
   html.expo-pronta .obra-legenda { opacity: 0; pointer-events: none; transition: opacity .45s ease; }
   html.expo-pronta .obra.em-foco .obra-legenda { opacity: 1; pointer-events: auto; }
+  /* 12/11: a legenda já vem centrada pelo artigo e o translateY(-50%) a sobe mais meia altura (termina no meio da
+     tela). As longas (portas da Ala 02, Caminhos da Ala 03) subiam para baixo do cabeçalho — a da Consultoria
+     começava fora da tela. Agora sobem no máximo até 84 px do topo; as curtas ficam onde estavam. */
+  html.expo-pronta .obra-legenda { transform: translateY(max(-50%, calc(50% - 50vh + 84px))); }
 }
 /* 12/11: quem navega pelo teclado nunca fica com o foco num link invisível — com o foco dentro, a legenda aparece
    (no celular e no computador), mesmo que o quadro ainda não tenha chegado na posição de leitura */

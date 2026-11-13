@@ -411,8 +411,60 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const obras = [...document.querySelectorAll('article.obra[data-img]')].map((el) => ({
       // no computador a HD (1920 px); no celular a de 1280 (06/11: a de 720 ficava borrada na tela 2x)
       el, src: (celular ? el.dataset.imgHd?.replace('-1920.webp', '-1280.webp') : el.dataset.imgHd) || el.dataset.img, w: parseFloat(el.dataset.w || '5'), lado: parseInt(el.dataset.lado || '1', 10),
-      hd: celular ? el.dataset.imgHd : null, tela: null, grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0, fs: 0, ws: 0, foco: false, ps: 1,
+      // (12/11) quadros que rolam não trocam para a HD: a faixa que rola já chega quando eles se aproximam
+      hd: celular && !el.dataset.rolagem ? el.dataset.imgHd : null, tela: null,
+      rol: el.dataset.rolagem ? { base: el.dataset.rolagem, modo: el.dataset.rolagemModo || 'pagina', n: parseInt(el.dataset.rolagemN || '0', 10), tex: null, carregando: false, falhou: false, t: 0, frac: 0, janela: 1 } : null, grupo: new THREE.Group(), parede: { pos: new THREE.Vector3(), quat: new THREE.Quaternion() }, topo: 0, alt: 1, f: 0, fs: 0, ws: 0, foco: false, ps: 1,
     }))
+    /* 12/11 — TELAS QUE ROLAM. Quadros com data-rolagem mostram o site (ou o sistema) andando: na parede, a primeira
+       tela; perto, baixa a faixa alta (testes/capturar-rolagem.mjs); em leitura, a faixa corre dentro do quadro —
+       "pagina" desce devagar, com pausa no topo e no fim; "telas" passa de uma tela para a outra. Longe, a faixa é
+       descartada e volta a primeira tela (um celular não aguenta todas na memória). */
+    const ROL = { vel: 0.22, pausaTopo: 1.8, pausaFim: 1.6, volta: 1.4, segura: 2.6, desliza: 0.8 }
+    const linhaDoTempo = (r, t) => {
+      if (r.modo === 'telas' && r.n > 1) {
+        const ciclo = r.n * ROL.segura + (r.n - 1) * ROL.desliza + ROL.volta
+        let tt = t % ciclo
+        for (let k = 0; k < r.n; k++) {
+          if (tt < ROL.segura) return k / (r.n - 1)
+          tt -= ROL.segura
+          if (k < r.n - 1) { if (tt < ROL.desliza) return (k + easeInOut(tt / ROL.desliza)) / (r.n - 1); tt -= ROL.desliza }
+        }
+        return 1 - easeInOut(Math.min(1, tt / ROL.volta))
+      }
+      const corre = Math.max(1.5, (1 / r.janela - 1) / ROL.vel), ciclo = ROL.pausaTopo + corre + ROL.pausaFim + ROL.volta
+      const tt = t % ciclo
+      if (tt < ROL.pausaTopo) return 0
+      if (tt < ROL.pausaTopo + corre) return suave(0, 1, (tt - ROL.pausaTopo) / corre)
+      if (tt < ROL.pausaTopo + corre + ROL.pausaFim) return 1
+      return 1 - easeInOut((tt - ROL.pausaTopo - corre - ROL.pausaFim) / ROL.volta)
+    }
+    const rolar = (o, f, dt) => {
+      const r = o.rol, dz = Math.abs(o.parede.pos.z - cam.position.z)
+      // baixa quando quem anda começa a virar o rosto para o quadro (o.ws) — 1 ou 2 faixas na memória por vez
+      if (!r.tex && !r.carregando && !r.falhou && (f > 0.001 || o.ws > 0.02)) {
+        r.carregando = true
+        // a imagem é decodificada antes de virar textura (decode() fora da thread principal): sem tranco ao chegar
+        const img = new Image(); img.crossOrigin = 'anonymous'; img.src = `${r.base}-r${celular ? 640 : 960}.webp`
+        img.decode().then(() => {
+          r.carregando = false
+          if (!vivo || !o.tela) return
+          const tx = new THREE.Texture(img)
+          tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = maxAniso; tx.generateMipmaps = true; tx.minFilter = THREE.LinearMipmapLinearFilter; tx.needsUpdate = true
+          // a janela do quadro: a largura toda da faixa e a altura que cabe na proporção do quadro
+          r.janela = Math.min(1, (img.naturalWidth * (o.h / o.w)) / img.naturalHeight)
+          tx.repeat.set(1, r.janela); tx.offset.set(0, 1 - r.janela)
+          r.tex = tx; r.frac = 0; o.tela.material.map = tx; o.tela.material.needsUpdate = true
+        }).catch(() => { r.carregando = false; r.falhou = true })
+      }
+      if (!r.tex) return
+      if (f <= 0.001 && o.ws < 0.01 && dz > 18) { o.tela.material.map = o.tex0; o.tela.material.needsUpdate = true; r.tex.dispose(); r.tex = null; r.t = 0; return }
+      const lendo = f > 0.6
+      if (lendo) r.t += dt; else r.t = 0
+      const alvo = lendo ? linhaDoTempo(r, r.t) : 0
+      r.frac += (alvo - r.frac) * Math.min(1, dt * (lendo ? 8 : 2.5))
+      r.tex.offset.y = (1 - r.janela) * (1 - r.frac)
+    }
+
     for (const o of obras) {
       cena.add(o.grupo)
       loader.load(o.src, (tex) => {
@@ -422,6 +474,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         tex.generateMipmaps = true; tex.minFilter = THREE.LinearMipmapLinearFilter; tex.magFilter = THREE.LinearFilter
         const h = o.w * (tex.image.height / tex.image.width)
         o.h = h // (12/11) para caber entre o cabeçalho e a legenda no celular
+        o.tex0 = tex // a primeira tela (volta para ela quando a faixa que rola é descartada)
         const moldura = new THREE.Mesh(new THREE.BoxGeometry(o.w + 0.18, h + 0.18, 0.09), matLatao)
         moldura.position.z = -0.045; moldura.castShadow = !celular
         const passe = new THREE.Mesh(new THREE.BoxGeometry(o.w + 0.08, h + 0.08, 0.06), new THREE.MeshStandardMaterial({ color: 0x0b1f1f, roughness: 0.9 }))
@@ -971,6 +1024,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         o.grupo.visible = pe > 0.02 && (f > 0.001 || Math.abs(o.parede.pos.z - cam.position.z) < LONGE)
         const focoObra = f > 0.72
         if (focoObra !== o.foco) { o.foco = focoObra; o.el.classList.toggle('em-foco', focoObra) }
+        if (o.rol && o.tela) rolar(o, f, dt)
         // 09/11: no celular, o quadro que chega na leitura troca para a imagem grande (1920 px) — só ele
         if (f > 0.3 && o.hd && o.tela) {
           const url = o.hd; o.hd = null
@@ -992,6 +1046,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         o.grupo.quaternion.slerpQuaternions(o.parede.quat, cam.quaternion, suave(0, 0.85, e))
         balanco.setFromAxisAngle(eixoZ, Math.sin(Math.PI * e) * 0.07 * o.lado); o.grupo.quaternion.multiply(balanco)
         let escAlvo = Math.min(1, (largVisivel * (retrato ? 0.9 : 0.5)) / o.w)
+        // 12/11: no computador, um quadro em pé (o app do Caminho 2) também cabe na altura — os deitados não mudam
+        if (!retrato && o.h) escAlvo = Math.min(escAlvo, (2 * dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * 0.74) / (o.h + 0.5))
         /* 12/11 (Fase 5): no celular o quadro em leitura cabe INTEIRO entre o cabeçalho e o topo da legenda (antes
            a legenda podia cobrir a base do quadro, em telas mais baixas como 360×740): centro e altura saem da faixa
            livre medida a cada quadro, com amortecimento */

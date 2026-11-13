@@ -22,7 +22,9 @@ const servir = (raiz, porta) => new Promise((ok) => {
 const VERSOES = [{ nome: 'publicado', raiz: path.resolve(SITE, '..'), porta: 4396 }, { nome: 'novo', raiz: path.join(SITE, 'dist'), porta: 4397 }]
 for (const v of VERSOES) v.srv = await servir(v.raiz, v.porta)
 // as mesmas três telas nas duas versões: abertura, uma obra em leitura e a entrada do saguão
-const TELAS_DE_ROLAGEM = [['abertura', () => 0], ['obra em leitura (VOKE)', () => { const r = document.querySelector('#obra-voke').getBoundingClientRect(); return scrollY + r.top + r.height / 2 - innerHeight / 2 }], ['entrada da Ala 02', () => { const r = document.querySelector('#problemas').getBoundingClientRect(); return scrollY + r.top - innerHeight * 0.1 }]]
+const TELAS_DE_ROLAGEM = [['abertura', () => 0], ['obra em leitura (VOKE)', () => { const r = document.querySelector('#obra-voke').getBoundingClientRect(); return scrollY + r.top + r.height / 2 - innerHeight / 2 }], ['entrada da Ala 02', () => { const r = document.querySelector('#problemas').getBoundingClientRect(); return scrollY + r.top - innerHeight * 0.1 }],
+  // 12/11: telas que rolam — a porta 04 passa 5 telas do CMMS (no site publicado antes de 12/11 é uma foto parada)
+  ['obra em leitura (porta 04, telas)', () => { const r = document.querySelector('#obra-p-manut').getBoundingClientRect(); return scrollY + r.top + r.height / 2 - innerHeight / 2 }]]
 const MODOS = [
   { nome: 'sem placa de vídeo · celular 390×844', gl: 'swiftshader', cpu: 1, tela: { w: 390, h: 844, dsf: 2, celular: true }, espera: 22000, janela: 8000 },
   { nome: 'CPU 6× mais lenta · celular 390×844', gl: 'gpu', cpu: 6, tela: { w: 390, h: 844, dsf: 2, celular: true }, espera: 5000, janela: 4000 },

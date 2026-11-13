@@ -689,7 +689,8 @@ export default function App() {
                         </div>
                       </div>
                     )}
-                    <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} data-img={o.img} data-img-hd={imagemHD(o.img)} data-w={o.w} data-lado={i % 2 ? 1 : -1}>
+                    <article className={`obra${i % 2 ? ' obra-dir' : ''}`} id={`obra-${o.id}`} data-img={o.img} data-img-hd={imagemHD(o.img)} data-w={o.w} data-lado={i % 2 ? 1 : -1}
+                      data-rolagem={o.rolagem?.base} data-rolagem-modo={o.rolagem?.modo} data-rolagem-n={o.rolagem?.n}>
                       <div className="wrap">
                         <div className="obra-legenda">
                           <img src={o.img} className={o.amostras || o.videos ? 'so-3d' : undefined} alt={o.grupo ? `Tela do projeto ${o.titulo}` : ''} width="720" height="450" loading="lazy" decoding="async" />
