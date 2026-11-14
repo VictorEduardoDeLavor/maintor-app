@@ -43,9 +43,11 @@ const T = (n) => path.join(ESTUDIO, 'telas', n), FIT = (n) => path.join(ESTUDIO,
 const PILHAS = [
   { nome: 'rh-telas', aspecto: 1.6, telas: [PF('rh-painel-1280.webp'), PF('rh-relatorios-1280.webp')] },
   { nome: 'task-telas', aspecto: 1.6, telas: [PF('task-indicadores-1280.webp'), PF('task-relatorios-1280.webp')] },
-  { nome: 'cmms-telas', aspecto: 1.6, telas: [T('01_dashboard.png'), T('02_ordens_servico.png'), T('06_calendario_preventivas.png'), T('05_historico_ativo.png'), T('08_estoque.png')] },
+  // 14/11: as telas do CMMS são 16:9 (em 1,6 o recorte comia 5% de cada lado — "ns de Serviço")
+  { nome: 'cmms-telas', aspecto: 16 / 9, telas: [T('01_dashboard.png'), T('02_ordens_servico.png'), T('06_calendario_preventivas.png'), T('05_historico_ativo.png'), T('08_estoque.png')] },
   { nome: 'besten-portal', aspecto: 1.6, telas: [PF('besten-kpis-1920.webp'), PF('besten-biblioteca-1920.webp'), PF('besten-onboarding-1920.webp')] },
-  { nome: 'sistemas-telas', aspecto: 1.6, telas: [T('02_ordens_servico.png'), PF('task-indicadores-1280.webp'), PF('rh-painel-1280.webp'), PF('besten-kpis-1920.webp'), T('06_calendario_preventivas.png')] },
+  // 14/11: mistura 16:9 (CMMS) com 1,6 (Task, RH, Besten): quadro em 16:9 e cada tela INTEIRA, com faixa escura dos lados
+  { nome: 'sistemas-telas', aspecto: 16 / 9, conter: true, telas: [T('02_ordens_servico.png'), PF('task-indicadores-1280.webp'), PF('rh-painel-1280.webp'), PF('besten-kpis-1920.webp'), T('06_calendario_preventivas.png')] },
   // o app com a marca do profissional (conta de demonstração "CR Performance"), em formato de celular
   { nome: 'fit-app', aspecto: 1170 / 2532, telas: [FIT('c2_marca_pro.png'), FIT('c2_home_aluno.png'), FIT('c2_painel_pro.png'), FIT('c3_em_risco.png')],
     // a tela "Minha marca" mostra o endereço de teste do ambiente de desenvolvimento: coberto (coordenadas na imagem original)
@@ -63,12 +65,18 @@ const gravar = (arq, dataUrl) => writeFileSync(path.join(SAIDA, arq), Buffer.fro
 const dataUrl = (arq) => `data:image/${arq.endsWith('.png') ? 'png' : arq.endsWith('.jpg') ? 'jpeg' : 'webp'};base64,${readFileSync(arq).toString('base64')}`
 
 // ---------- montagem no canvas (roda dentro da página "oficina") ----------
-async function montar({ fontes, tipo, aspecto, grade, tapar, fundo, maxAltura }) {
+async function montar({ fontes, tipo, aspecto, grade, tapar, fundo, maxAltura, conter }) {
   const imgs = await Promise.all(fontes.map((s) => new Promise((ok, erro) => { const i = new Image(); i.onload = () => ok(i); i.onerror = erro; i.src = s })))
   const exp = (c, q = 0.86) => c.toDataURL('image/webp', q)
   const canvas = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h })
   // desenha a imagem cobrindo o quadro (âncora no topo), como object-fit: cover; object-position: top
   const cobrir = (g, img, x, y, w, h) => { const s = Math.max(w / img.width, h / img.height), sw = w / s, sh = h / s; g.drawImage(img, (img.width - sw) / 2, 0, sw, sh, x, y, w, h) }
+  // conter: a tela inteira dentro do quadro, centrada, com o fundo nas sobras (como object-fit: contain)
+  const encaixar = (g, img, x, y, w, h) => {
+    if (!conter) return cobrir(g, img, x, y, w, h)
+    const s = Math.min(w / img.width, h / img.height), dw = img.width * s, dh = img.height * s
+    g.fillStyle = fundo; g.fillRect(x, y, w, h); g.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh)
+  }
   // as telas cobertas de cada imagem (o endereço de teste, por exemplo)
   const limpas = imgs.map((img, k) => {
     if (!tapar?.[k]) return img
@@ -100,10 +108,10 @@ async function montar({ fontes, tipo, aspecto, grade, tapar, fundo, maxAltura })
     const hTela = Math.round(W / aspecto), vao = Math.round(hTela * 0.06)
     const n = Math.max(1, Math.min(limpas.length, Math.floor((maxAltura + vao) / (hTela + vao))))
     const H = n * hTela + (n - 1) * vao, c = canvas(W, H), g = c.getContext('2d'); g.fillStyle = fundo; g.fillRect(0, 0, W, H)
-    for (let k = 0; k < n; k++) cobrir(g, limpas[k], 0, k * (hTela + vao), W, hTela)
+    for (let k = 0; k < n; k++) encaixar(g, limpas[k], 0, k * (hTela + vao), W, hTela)
     return { c, n, passo: (hTela + vao) / H, telaAltura: hTela }
   }
-  for (const [suf, W] of [['720', 720], ['1280', 1280]]) { const c = canvas(W, Math.round(W / aspecto)); cobrir(c.getContext('2d'), limpas[0], 0, 0, c.width, c.height); saida[suf] = exp(c) }
+  for (const [suf, W] of [['720', 720], ['1280', 1280]]) { const c = canvas(W, Math.round(W / aspecto)); encaixar(c.getContext('2d'), limpas[0], 0, 0, c.width, c.height); saida[suf] = exp(c) }
   for (const [suf, W0] of [['r960', 960], ['r640', 640]]) {
     // telas altas e estreitas (celular): a largura cai até as telas caberem no limite de altura
     let W = W0; if (!grade) { const porTela = 1 / aspecto * 1.06; W = Math.min(W0, Math.floor(maxAltura / (porTela * Math.min(limpas.length, 4) - 0.06 / aspecto))) }
@@ -196,7 +204,7 @@ for (const pg of PAGINAS.filter((x) => !SO || SO.includes(x.nome))) {
 }
 for (const pl of PILHAS.filter((x) => !SO || SO.includes(x.nome))) {
   const fontes = pl.telas.map((arq) => { if (!existsSync(arq)) throw new Error('tela não encontrada: ' + arq); return dataUrl(arq) })
-  const s = await oficina.evaluate(montar, { fontes, tipo: 'telas', aspecto: pl.aspecto, grade: pl.grade, tapar: pl.tapar, maxAltura: MAX_ALTURA, fundo: FUNDO })
+  const s = await oficina.evaluate(montar, { fontes, tipo: 'telas', aspecto: pl.aspecto, grade: pl.grade, tapar: pl.tapar, conter: pl.conter, maxAltura: MAX_ALTURA, fundo: FUNDO })
   for (const suf of ['720', '1280', 'r960', 'r640']) gravar(`${pl.nome}-${suf}.webp`, s[suf])
   relatorio.push({ nome: pl.nome, tipo: pl.grade ? 'feed' : 'telas', telas: s.n, aspecto: +pl.aspecto.toFixed(4), r960: [s.r960largura, s.r960altura], r640: [s.r640largura, s.r640altura] })
   console.log(`ok ${pl.nome}: ${s.n || 'feed'} telas → ${s.r960largura}×${s.r960altura} (960) · ${s.r640largura}×${s.r640altura} (640)`)

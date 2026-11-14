@@ -91,6 +91,13 @@ As notas abaixo dos quadros trocaram "Imagem ilustrativa" por "Na tela, …", di
    Agora sobem no máximo até 84 px do topo. As curtas não mudaram de lugar. A produção atual tem esse defeito.
 2. **Quadro em pé estourando a altura.** Antes não havia quadro em pé. O do Caminho 2 passou a caber entre o cabeçalho e a barra do guia, com um limite de altura que só afeta quadros em pé.
 
+### Correção de 14/11, depois de publicado
+
+As telas do CMMS são 16:9. Montadas em 1,6, perdiam 5% de cada lado: "ns de Serviço" no lugar de "Ordens de Serviço".
+
+- **Porta 04:** a pilha agora é 16:9, sem corte.
+- **Caminho 1:** mistura CMMS (16:9) com Task, RH e Besten (1,6). Ficou em 16:9 com cada tela inteira e uma faixa escura fina dos lados, nas telas de 1,6.
+
 ## 5. Verificação
 
 Todos os aceites rodaram contra o build de produção (`npm run build`, com prerender):
