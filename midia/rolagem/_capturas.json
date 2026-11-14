@@ -143,16 +143,16 @@
   "nome": "cmms-telas",
   "tipo": "telas",
   "telas": 5,
-  "aspecto": 1.6,
+  "aspecto": 1.7778,
   "r960": [
    960,
-   3144
+   2828
   ],
   "r640": [
    640,
-   2096
+   1888
   ],
-  "capturado": "2026-11-12"
+  "capturado": "2026-11-14"
  },
  "besten-portal": {
   "nome": "besten-portal",
@@ -173,16 +173,16 @@
   "nome": "sistemas-telas",
   "tipo": "telas",
   "telas": 5,
-  "aspecto": 1.6,
+  "aspecto": 1.7778,
   "r960": [
    960,
-   3144
+   2828
   ],
   "r640": [
    640,
-   2096
+   1888
   ],
-  "capturado": "2026-11-12"
+  "capturado": "2026-11-14"
  },
  "fit-app": {
   "nome": "fit-app",
