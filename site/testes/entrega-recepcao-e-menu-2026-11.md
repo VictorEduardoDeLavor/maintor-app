@@ -135,9 +135,29 @@ Dois problemas que os testes pegaram e foram corrigidos antes do checkpoint:
 - A régua da Ala 01 quebrava em duas linhas no celular de 360 px (o texto "12 projetos" é mais longo).
 - Os títulos clicáveis do painel do menu tinham menos de 40 px de altura para o toque.
 
+## 7b. Rodada de 15–16/11: narrativa das páginas internas
+
+Li as 22 páginas. O corpo já seguia um roteiro (dor → o que vem → como funciona → regra da casa → perguntas → chamada). Reescrevi onde a narrativa perdia o visitante:
+
+| Frente | Antes | Depois |
+|---|---|---|
+| Abertura das 16 páginas de serviço | Botão único "Conversar no WhatsApp" e a nota "Primeira conversa sem compromisso" | O botão diz o que a pessoa faz, a nota diz o que ela recebe de volta, e um segundo botão leva a um projeto no ar. Exemplo em Sites: "Mandar o que eu tenho hoje" · "Eu devolvo três coisas que mudaria primeiro" · "Ver três sites no ar" |
+| Prova em Loja virtual | Só a VOKE | Três lojas: VOKE WEAR, Maktub Conquista e Bendita |
+| Prova em Sites | "Este site" | Três clientes (Studio TechTrainer, Alves & Oliveira, Besten) e este site |
+| Página de clínicas | SorrIA como promessa, sem cliente | Alves & Oliveira como site no ar e SorrIA como sistema em operação |
+| Sistemas, automação e marketing | Sem exemplo no ar | SorrIA e Horaqui em sistemas; agendamento do TechTrainer e Horaqui em automação; vídeos de clientes em marketing |
+| Índice de guias | "Três guias" | Quatro guias (faltava o do sistema do nicho) |
+| Primeira tela no computador | Título em seis linhas, botões fora da tela | Botão principal à vista sem rolar, em 1440×900 e 1366×768 |
+
+Não mexi em "Como funciona", "A regra da casa", perguntas frequentes nem nas chamadas finais: já eram específicas de cada serviço. O endereço e a mensagem do WhatsApp de cada página não mudaram.
+
+O `aceite-menu.mjs` passou a ter 22 verificações: as 16 aberturas com duas ações e a oferta na nota, e o botão principal na primeira tela.
+
+Bateria completa no build desta rodada (16/11): home 104/104 · menu 22/22 · fluxos 25/25 · portas 65/65 · revender 71/71 · rolagem 25/25 · limpeza 0 falhas em 51. Publicado em 16/11/2026, com o "pode publicar" do Victor.
+
 ## 8. Pontos para o Victor conferir
 
 1. **Frase da Alves & Oliveira.** O quadro diz que o site tem "o pedido de uma prévia do sorriso". A nota do SorrIA diz: "Na tela, a entrada do SorrIA e o pedido de prévia do sorriso no site da Alves & Oliveira." Não afirmei que a clínica usa o SorrIA no dia a dia. Se usa, dá para dizer isso com todas as letras.
 2. **Telas de dentro do SorrIA.** Só capturei a entrada do sistema, que é pública. Para mostrar agenda, proposta e financeiro, preciso de uma conta de demonstração.
 3. **Site da Alves & Oliveira sem link externo.** Ele ainda está num endereço provisório. O botão do quadro leva à página "Site para clínicas". Quando o domínio da clínica estiver no ar, entra o "Visitar site".
-4. **Textos das páginas internas.** Não reescrevi o corpo de nenhuma. Se quiser uma revisão de narrativa página por página, é uma rodada à parte.
+4. **Textos das páginas internas.** Reescritos na rodada de 15–16/11 (seção 7b).
