@@ -18,7 +18,7 @@ Decisões dele no mesmo dia:
 | Ala 02 | "Você conta, a gente constrói" |
 | Trabalhos que estavam fora do site | Entram Maktub Conquista, Alves & Oliveira e SorrIA (em operação). Autorização de todos confirmada por ele. |
 
-Base publicada antes do trabalho: deploy `38ece42`. **Nada foi commitado nem publicado.** A publicação depende do "pode publicar".
+Base publicada antes do trabalho: deploy `38ece42`. Publicado em 15/11/2026, com o "pode publicar" do Victor.
 
 ## 1. Abertura: o Victor recebe
 
@@ -119,6 +119,16 @@ Testes novos ou reescritos nesta rodada:
 - **Ala 02:** ordem nova das portas, os três passos e a saída "Meu caso é outro".
 - **Menu:** as 22 páginas internas com o menu do site; o painel lista os 39 links; nada fica fora; abre e fecha no celular e no computador; área de toque de 40 px ou mais.
 - **Próximo passo:** o bloco "Veja funcionando" existe em todas as páginas e só aponta para obras e páginas que existem.
+
+### Quadros por segundo (`testes/medir-fps.mjs --vezes=3`, publicado × novo)
+
+| Situação | Abertura | VOKE em leitura | Entrada da Ala 02 | Porta de manutenção (telas) |
+|---|---|---|---|---|
+| Celular, CPU 6× mais lenta | 49,2 → 40,7 (−17%) | 126,7 → 125,2 | 107,8 → 102,9 (−5%) | 71,2 → 67,8 (−5%) |
+| Computador, CPU 6× mais lenta | 30,2 → 32,9 (+9%) | 29,2 → 25,2 (−14%) | 41,2 → 33,4 (−19%) | 20,9 → 19,6 (−6%) |
+| Celular sem placa de vídeo (caso extremo) | 2,08 → 2,07 | 2,31 → 2,40 | 2,73 → 2,84 | 1,08 → 1,11 |
+
+O desenho não ficou mais pesado (sem placa de vídeo, igual ou melhor). Com a CPU freada, alguns pontos caíram até 19%. Parte é custo real: são 3 quadros a mais no corredor e o balão é posicionado a cada quadro. Parte é ruído: esta rodada inteira mediu abaixo da de 13/11 na mesma máquina, que estava ocupada.
 
 Dois problemas que os testes pegaram e foram corrigidos antes do checkpoint:
 
