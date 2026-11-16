@@ -199,3 +199,18 @@ body.pagina .link-mostarda { padding: 10px 0; }
 .pg-trilha .porta-btn i { font-style: normal; color: var(--mostarda); }
 .pg-trilha .trilha-depois { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: var(--s4); }
 .pg-trilha .trilha-depois a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* ---- 15/11: abertura com duas ações — a nota (o que a pessoa recebe de volta) fica na linha de baixo ---- */
+.pg-hero .pg-acoes .nota { flex-basis: 100%; margin-top: -6px; max-width: 46ch; line-height: 1.5; }
+
+/* índice de guias com quatro cartões: dois por linha */
+@media (min-width: 901px) { .pg-cards.pg-cards-quatro { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---- 15/11: no computador o título da abertura ocupava seis linhas e empurrava os botões para fora da primeira
+   tela. Título um pouco menor e coluna um pouco mais larga: a ação fica à vista sem rolar. ---- */
+@media (min-width: 901px) {
+  .pg-hero { padding-top: calc(var(--s6) + 44px); }
+  .pg-hero .pg-h1 { font-size: clamp(40px, 4.2vw, 62px); line-height: 1.04; max-width: 20ch; }
+  .pg-hero .pg-lead { margin-top: var(--s3); }
+  .pg-hero .pg-acoes { margin-top: var(--s4); }
+}

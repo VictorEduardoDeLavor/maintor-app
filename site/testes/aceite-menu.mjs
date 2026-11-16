@@ -7,6 +7,8 @@
 //      todo link do bloco aponta para algo que existe (obra da home ou página do site)
 //   6. os títulos do painel não entram na hierarquia de títulos (a página continua começando no h1)
 //   7. home: o painel abre, fecha e um link de seção leva até a seção
+//   8. abertura das páginas de serviço: duas ações (o WhatsApp da página + um projeto ou página que existe), a nota
+//      diz o que a pessoa recebe de volta (não é mais a frase genérica) e o botão principal cabe na primeira tela
 // Uso (na pasta site/, depois de `npm run build`, com o dist servido em :4175): node testes/aceite-menu.mjs
 import { chromium } from 'file:///C:/Users/victo/AppData/Roaming/npm/node_modules/@playwright/cli/node_modules/playwright/index.mjs'
 import { MENU, TRILHAS } from '../src/menu.js'
@@ -28,7 +30,8 @@ ok(projFora.length === 0, `fonte: os ${ALAS[0].obras.length} projetos da Ala 01 
 
 const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage()
 const erros = []; p.on('pageerror', (e) => erros.push(e.message))
-const ruins = { menu: [], painel: [], whats: [], trilha: [], links: [], titulos: [], atual: [] }
+const ruins = { menu: [], painel: [], whats: [], trilha: [], links: [], titulos: [], atual: [], abertura: [], dobra: [] }
+let comAbertura = 0
 for (const pg of PAGINAS) {
   const r = await p.goto(BASE + pg, { waitUntil: 'domcontentloaded' })
   const d = await p.evaluate(() => ({
@@ -40,7 +43,16 @@ for (const pg of PAGINAS) {
     whatsCorpo: document.querySelector('main a[href*="wa.me/"]')?.href || '',
     trilha: (() => { const t = document.querySelector('.pg-trilha'); if (!t) return null; const cta = document.querySelector('.pg-cta'); return { links: [...t.querySelectorAll('a')].map((a) => a.getAttribute('href')), antesDaChamada: !cta || !!(t.compareDocumentPosition(cta) & Node.DOCUMENT_POSITION_FOLLOWING) } })(),
     titulos: [...document.querySelectorAll('h1, h2, h3, h4')].map((h) => +h.tagName[1]),
+    abertura: (() => { const a = [...document.querySelectorAll('.pg-hero .pg-acoes a')]; if (!a.length) return null; return { hrefs: a.map((x) => x.getAttribute('href')), rotulos: a.map((x) => x.textContent.trim()), nota: document.querySelector('.pg-hero .pg-acoes .nota')?.textContent.trim() || '', base: Math.round(a[0].getBoundingClientRect().bottom), vh: innerHeight } })(),
   }))
+  // 8. a abertura (guias e trilha têm abertura própria, sem a nota: ficam fora)
+  if (d.abertura && d.abertura.nota) {
+    comAbertura++
+    const [wa, ver] = d.abertura.hrefs
+    const verOk = !!ver && (obras.has(ver) || PAGINAS.includes(ver) || ['/#lojas-virtuais', '/#sites', '/#sistemas-e-aplicativos', '/#trabalhos'].includes(ver))
+    if (d.abertura.hrefs.length !== 2 || !wa.includes('wa.me/5511946610634') || !verOk || d.abertura.nota.startsWith('Primeira conversa sem compromisso') || d.abertura.rotulos[0] === 'Conversar no WhatsApp' || !d.abertura.nota.endsWith('Sem compromisso · (11) 94661-0634')) ruins.abertura.push(pg)
+    if (d.abertura.base > d.abertura.vh) ruins.dobra.push(`${pg} (${d.abertura.base} px)`)
+  }
   if (r.status() !== 200 || JSON.stringify(d.grupos) !== JSON.stringify(['Projetos', 'O que fazemos', 'Marketing', 'Guias', 'Contato']) || !d.marca) ruins.menu.push(pg)
   if (linksMenu.some((l) => !d.painel.includes(l))) ruins.painel.push(pg)
   if (!d.atual.includes(pg)) ruins.atual.push(pg)
@@ -55,6 +67,8 @@ ok(ruins.atual.length === 0, `2 · a página atual vem marcada no painel${ruins.
 ok(ruins.whats.length === 0, `3 · o WhatsApp do cabeçalho é o da própria página${ruins.whats.length ? ' — falham: ' + ruins.whats.join(', ') : ''}`)
 ok(ruins.trilha.length === 0, `5 · bloco "Veja funcionando" antes da chamada final em todas${ruins.trilha.length ? ' — falham: ' + ruins.trilha.join(', ') : ''}`)
 ok(ruins.links.length === 0, `5 · todo link do bloco aponta para uma obra ou página que existe${ruins.links.length ? ' — ' + ruins.links.join('; ') : ''}`)
+ok(comAbertura === 16 && ruins.abertura.length === 0, `8 · ${comAbertura} páginas de serviço com duas ações na abertura e a oferta na nota${ruins.abertura.length ? ' — falham: ' + ruins.abertura.join(', ') : ''}`)
+ok(ruins.dobra.length === 0, `8 · computador (1440×900): o botão principal da abertura cabe na primeira tela${ruins.dobra.length ? ' — fora: ' + ruins.dobra.join(', ') : ''}`)
 ok(ruins.titulos.length === 0, `6 · a hierarquia de títulos continua começando no h1${ruins.titulos.length ? ' — falham: ' + ruins.titulos.join(', ') : ''}`)
 
 // 4. abrir e fechar numa página interna — computador

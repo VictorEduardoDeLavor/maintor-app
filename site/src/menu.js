@@ -130,7 +130,7 @@ export const MENU = [
         titulo: 'Por onde começar',
         links: [
           { href: '/por-onde-comecar/', rotulo: 'Seu negócio na internet, na ordem certa', nota: 'Em que etapa você está' },
-          { href: '/guias/', rotulo: 'Todos os guias', nota: 'Leitura de dez minutos cada' },
+          { href: '/guias/', rotulo: 'Todos os guias', nota: 'Leitura curta, sem venda no meio' },
         ],
       },
       {
