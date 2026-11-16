@@ -1,7 +1,7 @@
 // Aceite dos FLUXOS que a revisão independente de 12/11/2026 achou quebrados (limpeza visual, Fase 5).
 // Cada verificação reproduz um cenário real — se alguma voltar a falhar, a regressão voltou:
 //   1. a sala de uma porta é a galeria acesa, mesmo entrando pela lista (o modo LER não fica preso lá dentro)
-//   2. com o painel "Qual é o seu problema?" aberto, o boneco só some enquanto o painel está na tela
+//   2. (15/11) na abertura o boneco recebe o visitante com o balão de fala, que cabe abaixo dos botões e some ao rolar
 //   3. virar o aparelho depois de abrir a página: o letreiro da orientação nova não fica atrás do título
 //   4. link direto /#contato chega no formulário, mesmo com a exposição carregando depois
 //   5. teclado: com o foco num link de legenda, a legenda está visível
@@ -49,15 +49,26 @@ const cruza = (a, c) => a.left < c.right && a.right > c.left && a.top < c.bottom
   ok(erros.length === 0, `1 · sem erro de JavaScript (${erros.join(' | ')})`)
   await ctx.close()
 }
-// 2. boneco com o painel aberto
-{
-  const { ctx, p } = await abrir(CEL); await pronta(p); await p.waitForTimeout(2500)
-  await p.locator('.pergunta-gatilho').tap(); await p.waitForTimeout(2000)
-  const naAbertura = await p.evaluate(() => window.__guia.scale.x)
-  await rolarPara(p, '#sistemas .regua', 0.16); await p.waitForTimeout(4000)
-  const naAla03 = await p.evaluate(() => ({ esc: window.__guia.scale.x, aberto: !!document.querySelector('.pergunta-painel.aberta') }))
-  ok(naAbertura < 0.1, `2 · com o painel aberto na tela, o boneco sai de cena (escala ${naAbertura.toFixed(3)})`)
-  ok(naAla03.aberto && naAla03.esc > 0.5, `2 · com o painel ainda aberto mas fora da tela, o boneco volta (escala ${naAla03.esc.toFixed(2)} na Ala 03)`)
+// 2. a recepção: boneco e balão de fala na abertura (15/11 — no lugar da placa "Qual é o seu problema?")
+for (const [nome, opts] of [['celular', CEL], ['celular baixo (360×640)', { ...CEL, viewport: { width: 360, height: 640 } }], ['computador', PC]]) {
+  const { ctx, p } = await abrir(opts); await pronta(p); await p.waitForTimeout(3500)
+  const medir = () => p.evaluate(() => {
+    const s = window.__expoSonda(), v = new s.T.Vector3(), cx = new s.T.Box3()
+    const tela = s.balao.children[0]; cx.setFromObject(tela)
+    const ys = [], xs = []
+    for (const x of [cx.min.x, cx.max.x]) for (const y of [cx.min.y, cx.max.y]) for (const z of [cx.min.z, cx.max.z]) { v.set(x, y, z).project(s.cam); xs.push((v.x + 1) / 2 * innerWidth); ys.push((1 - v.y) / 2 * innerHeight) }
+    const ctas = document.querySelector('.entrada-ctas').getBoundingClientRect(), apoio = document.querySelector('.entrada-oferta').getBoundingClientRect()
+    return { visivel: s.balao.visible, boneco: s.guia.raiz.scale.x, topo: Math.min(...ys), base: Math.max(...ys), esq: Math.min(...xs), dir: Math.max(...xs), ctasBase: ctas.bottom, textoDir: apoio.right, vw: innerWidth, vh: innerHeight }
+  })
+  const a = await medir()
+  ok(a.boneco > 0.9, `2 · ${nome}: o boneco está de pé na abertura (escala ${a.boneco.toFixed(2)})`)
+  if (a.visivel) {
+    const livre = opts.isMobile ? a.topo >= a.ctasBase + 4 : a.esq >= a.textoDir - 4
+    ok(livre && a.esq >= 0 && a.dir <= a.vw + 1 && a.base <= a.vh + 1 && a.dir - a.esq >= 185, `2 · ${nome}: o balão cabe na tela sem cobrir o texto nem os botões (${Math.round(a.esq)}–${Math.round(a.dir)} × ${Math.round(a.topo)}–${Math.round(a.base)} px)`)
+  } else ok(!!opts.isMobile, `2 · ${nome}: sem espaço para um balão legível, ele não aparece (o botão "Começar o tour" continua na tela)`)
+  await rolarPara(p, '#sistemas .regua', 0.16); await p.waitForTimeout(3000)
+  const b2 = await medir()
+  ok(!b2.visivel, `2 · ${nome}: o balão some quando o passeio começa`)
   await ctx.close()
 }
 // 3. virar o aparelho
@@ -95,7 +106,7 @@ for (const [de, para, nome] of [[{ width: 844, height: 390 }, { width: 390, heig
   ok(op > 0.95, `5 · teclado: com o foco num link da legenda, a legenda fica visível (opacidade ${op.toFixed(2)})`)
   await p.evaluate(() => document.activeElement?.blur())
   // 6: setas sem obra em foco (no painel do grupo 1)
-  await rolarPara(p, '#projetos-clientes .grupo-painel', 0.36); await p.waitForTimeout(2500)
+  await rolarPara(p, '#lojas-virtuais .grupo-painel', 0.36); await p.waitForTimeout(2500)
   const y0 = await p.evaluate(() => scrollY)
   await p.keyboard.press('ArrowRight'); await p.waitForTimeout(2500)
   const y1 = await p.evaluate(() => scrollY)

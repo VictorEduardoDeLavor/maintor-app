@@ -67,13 +67,13 @@ function placasSobreTexto() {
 {
   const { ctx, p, erros } = await abrir({ w: 390, h: 844, celular: true })
   await irPara(p, 'lista'); await p.waitForTimeout(3500)
-  ok((await p.locator('#problemas .portas-lista .porta-btn').count()) === 7, 'celular: a lista tem 7 botões')
-  const caixas = await p.evaluate(() => [...document.querySelectorAll('#problemas .portas-lista .porta-btn')].map((el) => { const r = el.getBoundingClientRect(); return { h: r.height, dentro: r.left >= 0 && r.right <= innerWidth } }))
+  ok((await p.locator('#problemas .portas-lista button.porta-btn').count()) === 7, 'celular: a lista tem 7 botões')
+  const caixas = await p.evaluate(() => [...document.querySelectorAll('#problemas .portas-lista button.porta-btn')].map((el) => { const r = el.getBoundingClientRect(); return { h: r.height, dentro: r.left >= 0 && r.right <= innerWidth } }))
   ok(caixas.every((c) => c.h >= 44 && c.dentro), `celular: os 7 botões têm toque ≥ 44 px e cabem na largura (menor altura ${Math.min(...caixas.map((c) => c.h)).toFixed(0)} px)`)
   for (let k = 0; k < 7; k++) {
     const pt = PORTAS[k]
     await irPara(p, 'lista'); await p.waitForTimeout(900)
-    await p.locator('#problemas .portas-lista .porta-btn').nth(k).tap()
+    await p.locator('#problemas .portas-lista button.porta-btn').nth(k).tap()
     const rotulo = await esperarSala(p, k)
     ok(rotulo === `Porta ${k + 1}: ${pt.objetivo}`, `celular · lista: o botão ${k + 1} abre a sala "${pt.objetivo}" (${rotulo})`)
     const d = await p.evaluate(() => ({ micro: document.querySelector('.sala-painel .micro')?.innerText || '', frase: document.querySelector('.sala-painel h2')?.innerText || '', whats: document.querySelector('.sala-painel a.btn')?.href || '', oculto: document.documentElement.classList.contains('em-sala') }))
@@ -85,7 +85,7 @@ function placasSobreTexto() {
   }
   // setas e botões de trocar de porta
   await irPara(p, 'lista'); await p.waitForTimeout(900)
-  await p.locator('#problemas .portas-lista .porta-btn').nth(0).tap(); await esperarSala(p, 0)
+  await p.locator('#problemas .portas-lista button.porta-btn').nth(0).tap(); await esperarSala(p, 0)
   await p.keyboard.press('ArrowRight'); ok((await esperarSala(p, 1))?.startsWith('Porta 2:'), 'celular · sala: seta → passa para a porta 2')
   await p.locator('.sala-nav .guia-seta[aria-label="Próxima porta"]').tap(); ok((await esperarSala(p, 2))?.startsWith('Porta 3:'), 'celular · sala: botão › passa para a porta 3')
   await p.keyboard.press('ArrowLeft'); ok((await esperarSala(p, 1))?.startsWith('Porta 2:'), 'celular · sala: seta ← volta para a porta 2')
@@ -129,7 +129,7 @@ function placasSobreTexto() {
     await p.keyboard.press('Escape'); await esperarFechar(p)
   }
   await irPara(p, 'lista'); await p.waitForTimeout(2500)
-  await p.locator('#problemas .portas-lista .porta-btn').nth(3).click()
+  await p.locator('#problemas .portas-lista button.porta-btn').nth(3).click()
   ok((await esperarSala(p, 3))?.startsWith('Porta 4:'), 'computador · lista: o botão 4 abre a sala da porta 4')
   await p.keyboard.press('Escape'); ok(await esperarFechar(p), 'computador · sala: Esc volta ao saguão')
   ok(erros.length === 0, `computador: sem erro de JavaScript (${erros.join(' | ')})`)

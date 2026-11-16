@@ -360,8 +360,9 @@ export function criarBoneco({ altura = 0.8, celular = false, detalhe = celular ?
      tangente  direção do fio em que ele está (Vector3, mundo)
      camera    posição da câmera (Vector3) — parado, ele se vira e olha para quem chega
      alvo      posição de um quadro em destaque (Vector3 | null) — ele vira a cabeça para lá
-     reduzido  movimento reduzido: fica parado, só respira */
-  function atualizar(dt, { v = 0, tangente = null, camera = null, alvo = null, reduzido = false, t = 0 } = {}) {
+     reduzido  movimento reduzido: fica parado, só respira
+     receber   (15/11) está recebendo o visitante na abertura: vira-se para a câmera na hora, sem esperar 1,5 s */
+  function atualizar(dt, { v = 0, tangente = null, camera = null, alvo = null, reduzido = false, t = 0, receber = false } = {}) {
     if (reduzido) v = 0
     E.v += (v - E.v) * Math.min(1, dt * 5)
     const vel = Math.abs(E.v)
@@ -377,7 +378,7 @@ export function criarBoneco({ altura = 0.8, celular = false, detalhe = celular ?
     // rumo: segue o fio (de costas se voltando); parado há um tempo, vira-se para a câmera
     let alvoRumo = E.rumo
     if (tangente && anda > 0.05) alvoRumo = Math.atan2(tangente.x, tangente.z) + (E.v < 0 ? Math.PI : 0)
-    if (camera && E.parado > 1.5 && !reduzido) {
+    if (camera && (E.parado > 1.5 || (receber && anda < 0.05)) && !reduzido) {
       const paraCam = Math.atan2(camera.x - raiz.position.x, camera.z - raiz.position.z)
       alvoRumo = E.rumo + angDif(E.rumo, paraCam) * 0.75
     }
@@ -423,7 +424,7 @@ export function criarBoneco({ altura = 0.8, celular = false, detalhe = celular ?
 
     // ---------- cabeça: equilibra o balanço, olha para o quadro em destaque ou para a câmera ----------
     let yaw = -tronco.rotation.y, pitch = 0
-    const olharPara = alvo || (E.parado > 1.5 ? camera : null)
+    const olharPara = alvo || (E.parado > 1.5 || receber ? camera : null)
     if (olharPara) {
       cabeca.getWorldPosition(tmp)
       const dx = olharPara.x - tmp.x, dz = olharPara.z - tmp.z
@@ -442,5 +443,7 @@ export function criarBoneco({ altura = 0.8, celular = false, detalhe = celular ?
     for (const o of olhos) o.scale.y = 1 - 0.9 * fecha
   }
 
-  return { raiz, atualizar, altura }
+  /* 15/11: aceno sob pedido (a recepção na abertura). Não interrompe um aceno em curso. */
+  const acenar = () => { if (E.aceno < 0) { E.acenou = true; E.aceno = 0 } }
+  return { raiz, atualizar, altura, acenar }
 }

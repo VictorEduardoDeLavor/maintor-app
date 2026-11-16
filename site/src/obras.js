@@ -25,8 +25,15 @@
                public/midia/rolagem/, geradas por testes/capturar-rolagem.mjs (ver tela())
 
    Regras da casa: só trabalho real e no ar; cliente só com autorização
-   (VOKE, Bendita, Besten); apps com telas de demonstração; nenhum preço
-   da Flow (decisão de 28/10). Foto de ambiente leva a nota de imagem
+   (VOKE, Bendita, Besten, Studio TechTrainer e, desde 15/11, Maktub Conquista
+   e Alves & Oliveira — confirmada pelo Victor); apps com telas de
+   demonstração; nenhum preço da Flow (decisão de 28/10).
+
+   15/11/2026 — a Ala 01 passou a ser organizada pelo TIPO de projeto (o
+   visitante acha logo um parecido com o dele): lojas → sites → sistemas e
+   aplicativos. O selo de cada quadro continua dizendo se é projeto de
+   cliente ou produto da Maintor. A Ala 02 virou "você conta, a gente
+   constrói": portas na ordem do que o cliente da Flow mais procura. Foto de ambiente leva a nota de imagem
    ilustrativa — não é trabalho entregue.
    ================================================================ */
 
@@ -51,23 +58,25 @@ export function imagemHD(img) {
 const ILUSTRATIVA = 'Imagem ilustrativa do tipo de negócio, não é um projeto entregue.'
 const DEMO = 'Telas de uma empresa de demonstração.'
 
-/* Ala 01 em dois grupos com título visível. O id do grupo é âncora pública
-   (/#projetos-clientes leva direto aos clientes). */
+/* Ala 01 em três grupos, pelo tipo de projeto (15/11). O id do grupo é âncora pública; `alias` mantém
+   as âncoras antigas (/#projetos-clientes, /#produtos-maintor) chegando num lugar que faz sentido. */
 export const GRUPOS = {
-  clientes: { id: 'projetos-clientes', titulo: 'Projetos para clientes', lead: 'Lojas e sites que desenvolvemos para empresas que já estão no ar.' },
-  produtos: { id: 'produtos-maintor', titulo: 'Produtos da Maintor', lead: 'Sistemas e aplicativos que a Maintor criou e mantém, oferecidos por assinatura.' },
+  lojas: { id: 'lojas-virtuais', alias: 'projetos-clientes', titulo: 'Lojas virtuais', lead: 'Lojas no ar, com pedido, pagamento e frete funcionando. O domínio, a conta e o painel ficam no nome de quem é dono.' },
+  sites: { id: 'sites', titulo: 'Sites que geram contato', lead: 'Para quem vende serviço ou atende com hora marcada: o visitante entende o que você faz, confia e chama.' },
+  apps: { id: 'sistemas-e-aplicativos', alias: 'produtos-maintor', titulo: 'Sistemas e aplicativos', lead: 'Sistemas que a Maintor criou e mantém em operação. É a mesma engenharia que entra no seu projeto.' },
 }
 
 export const ALAS = [
   {
     id: 'trabalhos',
     eyebrow: 'Ala 01 · Trabalhos no ar',
-    contagem: '9 projetos',
-    titulo: 'Projetos que você pode abrir e conhecer',
-    lead: 'Conheça projetos que desenvolvemos para clientes e produtos criados pela Maintor. Abra uma loja, veja as telas de um sistema ou teste uma demonstração.',
+    eyebrowCurto: 'Ala 01 · No ar', // no celular estreito (360 px) a régua cabe em uma linha com "12 projetos"
+    contagem: '12 projetos',
+    titulo: 'Doze projetos no ar. Um deles parece com o seu.',
+    lead: 'Abra uma loja, navegue por um site ou veja as telas de um sistema. Tudo aqui foi construído pela Maintor Flow e está funcionando.',
     obras: [
       {
-        id: 'voke', grupo: 'clientes', selo: 'Projeto para cliente', titulo: 'VOKE WEAR', categoria: 'Loja virtual para moda fitness',
+        id: 'voke', grupo: 'lojas', selo: 'Projeto para cliente', titulo: 'VOKE WEAR', categoria: 'Loja virtual para moda fitness',
         texto: 'Loja de moda fitness com estoque por tamanho, cálculo de frete pelo CEP e aviso de reposição. A equipe gerencia os produtos em um painel próprio.',
         ...tela('voke-home'), w: 5.4,
         acao: { href: '/casos/voke-wear/', rotulo: 'Ver case' },
@@ -75,7 +84,15 @@ export const ALAS = [
         assunto: 'uma loja virtual parecida com a VOKE WEAR',
       },
       {
-        id: 'bendita', grupo: 'clientes', selo: 'Projeto para cliente', titulo: 'Bendita Acessórios', categoria: 'Loja virtual para semijoias',
+        id: 'maktub', grupo: 'lojas', selo: 'Projeto para cliente', titulo: 'Maktub Conquista', categoria: 'Loja virtual de calçados femininos',
+        texto: 'Loja de calçados femininos com vitrine por marca e por categoria, compra online com retirada na loja e um painel para a equipe cadastrar e publicar os produtos.',
+        ...tela('maktub-home'), w: 5.4,
+        acao: { href: 'https://www.maktubconquista.com.br', rotulo: 'Visitar loja', externo: true },
+        mais: [{ href: '/loja-virtual/', rotulo: 'Como fica a sua loja' }],
+        assunto: 'uma loja virtual parecida com a da Maktub Conquista',
+      },
+      {
+        id: 'bendita', grupo: 'lojas', selo: 'Projeto para cliente', titulo: 'Bendita Acessórios', categoria: 'Loja virtual para semijoias',
         texto: 'Loja virtual de semijoias com um guia para a cliente descobrir o tamanho do anel em casa antes da compra.',
         ...tela('bendita-home'), w: 5.4,
         acao: { href: 'https://benditaacessorios.com', rotulo: 'Visitar loja', externo: true },
@@ -83,15 +100,7 @@ export const ALAS = [
         assunto: 'uma loja virtual parecida com a da Bendita Acessórios',
       },
       {
-        id: 'besten', grupo: 'clientes', selo: 'Projeto para cliente', titulo: 'Besten Consultoria', categoria: 'Site institucional e portal interno',
-        texto: 'Site institucional e portal que reúne indicadores dos projetos, tarefas da equipe, materiais e trilha de integração dos consultores.',
-        ...tela('besten-home'), w: 5.4,
-        nota: 'Na tela, o site institucional. O portal interno é de uso da equipe e exige login (veja na porta 07, da Ala 02).',
-        acao: { href: 'https://besten-site.vercel.app', rotulo: 'Visitar site institucional', externo: true },
-        assunto: 'um site com portal interno parecido com o da Besten Consultoria',
-      },
-      {
-        id: 'techtrainer', grupo: 'clientes', selo: 'Projeto para cliente', titulo: 'Studio TechTrainer', categoria: 'Site com agendamento online para studio de personal',
+        id: 'techtrainer', grupo: 'sites', selo: 'Projeto para cliente', titulo: 'Studio TechTrainer', categoria: 'Site com agendamento online para studio de personal',
         texto: 'Site de studio de personal com agendamento online da aula experimental, quiz que indica o formato de treino, vídeos de exercícios gravados no Studio e um vídeo que mostra o caminho até a sala.',
         ...tela('techtrainer-home', 'telas', 6), w: 5.4,
         acao: { href: 'https://studiotechtrainer.com.br', rotulo: 'Visitar site', externo: true },
@@ -99,23 +108,23 @@ export const ALAS = [
         assunto: 'um site com agendamento online como o do Studio TechTrainer',
       },
       {
-        id: 'cmms', grupo: 'produtos', selo: 'Produto da Maintor', titulo: 'Maintor CMMS', categoria: 'Sistema de gestão de manutenção',
-        texto: 'Sistema para acompanhar ordens de serviço, programar manutenções preventivas e consultar o histórico das máquinas e o estoque de peças.',
-        ...tela('cmms-site'), w: 5.4,
-        nota: 'Na tela, o site do Maintor CMMS. As telas do sistema estão na porta 04, da Ala 02.',
-        acao: { href: 'https://maintor.com.br', rotulo: 'Conhecer o sistema', externo: true },
-        assunto: 'um sistema de manutenção como o Maintor CMMS',
+        id: 'ao', grupo: 'sites', selo: 'Projeto para cliente', titulo: 'Alves & Oliveira Odontologia', categoria: 'Site para clínica odontológica',
+        texto: 'Site da clínica com as especialidades, o laboratório de prótese próprio, o agendamento da avaliação pelo WhatsApp e o pedido de uma prévia do sorriso.',
+        ...tela('ao-site', 'telas', 6), w: 5.4,
+        acao: { href: '/site-para-clinica-odontologica/', rotulo: 'Ver site para clínicas' },
+        mais: [{ href: '#obra-sorria', rotulo: 'Ver o SorrIA' }],
+        assunto: 'um site para clínica como o da Alves & Oliveira',
       },
       {
-        id: 'fit', grupo: 'produtos', selo: 'Produto da Maintor', titulo: 'Maintor FIT', categoria: 'Aplicativo de treino e alimentação',
-        texto: 'Aplicativo de treino e alimentação com a marca do profissional, painel de acompanhamento para personal trainers e nutricionistas e área para os alunos.',
-        ...tela('fit-site', 'telas', 6), w: 5.4,
-        acao: { href: 'https://maintorfit.com', rotulo: 'Conhecer o Maintor FIT', externo: true },
-        mais: [{ href: '/sistema-para-revender/app-para-personal-trainer/', rotulo: 'Quero um app com minha marca' }],
-        assunto: 'um aplicativo com a minha marca, como o Maintor FIT',
+        id: 'besten', grupo: 'sites', selo: 'Projeto para cliente', titulo: 'Besten Consultoria', categoria: 'Site institucional e portal interno',
+        texto: 'Site institucional e portal que reúne indicadores dos projetos, tarefas da equipe, materiais e trilha de integração dos consultores.',
+        ...tela('besten-home'), w: 5.4,
+        nota: 'Na tela, o site institucional. O portal interno é de uso da equipe e exige login (veja na porta 07, da Ala 02).',
+        acao: { href: 'https://besten-site.vercel.app', rotulo: 'Visitar site institucional', externo: true },
+        assunto: 'um site com portal interno parecido com o da Besten Consultoria',
       },
       {
-        id: 'horaqui', grupo: 'produtos', selo: 'Produto da Maintor', titulo: 'Horaqui', categoria: 'Agenda online',
+        id: 'horaqui', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Horaqui', categoria: 'Agenda online',
         texto: 'Agenda online para negócios que atendem com hora marcada. O cliente escolhe o serviço, o profissional e o horário pelo link de agendamento.',
         ...tela('horaqui-site', 'telas', 6), w: 5.4,
         acao: { href: 'https://www.horaqui.com.br/demo', rotulo: 'Testar agendamento', externo: true },
@@ -123,7 +132,32 @@ export const ALAS = [
         assunto: 'uma agenda online como o Horaqui',
       },
       {
-        id: 'rh', grupo: 'produtos', selo: 'Produto da Maintor', titulo: 'Maintor RH', categoria: 'Sistema de gestão de pessoas',
+        id: 'sorria', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'SorrIA', categoria: 'Sistema para clínicas odontológicas',
+        texto: 'Sistema para clínicas odontológicas: simula o novo sorriso do paciente a partir de uma foto, monta a proposta do tratamento e acompanha agenda, atendimentos e financeiro.',
+        ...tela('sorria-telas', 'telas', 2), w: 5.4,
+        nota: 'Na tela, a entrada do SorrIA e o pedido de prévia do sorriso no site da Alves & Oliveira.',
+        acao: { whats: true, rotulo: 'Pedir uma demonstração' },
+        mais: [{ href: '/site-para-clinica-odontologica/', rotulo: 'Site para clínicas' }],
+        assunto: 'uma demonstração do SorrIA para a minha clínica',
+      },
+      {
+        id: 'fit', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor FIT', categoria: 'Aplicativo de treino e alimentação',
+        texto: 'Aplicativo de treino e alimentação com a marca do profissional, painel de acompanhamento para personal trainers e nutricionistas e área para os alunos.',
+        ...tela('fit-site', 'telas', 6), w: 5.4,
+        acao: { href: 'https://maintorfit.com', rotulo: 'Conhecer o Maintor FIT', externo: true },
+        mais: [{ href: '/sistema-para-revender/app-para-personal-trainer/', rotulo: 'Quero um app com minha marca' }],
+        assunto: 'um aplicativo com a minha marca, como o Maintor FIT',
+      },
+      {
+        id: 'cmms', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor CMMS', categoria: 'Sistema de gestão de manutenção',
+        texto: 'Sistema para acompanhar ordens de serviço, programar manutenções preventivas e consultar o histórico das máquinas e o estoque de peças.',
+        ...tela('cmms-site'), w: 5.4,
+        nota: 'Na tela, o site do Maintor CMMS. As telas do sistema estão na porta 05, da Ala 02.',
+        acao: { href: 'https://maintor.com.br', rotulo: 'Conhecer o sistema', externo: true },
+        assunto: 'um sistema de manutenção como o Maintor CMMS',
+      },
+      {
+        id: 'rh', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor RH', categoria: 'Sistema de gestão de pessoas',
         texto: 'Sistema de gestão de pessoas que reúne documentos, ponto, férias e recrutamento, com relatórios para acompanhar a equipe.',
         ...tela('rh-telas', 'telas', 2), w: 5.4,
         nota: DEMO,
@@ -131,7 +165,7 @@ export const ALAS = [
         assunto: 'um sistema de RH como o Maintor RH',
       },
       {
-        id: 'task', grupo: 'produtos', selo: 'Produto da Maintor', titulo: 'Maintor Task', categoria: 'Sistema de processos e qualidade',
+        id: 'task', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor Task', categoria: 'Sistema de processos e qualidade',
         texto: 'Sistema para acompanhar o planejado e o executado, registrar evidências e tratar não conformidades.',
         ...tela('task-telas', 'telas', 2), w: 5.4,
         nota: DEMO,
@@ -142,80 +176,89 @@ export const ALAS = [
   },
   {
     id: 'problemas',
-    eyebrow: 'Ala 02 · Soluções por necessidade',
-    eyebrowCurto: 'Ala 02 · Soluções', // no celular a régua cabe em uma linha
+    eyebrow: 'Ala 02 · Feito para o seu caso',
+    eyebrowCurto: 'Ala 02 · Seu caso', // no celular a régua cabe em uma linha
     contagem: '7 portas',
-    titulo: 'O que você precisa resolver hoje?',
-    lead: 'Escolha uma situação parecida com a sua e veja o que podemos construir.',
-    /* cada porta: objetivo → frase do visitante → o que a Flow oferece → serviço e projeto relacionado.
+    /* 15/11 — "você conta, a gente constrói": a promessa no título, o caminho em três passos e as portas na ordem
+       do que o cliente da Flow mais procura (vender, se apresentar, atrair, atender; depois a operação). Quem não
+       se vê em nenhuma porta tem a saída "Meu caso é outro", direto no WhatsApp. */
+    titulo: 'Você conta. A gente constrói.', // espaços sem quebra: a segunda frase fica inteira numa linha
+    lead: 'Todo projeto da Ala 01 começou com uma conversa. Escolha a porta que mais parece com o seu momento e veja o que já construímos para casos assim.',
+    passos: [
+      { rot: 'Conversa', val: 'Você conta o que trava o seu dia.' },
+      { rot: 'Proposta', val: 'Escopo, prazo e valor por escrito.' },
+      { rot: 'No ar', val: 'A gente constrói, publica e ensina a usar.' },
+    ],
+    outro: { rotulo: 'Meu caso é outro', assunto: 'um projeto que não está na lista do site' },
+    /* cada porta: objetivo → frase do visitante → o que a gente constrói → projetos no ar → página do serviço.
        `placa` é o nome curto pintado na placa da porta em 3D (cabe numa linha). */
     obras: [
       {
         id: 'p-loja', objetivo: 'Vender online', placa: 'Vender online',
         titulo: '“Vendo pelo direct e perco tempo respondendo sobre tamanho, pagamento e frete.”',
-        texto: 'Loja virtual com catálogo, meios de pagamento, cálculo de frete e painel de gestão.',
+        texto: 'Uma loja sua, com catálogo, Pix, cartão e frete calculados sozinhos, e um painel para você cuidar de tudo sem depender de ninguém.',
         ...tela('bendita-produto'), foto: 'loja-moda', w: 4.6,
         nota: 'Na tela, a página de um produto da Bendita Acessórios, loja feita pela Maintor Flow.',
-        acao: { href: '/loja-virtual/', rotulo: 'Ver loja virtual' },
-        mais: [{ href: '#obra-voke', rotulo: 'Projeto: VOKE WEAR' }, { href: '#obra-bendita', rotulo: 'Projeto: Bendita' }],
+        acao: { href: '/loja-virtual/', rotulo: 'Ver como fica a loja' },
+        mais: [{ href: '#obra-voke', rotulo: 'VOKE WEAR' }, { href: '#obra-maktub', rotulo: 'Maktub Conquista' }, { href: '#obra-bendita', rotulo: 'Bendita' }],
         assunto: 'vender online',
       },
       {
         id: 'p-site', objetivo: 'Apresentar minha empresa', placa: 'Minha empresa',
         titulo: '“Quando alguém pede meu site, eu só tenho o Instagram ou um PDF para enviar.”',
-        texto: 'Site institucional com serviços, projetos e um caminho claro para solicitar contato.',
+        texto: 'Um site que explica o que você faz, mostra o seu trabalho e leva o visitante até o seu WhatsApp ou a sua agenda.',
         ...tela('besten-servicos'), foto: 'fachada-loja', w: 4.6,
         nota: 'Na tela, o site da Besten Consultoria, feito pela Maintor Flow.',
-        acao: { href: '/sites/', rotulo: 'Ver sites institucionais' },
-        mais: [{ href: '#obra-besten', rotulo: 'Projeto: Besten Consultoria' }],
+        acao: { href: '/sites/', rotulo: 'Ver como fica o site' },
+        mais: [{ href: '#obra-techtrainer', rotulo: 'Studio TechTrainer' }, { href: '#obra-ao', rotulo: 'Alves & Oliveira' }, { href: '#obra-besten', rotulo: 'Besten' }],
         assunto: 'um site para apresentar minha empresa',
+      },
+      {
+        id: 'p-mkt', objetivo: 'Atrair novos clientes', placa: 'Novos clientes',
+        titulo: '“Faço posts e anúncios, mas é difícil entender o que vira contato.”',
+        texto: 'Conteúdo, vídeos e anúncios ligados a uma página, loja ou WhatsApp, para você saber de onde vem cada contato.',
+        ...tela('flow-feed'), foto: 'estudio-conteudo', w: 4.0,
+        nota: 'Na tela, posts autorais do perfil @maintorflow, a própria marca da Flow.',
+        acao: { href: '/marketing-e-redes/', rotulo: 'Ver como funciona o marketing' },
+        mais: [{ href: '#marketing', rotulo: 'Ala 04 · Marketing' }],
+        assunto: 'atrair novos clientes',
       },
       {
         id: 'p-atend', objetivo: 'Automatizar o atendimento', placa: 'Atendimento',
         titulo: '“Respondo as mesmas perguntas no WhatsApp o dia inteiro.”',
-        texto: 'Automação para perguntas frequentes, confirmação de pedidos e encaminhamento para a equipe quando necessário.',
+        texto: 'Respostas automáticas para as perguntas de sempre, confirmação de pedido e passagem para uma pessoa quando precisa.',
         img: F + 'balcao-pedidos-640.webp', foto: 'balcao-pedidos', w: 4.6, nota: ILUSTRATIVA,
-        acao: { href: '/automacao-de-atendimento/', rotulo: 'Ver automação de atendimento' },
+        acao: { href: '/automacao-de-atendimento/', rotulo: 'Ver como funciona a automação' },
         assunto: 'automatizar o atendimento',
       },
       {
         id: 'p-manut', objetivo: 'Organizar a manutenção', placa: 'Manutenção',
         titulo: '“As ordens de serviço e o histórico das máquinas ficam espalhados em planilhas e cadernos.”',
-        texto: 'Sistema com ordens de serviço, preventivas e histórico dos ativos.',
+        texto: 'Um sistema com ordens de serviço, preventivas programadas e o histórico de cada máquina.',
         ...tela('cmms-telas', 'telas', 5), foto: 'manutencao-oficina', w: 4.6,
         nota: 'Na tela, o Maintor CMMS com uma empresa de demonstração.',
         acao: { href: '/sistemas-sob-medida/#manutencao', rotulo: 'Ver sistemas de manutenção' },
-        mais: [{ href: '#obra-cmms', rotulo: 'Projeto: Maintor CMMS' }],
+        mais: [{ href: '#obra-cmms', rotulo: 'Maintor CMMS' }],
         assunto: 'organizar a manutenção',
       },
       {
         id: 'p-rh', objetivo: 'Digitalizar o RH', placa: 'RH',
         titulo: '“Perco tempo procurando documentos e conferindo ponto e férias em arquivos diferentes.”',
-        texto: 'Centralizar rotinas e informações do RH em um sistema.',
+        texto: 'Um sistema que junta documentos, ponto, férias e recrutamento num lugar só.',
         ...tela('rh-telas', 'telas', 2), foto: 'rh-papelada', w: 4.6,
         nota: 'Na tela, o Maintor RH com uma empresa de demonstração.',
         acao: { href: '/sistemas-sob-medida/#rh', rotulo: 'Ver sistemas de RH' },
-        mais: [{ href: '#obra-rh', rotulo: 'Projeto: Maintor RH' }],
+        mais: [{ href: '#obra-rh', rotulo: 'Maintor RH' }],
         assunto: 'digitalizar o RH',
-      },
-      {
-        id: 'p-mkt', objetivo: 'Atrair novos clientes', placa: 'Novos clientes',
-        titulo: '“Faço posts e anúncios, mas é difícil entender o que vira contato.”',
-        texto: 'Conectar conteúdo, vídeos e campanhas a uma página, loja ou canal de atendimento.',
-        ...tela('flow-feed'), foto: 'estudio-conteudo', w: 4.0,
-        nota: 'Na tela, posts autorais do perfil @maintorflow, a própria marca da Flow.',
-        acao: { href: '#marketing', rotulo: 'Ver marketing' },
-        mais: [{ href: '/marketing-e-redes/', rotulo: 'Página de marketing' }],
-        assunto: 'atrair novos clientes',
       },
       {
         id: 'p-cons', objetivo: 'Digitalizar minha consultoria', placa: 'Consultoria',
         titulo: '“Preciso reunir indicadores, tarefas e materiais dos projetos em um só lugar.”',
-        texto: 'Portal com indicadores, acompanhamento de projetos e materiais para a equipe. Se o objetivo for comercializar o seu método como software, veja a Ala 03.',
+        texto: 'Um portal com os indicadores, as tarefas e os materiais dos seus projetos. Para vender o seu método como software, veja a Ala 03.',
         ...tela('besten-portal', 'telas', 3), foto: 'consultoria-portal', w: 4.6,
         nota: 'Na tela, o portal da Besten Consultoria, com os nomes dos projetos desfocados.',
         acao: { href: '/para-consultorias/', rotulo: 'Ver para consultorias' },
-        mais: [{ href: '#obra-besten', rotulo: 'Projeto: Besten Consultoria' }, { href: '#sistemas', rotulo: 'Ala 03: software com sua marca' }],
+        mais: [{ href: '#obra-besten', rotulo: 'Besten' }, { href: '#sistemas', rotulo: 'Ala 03 · Software com sua marca' }],
         assunto: 'digitalizar minha consultoria',
       },
     ],

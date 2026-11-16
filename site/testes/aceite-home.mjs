@@ -14,7 +14,7 @@ const humano = (ctx) => ctx.addInitScript(() => Object.defineProperty(Navigator.
 // HTML pré-renderizado: sem abertura nem fio, com os trabalhos
 const estatico = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
 ok(!estatico.includes('id="abertura"') && !/<svg[^>]*class="fio"/.test(estatico), 'prerender sem a abertura e sem o fio');
-ok((estatico.match(/class="obra( obra-dir)?"/g) || []).length === 21, `prerender com as 21 obras (${(estatico.match(/class="obra( obra-dir)?"/g) || []).length})`);
+ok((estatico.match(/class="obra( obra-dir)?"/g) || []).length === 24, `prerender com as 24 obras (${(estatico.match(/class="obra( obra-dir)?"/g) || []).length})`);
 ok(estatico.includes("classList.add('com-abertura')") && estatico.includes('background:#0D2626'), 'index.html tem a capa escura antes do primeiro quadro');
 
 // 1ª visita: a abertura roda DENTRO da exposição e termina sozinha
@@ -72,8 +72,8 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   }));
   ok(d.icones === 0, 'sem ícones flutuantes nem números-fantasma');
   ok(d.fio || !!(await p.evaluate(() => document.querySelector('#canvas-root canvas'))), 'o fio está desenhado (ou a exposição 3D está montada)');
-  ok(d.obras.length === 21 && d.obras.every((o) => o.url && o.img && o.titulo), `21 obras com quadro, título e link (${d.obras.length})`);
-  ok(d.obras.filter((o) => o.ala === 'trabalhos').length === 9 && d.obras.filter((o) => o.ala === 'problemas').length === 7, 'ala trabalhos com 9 obras e ala de soluções com 7 portas');
+  ok(d.obras.length === 24 && d.obras.every((o) => o.url && o.img && o.titulo), `24 obras com quadro, título e link (${d.obras.length})`);
+  ok(d.obras.filter((o) => o.ala === 'trabalhos').length === 12 && d.obras.filter((o) => o.ala === 'problemas').length === 7, 'ala trabalhos com 12 obras e ala de soluções com 7 portas');
   ok(d.nav.includes('#trabalhos') && !d.nav.includes('#vitrine'), 'menu leva a "Trabalhos"');
   ok(!/base44/i.test(await p.evaluate(() => document.querySelector('#trabalhos').innerText)), 'trabalhos: a plataforma não aparece em texto')
   ok(d.logo === '/midia/marca/maintor-lockup-claro.svg', 'cabeçalho com o lockup oficial');
@@ -128,15 +128,11 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   await p.goto(BASE + '/', { waitUntil: 'networkidle' });
   const h = await p.evaluate(() => ({
     card: !!document.querySelector('#problemas article.obra a[href="/para-consultorias/"]'),
-    chips: [...document.querySelectorAll('#topo .hero-chip')].map((c) => c.innerText),
+    porta: [...document.querySelectorAll('#problemas button.porta-btn')].some((b) => /Digitalizar minha consultoria/.test(b.innerText)),
+    menu: !!document.querySelector('#menu-secoes a[href="/para-consultorias/"]'),
     contato: !!document.querySelector('footer a[href="/para-consultorias/"]'), // 10/11: o catálogo foi para o rodapé
   }));
-  ok(h.card && h.contato && h.chips.includes('Digitalizar minha consultoria') && h.chips.length === 8, `home: porta, atalho "Digitalizar minha consultoria" e serviço no rodapé (${h.chips.length} atalhos)`);
-  // com a exposição, as opções moram atrás do totem: abre o painel antes (o botão gatilho faz o mesmo que o totem)
-  await p.evaluate(() => document.querySelector('.pergunta-gatilho')?.click()); await p.waitForTimeout(300);
-  await p.locator('#topo .hero-chip', { hasText: 'Digitalizar minha consultoria' }).click();
-  await p.waitForTimeout(300);
-  ok((await p.locator('#topo .hero-links a[href="/para-consultorias/"]').count()) === 1 && (await p.locator('#topo .hero-dor').count()) === 1, 'atalho "Digitalizar minha consultoria" mostra a situação e leva à página');
+  ok(h.card && h.contato && h.porta && h.menu, 'home: porta "Digitalizar minha consultoria", cartão, menu e serviço no rodapé');
   ok((await p.locator('#topo h1').count()) === 1, 'entrada com um único h1');
   const sm = await (await fetch(BASE + '/sitemap.xml')).text();
   ok(sm.includes('/para-consultorias/'), 'sitemap com /para-consultorias/');
@@ -159,27 +155,38 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(!r.canvas && r.fio, 'movimento reduzido: sem 3D, com o fio em SVG');
   await ctxR.close();
 }
-// 05/11 (v3): a pergunta no totem, o letreiro no lugar da faixa, o saguão com portas e as salas
+// 05/11 (v3): o letreiro no lugar da faixa, o saguão com portas e as salas · 15/11: o boneco recebe e o balão dele começa o tour
 {
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
   const p = await ctx.newPage(); const erros = []; p.on('pageerror', (e) => erros.push(e.message));
   await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(3000);
-  const e0 = await p.evaluate(() => ({ marquee: !!document.querySelector('.marquee'), painel: getComputedStyle(document.querySelector('.pergunta-painel')).display, chips: document.querySelectorAll('#topo .hero-chip').length }));
+  const e0 = await p.evaluate(() => ({ marquee: !!document.querySelector('.marquee'), pergunta: document.querySelectorAll('#topo .hero-chip, #topo .pergunta-painel, #topo .pergunta-gatilho').length, texto: document.querySelector('#topo').innerText }));
   ok(!e0.marquee, 'com 3D, a faixa de serviços sai do site (corre no letreiro dentro da exposição)');
-  ok(e0.painel === 'none' && e0.chips === 8, `atalho opcional: as 8 opções existem mas só abrem quando se pede (display=${e0.painel})`);
-  await p.mouse.click(1090, 412); await p.waitForTimeout(700);
-  ok(await p.evaluate(() => !!document.querySelector('.pergunta-painel.aberta')), 'clicar no totem em 3D abre "Qual é o seu problema?"');
-  await p.locator('.pergunta-fechar').click(); await p.waitForTimeout(300);
-  ok(!(await p.evaluate(() => !!document.querySelector('.pergunta-painel.aberta'))), 'o ✕ fecha as opções');
-  const portas = await p.evaluate(() => [...document.querySelectorAll('#problemas .porta-btn')].map((b) => b.innerText.replace(/\s+/g, ' ').trim()));
-  ok(portas.length === 7, `saguão da Ala 2 com 7 portas (${portas.join(' | ')})`);
-  await p.locator('#problemas .porta-btn').nth(2).click(); await p.waitForTimeout(1200);
+  ok(e0.pergunta === 0 && !/Qual é o seu problema/i.test(e0.texto), 'abertura sem a placa nem a lista "Qual é o seu problema?"');
+  // o boneco recebe: de pé, na abertura, com o balão de fala à vista (posição lida do 3D)
+  await p.waitForTimeout(1500);
+  const rec = await p.evaluate(() => {
+    const s = window.__expoSonda(), v = new s.T.Vector3()
+    const tela = (o) => { o.getWorldPosition(v); v.project(s.cam); return { x: (v.x + 1) / 2 * innerWidth, y: (1 - v.y) / 2 * innerHeight } }
+    return { boneco: tela(s.guia.raiz), balao: tela(s.balao), balaoVisivel: s.balao.visible, escala: s.guia.raiz.scale.x }
+  });
+  ok(rec.balaoVisivel && rec.escala > 0.9 && rec.boneco.x > 720 && rec.boneco.x < 1400 && rec.boneco.y > 450 && rec.boneco.y < 900, `o boneco recebe na abertura, à direita do texto (x ${Math.round(rec.boneco.x)}, y ${Math.round(rec.boneco.y)}), com o balão de fala`);
+  await p.mouse.click(rec.balao.x, rec.balao.y); await p.waitForTimeout(4200);
+  ok(await p.evaluate(() => !!document.querySelector('#obra-voke.em-foco')), 'clicar no balão do boneco começa o tour: o primeiro projeto chega em leitura');
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(1500);
+  const portas = await p.evaluate(() => [...document.querySelectorAll('#problemas button.porta-btn')].map((b) => b.innerText.replace(/\s+/g, ' ').trim()));
+  ok(portas.length === 7 && portas[0] === '01 Vender online' && portas[2] === '03 Atrair novos clientes', `saguão da Ala 2 com 7 portas, na ordem nova (${portas.join(' | ')})`);
+  const outro = await p.evaluate(() => { const a = document.querySelector('#problemas a.porta-outro'); return a ? decodeURIComponent(a.href) : '' });
+  ok(/wa\.me\/5511946610634/.test(outro) && /um projeto que não está na lista do site/.test(outro), 'saída "Meu caso é outro" abre o WhatsApp com o assunto');
+  const passos = await p.evaluate(() => [...document.querySelectorAll('#problemas .ala-passos b')].map((b) => b.textContent));
+  ok(JSON.stringify(passos) === JSON.stringify(['Conversa', 'Proposta', 'No ar']), `Ala 02 com os três passos (${passos.join(' → ')})`);
+  await p.locator('#problemas button.porta-btn').nth(3).click(); await p.waitForTimeout(1200);
   const s1 = await p.evaluate(() => ({ painel: document.querySelector('.sala-painel')?.innerText || '', trava: document.documentElement.style.overflow, guia: document.querySelector('.guia')?.classList.contains('guia-on') || false, emSala: document.documentElement.classList.contains('em-sala') }));
-  ok(/Porta 03 de 07/i.test(s1.painel) && /atendimento/i.test(s1.painel) && s1.trava === 'hidden' && !s1.guia && s1.emSala, 'porta 03 leva à sala de atendimento, com a página parada e o corredor escondido');
+  ok(/Porta 04 de 07/i.test(s1.painel) && /atendimento/i.test(s1.painel) && /O que a gente constrói/.test(s1.painel) && s1.trava === 'hidden' && !s1.guia && s1.emSala, 'porta 04 leva à sala de atendimento, com a página parada e o corredor escondido');
   const zapSala = decodeURIComponent(await p.evaluate(() => document.querySelector('.sala-painel a.btn').href));
   ok(/wa\.me\/5511946610634/.test(zapSala) && /portfólio da Maintor Flow e quero conversar sobre automatizar o atendimento\./.test(zapSala), 'a sala abre o WhatsApp comercial com o objetivo da porta');
   await p.keyboard.press('ArrowRight'); await p.waitForTimeout(900);
-  ok(/Porta 04 de 07/i.test(await p.evaluate(() => document.querySelector('.sala-painel')?.innerText || '')), 'seta → passa para a porta seguinte sem voltar ao corredor');
+  ok(/Porta 05 de 07/i.test(await p.evaluate(() => document.querySelector('.sala-painel')?.innerText || '')), 'seta → passa para a porta seguinte sem voltar ao corredor');
   await p.keyboard.press('Escape'); await p.waitForTimeout(900);
   const s2 = await p.evaluate(() => ({ painel: !!document.querySelector('.sala-painel'), trava: document.documentElement.style.overflow, emSala: document.documentElement.classList.contains('em-sala') }));
   ok(!s2.painel && s2.trava === '' && !s2.emSala, 'Esc volta ao saguão e devolve a rolagem');
@@ -188,9 +195,9 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   // sem 3D: a faixa volta, as opções aparecem direto e a porta leva até a obra da dor
   const ctxR = await b.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const pr = await ctxR.newPage(); await pr.goto(BASE + '/', { waitUntil: 'networkidle' }); await pr.waitForTimeout(800);
-  const r0 = await pr.evaluate(() => ({ marquee: !!document.querySelector('.marquee'), chipVisivel: document.querySelector('#topo .hero-chip').getBoundingClientRect().height > 0 }));
-  ok(r0.marquee && r0.chipVisivel, 'sem 3D: faixa de serviços e opções do hero visíveis como antes');
-  await pr.locator('#problemas .porta-btn').nth(2).click(); await pr.waitForTimeout(900);
+  const r0 = await pr.evaluate(() => ({ marquee: !!document.querySelector('.marquee'), tour: [...document.querySelectorAll('#topo .entrada-ctas a')].some((a) => /Começar o tour/.test(a.innerText)) }));
+  ok(r0.marquee && r0.tour, 'sem 3D: faixa de serviços visível e o convite para o tour na abertura');
+  await pr.locator('#problemas button.porta-btn').nth(3).click(); await pr.waitForTimeout(900);
   const topo = await pr.evaluate(() => document.getElementById('obra-p-atend').getBoundingClientRect().top);
   ok(Math.abs(topo) < 200 && !(await pr.locator('.sala-painel').count()), `sem 3D: a porta leva até a obra da dor (topo ${Math.round(topo)})`);
   await ctxR.close();
@@ -203,13 +210,13 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(!(await p.evaluate(() => document.querySelector('.guia')?.classList.contains('guia-on'))), 'guia escondido na entrada');
   await p.evaluate(() => { const el = document.getElementById('obra-bendita'); window.scrollTo(0, window.scrollY + el.getBoundingClientRect().top + el.offsetHeight / 2 - innerHeight / 2); }); await p.waitForTimeout(900);
   const g1 = await p.evaluate(() => ({ on: document.querySelector('.guia').classList.contains('guia-on'), titulo: document.querySelector('.guia-onde b').innerText, pontos: document.querySelectorAll('.guia-ponto').length, zap: decodeURIComponent(document.querySelector('.guia-quero').href) }));
-  ok(g1.on && g1.titulo === 'Bendita Acessórios' && g1.pontos === 21, `guia aparece no passeio e diz onde estou (${g1.titulo}, ${g1.pontos} pontos)`);
+  ok(g1.on && g1.titulo === 'Bendita Acessórios' && g1.pontos === 24, `guia aparece no passeio e diz onde estou (${g1.titulo}, ${g1.pontos} pontos)`);
   ok(/Bendita Acessórios/.test(g1.zap) && /Vim pelo portfólio da Maintor Flow/.test(g1.zap), '"Quero algo assim" leva a obra na mensagem do WhatsApp');
   await p.keyboard.press('ArrowRight'); await p.waitForTimeout(2600);
   const t2 = await p.evaluate(() => document.querySelector('.guia-onde b').innerText);
-  ok(t2 === 'Besten Consultoria', `seta → anda para a próxima obra (${t2})`);
+  ok(t2 === 'Studio TechTrainer', `seta → anda para a próxima obra (${t2})`);
   await p.locator('.guia-seta[aria-label="Próxima obra"]').click(); await p.waitForTimeout(2600);
-  ok((await p.evaluate(() => document.querySelector('.guia-onde b').innerText)) === 'Studio TechTrainer', 'botão › anda para a próxima obra');
+  ok((await p.evaluate(() => document.querySelector('.guia-onde b').innerText)) === 'Alves & Oliveira Odontologia', 'botão › anda para a próxima obra');
   await p.evaluate(() => document.getElementById('contato').scrollIntoView()); await p.waitForTimeout(900);
   ok(!(await p.evaluate(() => document.querySelector('.guia').classList.contains('guia-on'))), 'guia some no fim do passeio');
   await ctx.close();
@@ -226,7 +233,7 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
     apoio: document.querySelector('#topo .entrada-apoio')?.innerText.replace(/\s+/g, ' ').trim(),
     ctas: [...document.querySelectorAll('#topo .entrada-ctas a')].map((a) => [a.innerText.trim(), a.getAttribute('href')]),
     menu: [...document.querySelectorAll('header .navlinks a')].map((a) => [a.textContent.trim(), a.getAttribute('href')]),
-    menuCel: [...document.querySelectorAll('#menu-secoes nav a')].map((a) => [a.querySelector('.serif')?.textContent.trim(), a.getAttribute('href')]),
+    painel: { grupos: [...document.querySelectorAll('#menu-secoes .mega-titulo')].map((h) => h.textContent.trim()), links: [...document.querySelectorAll('#menu-secoes .mega-colunas li a')].map((a) => a.getAttribute('href')) },
     ordem: [...document.querySelectorAll('#trabalhos article.obra')].map((a) => a.id.replace('obra-', '')),
     grupos: [...document.querySelectorAll('#trabalhos .obra-grupo')].map((g) => [g.id, g.querySelector('h3')?.textContent.trim()]),
     selos: [...document.querySelectorAll('#trabalhos article.obra .obra-legenda > .micro')].map((s) => s.textContent.trim().toLowerCase()),
@@ -250,15 +257,20 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
     },
   }));
   ok(d.h1 === 'Sites, lojas virtuais e sistemas sob medida para o seu negócio', `abertura: título da oferta (${d.h1})`);
-  ok(/^A Maintor Flow desenvolve projetos para vender online/.test(d.apoio || ''), 'abertura: texto de apoio');
-  ok(JSON.stringify(d.ctas) === JSON.stringify([['Ver projetos realizados', '#trabalhos'], ['Conversar sobre meu projeto', '#contato']]), `abertura: as duas ações e destinos (${JSON.stringify(d.ctas)})`);
-  const MENU = [['Portfólio', '#trabalhos'], ['Serviços', '#problemas'], ['Sistemas', '#sistemas'], ['Marketing', '#marketing'], ['Contato', '#contato']];
+  ok(/^Aqui você tem alguém, não só uma ferramenta/.test(d.apoio || '') && /Faça o tour/.test(d.apoio || ''), 'abertura: texto de apoio convida para o tour');
+  ok(JSON.stringify(d.ctas) === JSON.stringify([['Começar o tour', '#trabalhos'], ['Conversar sobre meu projeto', '#contato']]), `abertura: as duas ações e destinos (${JSON.stringify(d.ctas)})`);
+  const MENU = [['Projetos', '#trabalhos'], ['O que fazemos', '#problemas'], ['Marketing', '#marketing'], ['Guias', '/guias/'], ['Contato', '#contato']];
   ok(JSON.stringify(d.menu) === JSON.stringify(MENU), `menu do cabeçalho: ${d.menu.map((m) => m[0]).join(', ')}`);
-  ok(JSON.stringify(d.menuCel) === JSON.stringify(MENU), 'menu do celular com os mesmos rótulos e destinos');
+  // o painel do menu: quatro grupos e todas as páginas do site (nenhuma fica escondida)
+  const PAGINAS = ['/casos/voke-wear/', '/loja-virtual/', '/loja-no-instagram/', '/loja-virtual-moda-fitness/', '/sites/', '/site-para-clinica-odontologica/', '/automacao-de-atendimento/', '/sistemas-sob-medida/', '/para-consultorias/', '/manutencao-mensal/', '/sistema-para-revender/', '/sistema-para-revender/app-para-personal-trainer/', '/sistema-para-revender/sistema-para-salao-de-beleza/', '/marketing-e-redes/', '/trafego-pago/', '/videos-personalizados/', '/por-onde-comecar/', '/guias/', '/guias/quanto-custa-uma-loja-virtual/', '/guias/loja-propria-ou-plataforma-pronta/', '/guias/se-o-desenvolvedor-sumir/', '/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/'];
+  const foraDoMenu = PAGINAS.filter((x) => !d.painel.links.includes(x));
+  ok(d.painel.grupos.length === 4 && foraDoMenu.length === 0, `painel do menu com 4 grupos e as ${PAGINAS.length} páginas do site (${d.painel.links.length} links)${foraDoMenu.length ? ' — fora: ' + foraDoMenu.join(', ') : ''}`);
+  const projetosNoMenu = ['voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'besten', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task'].filter((x) => !d.painel.links.includes('#obra-' + x));
+  ok(projetosNoMenu.length === 0, `os 12 projetos estão no menu ${projetosNoMenu.join(', ')}`);
   ok(JSON.stringify(d.secoes) === JSON.stringify(['topo', 'trabalhos', 'problemas', 'sistemas', 'marketing', 'como', 'perguntas', 'contato']), `ordem da página: ${d.secoes.join(' → ')}`);
-  ok(JSON.stringify(d.ordem) === JSON.stringify(['voke', 'bendita', 'besten', 'techtrainer', 'cmms', 'fit', 'horaqui', 'rh', 'task']), `Ala 01 na ordem: ${d.ordem.join(', ')}`);
-  ok(JSON.stringify(d.grupos) === JSON.stringify([['projetos-clientes', 'Projetos para clientes'], ['produtos-maintor', 'Produtos da Maintor']]), 'Ala 01 com os dois grupos visíveis');
-  ok(d.selos.slice(0, 4).every((s) => s === 'projeto para cliente') && d.selos.slice(4).every((s) => s === 'produto da maintor'), 'cada card diz se é projeto de cliente ou produto da Maintor');
+  ok(JSON.stringify(d.ordem) === JSON.stringify(['voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'besten', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task']), `Ala 01 na ordem: ${d.ordem.join(', ')}`);
+  ok(JSON.stringify(d.grupos) === JSON.stringify([['lojas-virtuais', 'Lojas virtuais'], ['sites', 'Sites que geram contato'], ['sistemas-e-aplicativos', 'Sistemas e aplicativos']]), 'Ala 01 com os três grupos visíveis, por tipo de projeto');
+  ok(d.selos.slice(0, 6).every((s) => s === 'projeto para cliente') && d.selos.slice(6).every((s) => s === 'produto da maintor'), 'cada card diz se é projeto de cliente ou produto da Maintor');
   ok(d.titulos[0] === 1 && d.titulos.every((n, i) => i === 0 || n <= d.titulos[i - 1] + 1), `títulos sem pular nível (${d.titulos.join('')})`);
   ok(d.regua[0] === 'Como trabalhamos', 'processo identificado como "Como trabalhamos"');
   ok(d.faq === 7 && JSON.stringify(d.faqLd) === JSON.stringify(d.faqVis), 'FAQ: 7 perguntas, JSON-LD igual ao visível');
@@ -268,13 +280,13 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(/^Conheça lojas virtuais, sites e sistemas/.test(d.meta.desc) && d.meta.ogd === d.meta.desc, 'description e og:description novas');
   ok(d.meta.canon === 'https://maintorflow.com.br/' && /^https:\/\/maintorflow\.com\.br\/midia\/og-portfolio\.jpg$/.test(d.meta.ogi), 'canonical mantida e og:image absoluta');
   ok((await fetch(BASE + '/midia/og-portfolio.jpg')).status === 200, 'a imagem de compartilhamento existe no build');
-  // "Ver projetos realizados" chega na Ala 01
-  await p.locator('#topo .entrada-ctas a', { hasText: 'Ver projetos realizados' }).click(); await p.waitForTimeout(2200);
-  const topoAla = await p.evaluate(() => document.getElementById('trabalhos').getBoundingClientRect().top);
-  ok(Math.abs(topoAla) < 80, `"Ver projetos realizados" chega ao início da Ala 01 (topo ${Math.round(topoAla)})`);
+  // "Começar o tour" leva ao primeiro projeto, em posição de leitura, com a barra do guia
+  await p.locator('#topo .entrada-ctas a', { hasText: 'Começar o tour' }).click(); await p.waitForTimeout(4200);
+  const tour = await p.evaluate(() => ({ foco: !!document.querySelector('#obra-voke.em-foco'), guia: document.querySelector('.guia')?.classList.contains('guia-on') }));
+  ok(tour.foco && tour.guia, '"Começar o tour" leva ao primeiro projeto em leitura, com a barra do guia');
   // links de compatibilidade e atalho para clientes
   const faltam = []
-  for (const id of ['trabalhos', 'problemas', 'sistemas', 'marketing', 'como', 'perguntas', 'contato', 'projetos-clientes', 'produtos-maintor']) {
+  for (const id of ['trabalhos', 'problemas', 'sistemas', 'marketing', 'como', 'perguntas', 'contato', 'projetos-clientes', 'produtos-maintor', 'lojas-virtuais', 'sites', 'sistemas-e-aplicativos']) {
     if (!(await p.evaluate((x) => !!document.getElementById(x), id))) faltam.push(id);
   }
   ok(faltam.length === 0, `âncoras antigas e novas existem ${faltam.join(', ')}`);

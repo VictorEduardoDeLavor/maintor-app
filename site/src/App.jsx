@@ -13,6 +13,7 @@ import Fio from './Fio.jsx'
 const Exposicao = lazy(() => import('./Exposicao.jsx'))
 import { ALAS, GRUPOS, PORTAS, imagemHD, msgWhats } from './obras.js'
 import Guia from './Guia.jsx'
+import { MENU, MENU_CONTATO } from './menu.js'
 
 /* A abertura 3D roda uma vez por sessão. Fica de fora para quem pede
    movimento reduzido, para robôs (navigator.webdriver: o prerender e os
@@ -36,29 +37,9 @@ const CRM_TOKEN = '2l-UaqQnRhF-oi_S6oDqgVSZxFJKyj5kU78QpVGMbuw'
 const whatsDe = (assunto) => `${WHATS_NUM}?text=${encodeURIComponent(msgWhats(assunto))}`
 const WHATS = whatsDe()
 
-/* Menu (10/11): o mesmo para o cabeçalho e para o painel do celular. Os ids
-   das seções são os de antes — links já compartilhados (/#trabalhos,
-   /#problemas…) continuam chegando no mesmo lugar. */
-const SECOES = [
-  { href: '#trabalhos', rotulo: 'Portfólio' },
-  { href: '#problemas', rotulo: 'Serviços' },
-  { href: '#sistemas', rotulo: 'Sistemas' },
-  { href: '#marketing', rotulo: 'Marketing' },
-  { href: '#contato', rotulo: 'Contato' },
-]
-
-/* "Qual é o seu problema?" virou atalho opcional (10/11): as opções são as
-   sete portas da Ala 02, mais o atalho direto para a Ala 03. O percurso
-   principal (abertura → portfólio → contato) não depende dele. */
-const HERO_ATALHOS = [
-  ...PORTAS.map((p) => ({ chip: p.objetivo, dor: p.frase, solucao: p.texto, href: p.acao.href, rotulo: p.acao.rotulo, assunto: p.assunto })),
-  {
-    chip: 'Quero vender meu sistema',
-    dor: 'Quero oferecer aos meus clientes um software com a minha marca.',
-    solucao: 'Transformamos o seu método ou a rotina do seu nicho em um aplicativo com a sua marca.',
-    href: '#sistemas', rotulo: 'Ver a Ala 03 · Sistemas', assunto: 'lançar um software com a minha marca',
-  },
-]
+/* Menu (15/11): quatro grupos + Contato, a mesma fonte (src/menu.js) da home e das páginas internas. Na home os
+   endereços "/#secao" perdem a barra: a rolagem suave trata só âncoras da própria página. */
+const naHome = (href) => (href.startsWith('/#') ? href.slice(1) : href)
 
 /* Perguntas frequentes (10/11): cada resposta diz a condição de cada tipo
    de projeto — sob medida, serviço contínuo e produto por assinatura não
@@ -161,14 +142,11 @@ function Marquee() {
 }
 
 export default function App() {
-  const [escolha, setEscolha] = useState(null)
-  const [perguntaAberta, setPerguntaAberta] = useState(false)
   const [sala, setSala] = useState(null) // porta do saguão em que o visitante entrou (null = no corredor)
   const salaTituloRef = useRef(null)
   /* 10/11: vídeo de cliente aberto no player em janela (null = fechado). Nada baixa antes do clique. */
   const [video, setVideo] = useState(null)
   const videoDialogoRef = useRef(null)
-  const atual = escolha == null ? null : HERO_ATALHOS[escolha]
   const progressoRef = useRef(0)
   const velocidadeRef = useRef(0)
   const [reduzido] = useState(
@@ -196,6 +174,7 @@ export default function App() {
   const [whats, setWhats] = useState('')
   const [somLigado, setSomLigado] = useState(false)
   const [menuAberto, setMenuAberto] = useState(false)
+  const [menuGrupo, setMenuGrupo] = useState(null) // grupo em destaque no painel (o botão do cabeçalho que abriu)
   const botaoMenuRef = useRef(null)
   const painelMenuRef = useRef(null)
   const lenisRef = useRef(null)
@@ -372,7 +351,10 @@ export default function App() {
     document.body.style.overflow = 'hidden'
     const painel = painelMenuRef.current
     const focaveis = painel?.querySelectorAll('a[href], button') || []
-    focaveis[0]?.focus()
+    // aberto por um grupo do cabeçalho: o painel rola até esse grupo e o foco vai para o primeiro link dele
+    const destaque = menuGrupo && painel?.querySelector('.mega-grupo.em-destaque')
+    destaque?.scrollIntoView({ block: 'nearest' })
+    ;(destaque?.querySelector('a[href]') || focaveis[0])?.focus({ preventScroll: true })
 
     const aoTeclar = (e) => {
       if (e.key === 'Escape') { setMenuAberto(false); return }
@@ -389,7 +371,7 @@ export default function App() {
       document.body.style.overflow = ''
       botaoMenuRef.current?.focus()
     }
-  }, [menuAberto])
+  }, [menuAberto, menuGrupo])
 
   /* Dentro de uma sala do saguão a página não rola (o visitante está "dentro"
      da porta): Esc volta ao saguão, as setas trocam de porta. */
@@ -424,7 +406,15 @@ export default function App() {
     if (lenisRef.current) lenisRef.current.scrollTo(el, { offset: -40 })
     else el.scrollIntoView()
   }
-  const abrirPergunta = useCallback(() => setPerguntaAberta(true), [])
+  /* 15/11 — "Começar o tour": leva ao primeiro projeto em posição de leitura; a barra do guia aparece ali, com
+     as setas para seguir de obra em obra. Vale para o botão da abertura e para o balão do boneco, no 3D. */
+  const iniciarTour = useCallback(() => {
+    const el = document.getElementById(`obra-${ALAS[0].obras[0].id}`)
+    if (!el) return
+    const alvo = window.scrollY + el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2 - window.innerHeight / 2
+    if (lenisRef.current) lenisRef.current.scrollTo(alvo, { duration: 2.4, easing: (t) => 1 - Math.pow(1 - t, 3) })
+    else window.scrollTo({ top: alvo, behavior: 'smooth' })
+  }, [])
   // o player usa <dialog> nativo: prende o foco, fecha no Esc e devolve o foco ao botão da capa
   useEffect(() => {
     const d = videoDialogoRef.current
@@ -444,14 +434,6 @@ export default function App() {
       history.replaceState(null, '', href)
     }, 650)
   }
-
-  // fecha o menu se a tela crescer e as âncoras do header voltarem
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 821px)')
-    const aoMudar = (e) => { if (e.matches) setMenuAberto(false) }
-    mq.addEventListener('change', aoMudar)
-    return () => mq.removeEventListener('change', aoMudar)
-  }, [])
 
   const abrirWhats = (e) => {
     e.preventDefault()
@@ -499,10 +481,14 @@ export default function App() {
           <a className="marca marca-lockup" href="#topo" aria-label="Maintor Flow — início">
             <img src="/midia/marca/maintor-lockup-claro.svg" alt="Maintor Flow" width="132" height="42" />
           </a>
-          <nav className="navlinks">
-            {SECOES.map((s) => (
-              <a key={s.href} href={s.href}>{s.rotulo}</a>
+          <nav className="navlinks" aria-label="Menu principal">
+            {MENU.map((g) => (
+              <a key={g.id} href={naHome(g.href)} className="nav-grupo" aria-expanded={menuAberto && menuGrupo === g.id} aria-controls="menu-secoes"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); const mesmo = menuAberto && menuGrupo === g.id; setMenuGrupo(g.id); setMenuAberto(!mesmo) }}>
+                {g.rotulo}<i aria-hidden="true" />
+              </a>
             ))}
+            <a href={naHome(MENU_CONTATO.href)} onClick={() => setMenuAberto(false)}>{MENU_CONTATO.rotulo}</a>
           </nav>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)' }}>
             <button
@@ -525,28 +511,40 @@ export default function App() {
               ref={botaoMenuRef}
               aria-expanded={menuAberto}
               aria-controls="menu-secoes"
-              onClick={() => setMenuAberto((v) => !v)}
+              onClick={() => { setMenuGrupo(null); setMenuAberto((v) => !v) }}
             >
               <span className="menu-traco" aria-hidden="true" />
-              <span className="sr-only">{menuAberto ? 'Fechar menu' : 'Abrir menu de seções'}</span>
+              <span className="sr-only">{menuAberto ? 'Fechar menu' : 'Abrir menu'}</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* painel de seções do celular */}
+      {/* o painel do menu: tudo o que existe no site, em quatro grupos (o mesmo no celular e no computador) */}
       <div
         id="menu-secoes"
-        className={`menu-painel${menuAberto ? ' aberto' : ''}`}
+        className={`menu-painel mega${menuAberto ? ' aberto' : ''}`}
         ref={painelMenuRef}
         hidden={!menuAberto}
+        onClick={(e) => { if (e.target === e.currentTarget || e.target.closest('a')) setMenuAberto(false) }}
       >
-        <nav aria-label="Seções do site">
-          {SECOES.map((s, i) => (
-            <a key={s.href} href={s.href} onClick={() => setMenuAberto(false)}>
-              <span className="micro idx-menu">{String(i + 1).padStart(2, '0')}</span>
-              <span className="serif">{s.rotulo}</span>
-            </a>
+        <nav aria-label="Tudo o que existe no site" className="mega-grupos">
+          {MENU.map((g) => (
+            <section key={g.id} className={`mega-grupo${menuGrupo === g.id ? ' em-destaque' : ''}`} aria-labelledby={`mega-${g.id}`}>
+              <p className="serif mega-titulo" id={`mega-${g.id}`}><a href={naHome(g.href)}>{g.titulo}</a></p>
+              <div className="mega-colunas">
+                {g.colunas.map((c) => (
+                  <div key={c.titulo}>
+                    <p className="micro mega-sub">{c.href ? <a href={naHome(c.href)}>{c.titulo}</a> : c.titulo}</p>
+                    <ul>
+                      {c.links.map((l) => (
+                        <li key={l.href}><a href={naHome(l.href)}><b>{l.rotulo}</b>{l.nota && <span>{l.nota}</span>}</a></li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
           ))}
         </nav>
         <div className="menu-pe">
@@ -559,6 +557,7 @@ export default function App() {
           >
             Chamar no WhatsApp
           </a>
+          <a className="btn btn-fantasma" href={naHome(MENU_CONTATO.href)}>Conversar sobre meu projeto</a>
           {/* o controle de som vive aqui no celular: no header ele espremia
               a marca em duas linhas */}
           <button
@@ -574,7 +573,7 @@ export default function App() {
 
       <main id="conteudo">
         {expor
-          ? <Suspense fallback={null}><Exposicao intro={abrindo} aoFimIntro={fimAbertura} pularRef={pularRef} portas={PORTAS} sala={sala} aoPorta={setSala} aoPergunta={abrirPergunta} pergunta={perguntaAberta} /></Suspense>
+          ? <Suspense fallback={null}><Exposicao intro={abrindo} aoFimIntro={fimAbertura} pularRef={pularRef} portas={PORTAS} sala={sala} aoPorta={setSala} aoTour={iniciarTour} /></Suspense>
           : <Fio reduzido={reduzido} />}
         {/* tabindex -1: crawlers leem o href de qualquer jeito; para quem
             navega por teclado, era um link invisível roubando o foco */}
@@ -584,56 +583,23 @@ export default function App() {
           <a href="/index.md" tabIndex={-1}>maintorflow.com.br/index.md</a>.
         </p>
 
-        {/* ============ A ABERTURA (10/11) — a oferta e o caminho até os projetos, antes de qualquer pergunta ============ */}
+        {/* ============ A ABERTURA (15/11) — o Victor recebe o visitante (boneco em 3D) e convida para o tour ============ */}
         <section className="cena cena-entrada" id="topo">
           <div className="wrap">
             <div className="entrada-oferta">
               <p className="micro entrada-selo">Maintor Flow · portfólio</p>
               <h1 className="serif entrada-h1">Sites, lojas virtuais e sistemas sob medida para o seu negócio</h1>
               <p className="entrada-apoio">
-                A Maintor Flow desenvolve projetos para vender online, automatizar o atendimento e organizar a operação.
-                Veja o que já está no ar e encontre um projeto parecido com o seu.
+                Aqui você tem alguém, não só uma ferramenta: quem constrói é quem atende.
+                Faça o tour pelos projetos que já estão no ar e encontre um parecido com o seu.
               </p>
               <div className="entrada-ctas">
-                <a className="btn" href="#trabalhos" onMouseEnter={blipHover}>Ver projetos realizados</a>
+                <a className="btn" href="#trabalhos" onMouseEnter={blipHover} onClick={(e) => { e.preventDefault(); e.stopPropagation(); iniciarTour() }}>Começar o tour</a>
                 <a className="btn btn-fantasma" href="#contato">Conversar sobre meu projeto</a>
               </div>
             </div>
             <div className="entrada-base">
-              {/* atalho opcional: na exposição a pergunta também mora no totem em 3D */}
-              {expor && !perguntaAberta && (
-                <button type="button" className="pergunta-gatilho" onClick={() => setPerguntaAberta(true)}>
-                  <span className="micro">Atalho</span> Qual é o seu problema? <i aria-hidden="true">→</i>
-                </button>
-              )}
-              <div className={`hero-escolha${expor ? ' pergunta-painel' : ''}${perguntaAberta ? ' aberta' : ''}`} role="group" aria-label="Qual é o seu problema?">
-                <div className="pergunta-topo">
-                  <div className="micro">Qual é o seu problema?</div>
-                  {expor && (
-                    <button type="button" className="pergunta-fechar" onClick={() => { setPerguntaAberta(false); setEscolha(null) }} aria-label="Fechar as opções">✕</button>
-                  )}
-                </div>
-                <div className="hero-chips">
-                  {HERO_ATALHOS.map((p, i) => (
-                    <button type="button" className="hero-chip" key={p.chip} aria-pressed={escolha === i} onClick={() => setEscolha(escolha === i ? null : i)}>
-                      {p.chip}
-                    </button>
-                  ))}
-                </div>
-                <div className="lado-dir" aria-live="polite">
-                  {atual && (
-                    <>
-                      <p className="hero-dor serif">“{atual.dor}”</p>
-                      <p className="corpo-apoio">{atual.solucao}</p>
-                      <div className="hero-links">
-                        <a className="btn" href={whatsDe(atual.assunto)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Conversar sobre isso no WhatsApp</a>
-                        <a className="link-mostarda" href={atual.href}>{atual.rotulo} →</a>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-              {expor && <p className="dica-scroll" aria-hidden="true">Role para caminhar pela exposição</p>}
+              {expor && <p className="dica-scroll" aria-hidden="true">Ou role para caminhar pela exposição</p>}
             </div>
           </div>
         </section>
@@ -650,6 +616,11 @@ export default function App() {
                 <Regua esquerda={ala.eyebrow} direita={ala.contagem} esquerdaCurta={ala.eyebrowCurto} />
                 <h2 className="titulo-cena serif" data-palavras><Palavras texto={ala.titulo} /></h2>
                 <p className="corpo-apoio" data-reveal>{ala.lead}</p>
+                {ala.passos && (
+                  <ol className="ala-passos" data-reveal>
+                    {ala.passos.map((p, k) => <li key={p.rot}><i aria-hidden="true">{k + 1}</i><b>{p.rot}</b><span>{p.val}</span></li>)}
+                  </ol>
+                )}
                 {ala.id === 'trabalhos' && (
                   <nav className="grupos-atalhos" aria-label="Grupos de projetos">
                     {Object.values(GRUPOS).map((g) => (
@@ -659,13 +630,15 @@ export default function App() {
                 )}
                 {ala.id === 'problemas' && (
                   <nav className="portas-lista" aria-label="Portas: escolha a sua necessidade">
-                    <span className="micro">{expor ? 'Escolha aqui ou nas portas, logo à frente' : 'Escolha a sua'}</span>
+                    <span className="micro">{expor ? 'Qual é o seu momento? Escolha aqui ou nas portas, logo à frente' : 'Qual é o seu momento?'}</span>
                     <div>
                       {PORTAS.map((p, k) => (
                         <button type="button" key={p.obra} className="porta-btn" onClick={() => entrarPorta(k)}>
                           <i aria-hidden="true">{String(k + 1).padStart(2, '0')}</i>{p.objetivo}
                         </button>
                       ))}
+                      {/* quem não se vê em nenhuma porta: conta do próprio jeito, direto no WhatsApp */}
+                      <a className="porta-btn porta-outro" href={whatsDe(ala.outro.assunto)} target="_blank" rel="noopener">{ala.outro.rotulo} <i aria-hidden="true">↗</i></a>
                     </div>
                   </nav>
                 )}
@@ -673,16 +646,20 @@ export default function App() {
               {ala.obras.map((o, i) => {
                 const grupo = o.grupo && o.grupo !== grupoAtual ? GRUPOS[(grupoAtual = o.grupo)] : null
                 const Titulo = o.grupo ? 'h4' : 'h3' // na Ala 01 o título do grupo é o h3
-                const lnk = (l, cls) => (l.externo
+                const lnk = (l, cls) => (l.whats
+                  ? <a key="whats" className={cls} href={whatsDe(o.assunto)} target="_blank" rel="noopener">{l.rotulo} ↗</a>
+                  : l.externo
                   ? <a key={l.href} className={cls} href={l.href} target="_blank" rel="noopener">{l.rotulo} ↗</a>
                   : <a key={l.href} className={cls} href={l.href}>{l.rotulo} {l.href.startsWith('#') ? '↓' : '→'}</a>)
                 return (
                   <Fragment key={o.id}>
                     {grupo && (
                       <div className="obra-grupo" id={grupo.id}>
+                        {/* âncora antiga do grupo (links já compartilhados continuam chegando aqui) */}
+                        {grupo.alias && <span id={grupo.alias} className="ancora-antiga" aria-hidden="true" />}
                         <div className="wrap">
                           <div className="grupo-painel">
-                            <span className="micro">{grupo === GRUPOS.clientes ? 'Grupo 1 de 2' : 'Grupo 2 de 2'}</span>
+                            <span className="micro">Grupo {Object.values(GRUPOS).indexOf(grupo) + 1} de {Object.keys(GRUPOS).length}</span>
                             <h3 className="serif">{grupo.titulo}</h3>
                             <p>{grupo.lead}</p>
                           </div>
@@ -697,7 +674,7 @@ export default function App() {
                           <span className="micro">{o.objetivo ? `Porta ${String(i + 1).padStart(2, '0')} · ${o.objetivo}` : o.selo}</span>
                           <Titulo className="serif">{o.titulo}</Titulo>
                           {o.categoria && <p className="obra-nicho">{o.categoria}</p>}
-                          <p>{o.objetivo ? <><b>O que a Maintor Flow oferece:</b> {o.texto}</> : o.texto}</p>
+                          <p>{o.objetivo ? <><b>O que a gente constrói:</b> {o.texto}</> : o.texto}</p>
                           {o.amostras && (
                             <ul className="obra-amostras">
                               {o.amostras.map((a) => (
@@ -726,6 +703,8 @@ export default function App() {
                           {o.nota && <p className="obra-nota">{o.nota}</p>}
                           <div className="obra-links">
                             {lnk(o.acao, 'btn btn-fino')}
+                            {/* nas portas, os links seguintes são os projetos no ar que provam aquela solução */}
+                            {o.objetivo && o.mais?.length > 0 && <span className="micro obra-prova">Já no ar</span>}
                             {(o.mais || []).map((l) => lnk(l, 'link-mostarda'))}
                           </div>
                         </div>
@@ -757,7 +736,7 @@ export default function App() {
               <dl>
                 <div><dt>Projeto sob medida</dt><dd>Site, loja ou sistema. Você paga pelo desenvolvimento; domínio, contas e dados ficam no seu nome, e o que é entregue — código, treinamento, manual — fica descrito na proposta.</dd></div>
                 <div><dt>Serviço contínuo</dt><dd>Conteúdo, campanhas e manutenção mensal. Contratado à parte, com escopo e valor próprios.</dd></div>
-                <div><dt>Produto por assinatura</dt><dd>Maintor CMMS, Maintor FIT, Horaqui, Maintor RH e Maintor Task. Seguem as condições de cada produto.</dd></div>
+                <div><dt>Produto por assinatura</dt><dd>Maintor CMMS, Maintor FIT, Horaqui, SorrIA, Maintor RH e Maintor Task. Seguem as condições de cada produto.</dd></div>
               </dl>
             </div>
           </div>
@@ -891,7 +870,7 @@ export default function App() {
           <aside className="sala-painel" aria-label={`Porta ${sala + 1}: ${p.objetivo}`} key={sala}>
             <span className="micro">Porta {String(sala + 1).padStart(2, '0')} de {String(PORTAS.length).padStart(2, '0')} · {p.objetivo}</span>
             <h2 className="serif" tabIndex={-1} ref={salaTituloRef}>“{p.frase}”</h2>
-            <p className="sala-solucao"><b>O que a Maintor Flow oferece:</b> {p.texto}</p>
+            <p className="sala-solucao"><b>O que a gente constrói:</b> {p.texto}</p>
             <div className="sala-ctas">
               <a className="btn" href={whatsDe(p.assunto)} target="_blank" rel="noopener" onMouseEnter={blipHover}>Conversar sobre isso no WhatsApp</a>
               {[p.acao, ...(p.mais || [])].map((l) => (l.href.startsWith('#')

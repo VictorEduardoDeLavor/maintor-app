@@ -274,21 +274,39 @@ header .navrow {
    produção de 26/08 a 17/09 sem ninguém ver, porque a verificação da home
    rodava só em 1280px. Atributo (0,1,1) > classe (0,1,0). */
 .menu-painel[hidden] { display: none; }
-.menu-painel nav { display: flex; flex-direction: column; }
-.menu-painel nav a {
-  display: flex;
-  align-items: baseline;
-  gap: 18px;
-  padding: 18px 0;
-  border-top: var(--hairline);
-  text-decoration: none;
-  color: var(--creme);
-  font-size: clamp(28px, 8vw, 40px);
-  transition: color var(--t-rapido);
+/* ---- 15/11: o painel virou o MENU DO SITE (src/menu.js) — quatro grupos com tudo o que existe, o mesmo na home
+   e nas páginas internas, no celular e no computador. Abre pelos botões do cabeçalho ou pelo botão de menu. ---- */
+.menu-painel.mega { justify-content: flex-start; gap: var(--s4); padding: 96px clamp(20px, 5vw, 56px) 40px; background: rgba(9, 27, 27, .97); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); overscroll-behavior: contain; }
+.mega-grupos { display: flex; flex-direction: column; width: min(1240px, 100%); margin: 0 auto; }
+.mega-grupo { display: grid; grid-template-columns: 1fr; gap: 12px; padding: 22px 0; border-top: var(--hairline); }
+.mega-grupo:last-child { border-bottom: var(--hairline); }
+/* títulos do painel são parágrafos, não h2/h3: o painel vem antes do h1 da página e não entra na hierarquia dela */
+.mega-titulo { font-size: clamp(22px, 2.2vw, 28px); line-height: 1.15; margin: 0; }
+.mega-titulo a { color: var(--creme); text-decoration: none; }
+.mega-grupo.em-destaque .mega-titulo a, .mega-titulo a:hover { color: var(--mostarda); }
+.mega-colunas { display: grid; grid-template-columns: 1fr; gap: 18px 28px; }
+.mega-sub { color: var(--mostarda); margin: 0 0 4px; }
+.mega-sub a { color: inherit; text-decoration: none; }
+.mega-sub a:hover { text-decoration: underline; }
+.mega-colunas ul { list-style: none; margin: 0; padding: 0; }
+.mega-colunas li a { display: flex; flex-direction: column; justify-content: center; min-height: 44px; padding: 5px 0; text-decoration: none; color: var(--creme); }
+.mega-colunas li a b { font-weight: 600; font-size: 15px; line-height: 1.25; transition: color var(--t-rapido); }
+.mega-colunas li a span { font-size: 12.5px; line-height: 1.3; color: var(--cinza-claro); }
+.mega-colunas li a:hover b, .mega-colunas li a:focus-visible b { color: var(--mostarda); }
+.menu-painel.mega .menu-pe { width: min(1240px, 100%); margin: 0 auto; }
+@media (min-width: 821px) {
+  .mega-grupo { grid-template-columns: 230px 1fr; gap: 28px; }
+  .mega-colunas { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .mega-colunas li a { min-height: 40px; }
 }
-.menu-painel nav a:last-child { border-bottom: var(--hairline); }
-.menu-painel nav a:hover, .menu-painel nav a:focus-visible { color: var(--mostarda); }
-.menu-painel .idx-menu { color: var(--mostarda); font-size: 11px; }
+@media (min-width: 560px) and (max-width: 820px) { .mega-colunas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* os grupos no cabeçalho: mesmo desenho dos links, com a seta que vira quando o painel está aberto naquele grupo */
+.nav-grupo { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; cursor: pointer; }
+/* a seta é desenhada (a fonte do site não tem o caractere) */
+.nav-grupo i { width: 6px; height: 6px; margin-top: -3px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); font-size: 0; opacity: .75; transition: transform var(--t-rapido), margin var(--t-rapido); }
+.nav-grupo[aria-expanded="true"] { color: var(--mostarda); }
+.nav-grupo[aria-expanded="true"] i { transform: rotate(225deg); margin-top: 3px; }
+.navlinks { align-items: center; }
 .menu-pe { display: flex; align-items: center; gap: var(--s4); flex-wrap: wrap; }
 .som-no-menu { padding: 12px 4px; }
 
@@ -297,7 +315,7 @@ header .navrow {
   /* o botão de som sai do header (espremia a marca) e vai para o painel */
   .navrow > div > .som-toggle { display: none; }
 }
-@media (min-width: 821px) { .menu-painel { display: none; } }
+/* 15/11: no computador o botão de menu some (os grupos do cabeçalho abrem o painel); o painel vale nos dois tamanhos */
 
 /* ---- util ----------------------------------------------------- */
 .wrap {
@@ -1624,3 +1642,24 @@ html.expo-pronta .obra-legenda:focus-within { opacity: 1; transform: none; point
   html:not(.sem-3d) #como .linhas, html:not(.sem-3d) #como .modalidades, html:not(.sem-3d) .faq-home,
   html:not(.sem-3d) #como .regua, html:not(.sem-3d) #perguntas .regua, html:not(.sem-3d) #contato .regua { max-width: min(700px, 56vw); }
 }
+/* ================================================================
+   15/11 — ABERTURA COM O TOUR, ALA 02 "VOCÊ CONTA, A GENTE CONSTRÓI"
+   ================================================================ */
+.ala-passos { list-style: none; margin: var(--s4) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 760px; }
+.ala-passos li { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline; padding-top: 12px; border-top: 1px solid rgba(212, 165, 116, .45); }
+.ala-passos i { font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: .1em; color: var(--mostarda); grid-row: span 2; }
+.ala-passos b { color: var(--creme); font-size: 15px; font-weight: 600; }
+.ala-passos span { color: var(--cinza-claro); font-size: 14px; line-height: 1.4; }
+@media (max-width: 820px) {
+  .ala-passos { grid-template-columns: 1fr; gap: 0; margin-top: var(--s3); }
+  .ala-passos li { padding: 9px 0; }
+  .ala-passos span { font-size: 13.5px; }
+}
+.porta-btn.porta-outro { text-decoration: none; border-style: dashed; border-color: rgba(212, 165, 116, .7); color: var(--mostarda); }
+.porta-btn.porta-outro i { font-style: normal; }
+.obra-prova { color: var(--mostarda); align-self: center; }
+.ancora-antiga { position: absolute; }
+/* no computador o rótulo "Já no ar" abre a linha dos projetos (não fica solto ao lado do botão) */
+@media (min-width: 821px) { .obra-links .obra-prova { flex-basis: 100%; margin-top: 2px; } }
+/* no celular os títulos clicáveis do painel do menu ganham área de toque (44 px) */
+@media (max-width: 820px) { .mega-titulo a, .mega-sub a { display: inline-flex; align-items: center; min-height: 44px; } .mega-sub { margin-bottom: 0; } }

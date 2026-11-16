@@ -24,8 +24,8 @@ import { criarBoneco } from './Boneco.js'
    · alas sem quadro ganham uma peça (lâminas de vidro, laço, balão)
 
    v3 (05/11, à noite) — o que era HTML por cima virou parte do mundo:
-   · o TOTEM da entrada pergunta "Qual é o seu problema?"; clicar nele
-     abre as opções (o painel continua em HTML, acessível)
+   · (até 14/11 um TOTEM na entrada perguntava "Qual é o seu problema?". 15/11: saiu — quem recebe o visitante
+     é o boneco do Victor, acenando, com um BALÃO de fala que convida para o tour; clicar no balão começa o tour)
    · o LETREIRO pendurado sobre o corredor corre os serviços (era a faixa)
    · o SAGUÃO da Ala 2: uma porta por necessidade (sete), sobem do chão quando se
      chega; clicar numa porta leva para a SALA daquele tema (cômodo fora do
@@ -41,7 +41,7 @@ const OLHO = 1.7
 const suave = (a, b, x) => { const t = THREE.MathUtils.clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t) }
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
-/* texto desenhado num canvas vira textura (placas, totem, letreiro).
+/* texto desenhado num canvas vira textura (placas, balão do boneco, letreiro).
    Repinta quando as fontes do site terminam de carregar. */
 function placaCanvas(w, h, desenhar) {
   const c = document.createElement('canvas'); c.width = w; c.height = h
@@ -77,15 +77,13 @@ const F_LETREIRO = 'italic 104px "DM Serif Display"'
 const SERVICOS = ['loja virtual', 'loja no Instagram', 'site institucional', 'sistemas sob medida', 'gestão de manutenção',
   'gestão de RH', 'sistema para revender', 'automação de atendimento', 'vídeos personalizados', 'marketing e redes', 'tráfego pago']
 
-export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas = [], sala = null, aoPorta, aoPergunta, pergunta = false }) {
+export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas = [], sala = null, aoPorta, aoTour }) {
   const hostRef = useRef(null)
   // a cena é montada uma vez; o que muda depois chega por referência
   const salaRef = useRef(sala)
   const cbRef = useRef({})
   salaRef.current = sala
-  const perguntaRef = useRef(pergunta) // o painel "Qual é o seu problema?" está aberto
-  perguntaRef.current = pergunta
-  cbRef.current = { aoPorta, aoPergunta, aoFimIntro }
+  cbRef.current = { aoPorta, aoTour, aoFimIntro }
   const portasRef = useRef(portas)
 
   useEffect(() => {
@@ -259,7 +257,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     if (navigator.webdriver) window.__guia = guia.raiz // só para a bateria de aceite (robôs): conferir que ele anda
     // 11/11: sonda da limpeza visual (só robôs) — testes/aceite-limpeza.mjs lê daqui os objetos da cena e projeta os retângulos de tela.
     // Só as classes usadas, nunca o módulo THREE inteiro: passar o módulo como valor desliga o tree-shaking (+45 KB em gzip)
-    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, totem, portas3d, obras, guia, pecasAla, prog, ler, lado, get caixaLetreiro() { return letreiroAtual.grupo } })
+    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, balao, portas3d, obras, guia, pecasAla, prog, ler, lado, get caixaLetreiro() { return letreiroAtual.grupo } })
     const guiaPos = new THREE.Vector3(), guiaAnt = new THREE.Vector3(), guiaTan = new THREE.Vector3(), guiaDelta = new THREE.Vector3()
     let guiaComecou = false
 
@@ -273,7 +271,6 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     luzPortico.position.set(1.2, ALT - 0.1, -14); luzPortico.target.position.set(1.2, 5.2, -24)
     cena.add(luzPortico); cena.add(luzPortico.target)
     const retratoIni = window.innerWidth < window.innerHeight
-    const TOTEM_RETRATO = new THREE.Vector3(0.35, 0, -9.5), TOTEM_PAISAGEM = new THREE.Vector3(2.05, 0, -7)
     /* 11/11 — ABERTURA NO CELULAR (limpeza visual, Fase 1): "uma coisa por vez". Na primeira tela em pé,
        cada elemento tem a sua faixa e nenhum passa atrás do texto:
          · no alto, entre o cabeçalho e o título: o letreiro e, logo abaixo, o logo 3D (mais perto e menor)
@@ -301,13 +298,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const posicionarLockup = () => {
       // a luminária do teto que ficaria logo abaixo do logo (lida como um risco cinza) sai no retrato
       luzesTeto[1]?.forEach((o) => { o.visible = !(cam.aspect < 1) })
-      /* 12/11 (Fase 5): o letreiro, o totem e o foco do pórtico seguem a orientação ATUAL (antes ficavam presos à
+      /* 12/11 (Fase 5): o letreiro e o foco do pórtico seguem a orientação ATUAL (antes ficavam presos à
          do carregamento: virar o aparelho deixava o letreiro do computador atrás do título do celular) */
       const retr = cam.aspect < 1
       letreiroAtual = letreiros[retr ? 0 : 1]
       for (const lt of letreiros) lt.grupo.visible = lt === letreiroAtual
-      const tp = retr ? TOTEM_RETRATO : TOTEM_PAISAGEM
-      totem.position.set(tp.x, totem.position.y, tp.z); totem.rotation.y = Math.atan2(-1.6 - tp.x, -tp.z)
       INT.portico = retr ? 55 : 140
       if (introAcabou && !luzBaixa) luzPortico.intensity = INT.portico
       if (!lockupCaixa) return
@@ -326,7 +321,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
     }
     let introTl = null, renderizou = false, introAcabou = !intro, quadrosDesenhados = 0
-    // o totem e o letreiro só entram depois que o logo se monta (antes disputavam a tela com a abertura)
+    // o boneco, o balão e o letreiro só entram depois que o logo se monta (antes disputavam a tela com a abertura)
     const entrada = { v: intro ? 0 : 1 }
     const terminarIntro = () => {
       introAcabou = true
@@ -524,29 +519,48 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const clicaveis = []   // meshes com userData.acao
     const matBase = (cor) => new THREE.MeshBasicMaterial({ color: cor, toneMapped: false })
 
-    // 1) o TOTEM da entrada: "Qual é o seu problema?" — clicar abre as opções
-    const totem = new THREE.Group(); cena.add(totem)
-    const totemPos = retratoIni ? TOTEM_RETRATO : TOTEM_PAISAGEM
-    totem.position.copy(totemPos)
-    totem.rotation.y = Math.atan2(-1.6 - totemPos.x, -totemPos.z)
-    const placaTotem = placaCanvas(1024, 440, (g, c, hover = false) => {
-      g.fillStyle = 'rgba(9, 27, 27, 0.94)'; g.beginPath(); g.roundRect(6, 6, c.width - 12, c.height - 12, 34); g.fill()
-      g.lineWidth = hover ? 7 : 4; g.strokeStyle = '#D4A574'; g.stroke()
-      g.fillStyle = '#D4A574'; g.font = '700 28px Inter'; g.letterSpacing = '7px'; g.fillText('COMECE POR AQUI', 64, 92)
-      g.letterSpacing = '0px'; g.font = 'italic 96px "DM Serif Display"'
-      g.fillStyle = '#FAF7F2'; g.fillText('Qual é o seu', 64, 205)
-      g.fillStyle = '#D4A574'; g.fillText('problema?', 64, 300)
-      g.fillStyle = hover ? '#FAF7F2' : '#E6DDD0'; g.font = '600 32px Inter'; g.fillText(toque ? 'Toque e escolha o seu  →' : 'Clique e escolha o seu  →', 64, 384)
+    /* 1) o BALÃO de fala do boneco (15/11): na abertura o Victor recebe o visitante e convida para o tour. O balão
+       é um plano sempre de frente para a câmera, preso ao lado da cabeça do boneco; clicar nele começa o tour
+       (o mesmo que o botão "Começar o tour" do HTML). Some quando a rolagem começa. */
+    const balao = new THREE.Group(); cena.add(balao); balao.visible = false
+    const BAL = { w: 1024, h: 560 }
+    const placaBalao = placaCanvas(BAL.w, BAL.h, (g, c, hover = false, pc = true) => {
+      g.fillStyle = 'rgba(9, 27, 27, 0.985)'; g.strokeStyle = '#D4A574'; g.lineWidth = hover ? 7 : 4
+      const botao = (x, y, w, h, fonte, texto, tx) => {
+        g.fillStyle = hover ? '#E2B98A' : '#D4A574'; g.beginPath(); g.roundRect(x, y, w, h, h / 2); g.fill()
+        g.fillStyle = '#0B1F1F'; g.font = fonte; g.fillText(texto, tx, y + h * 0.64)
+      }
+      if (pc) {
+        // corpo arredondado + a ponta embaixo, à esquerda, apontando para a cabeça do boneco
+        const base = c.height - 70, px = 150
+        g.beginPath(); g.roundRect(6, 6, c.width - 12, base - 6, 40)
+        g.moveTo(px - 34, base - 2); g.lineTo(px - 64, c.height - 8); g.lineTo(px + 34, base - 2)
+        g.fill(); g.stroke()
+        g.fillRect(px - 30, base - 8, 60, 10) // apaga o traço da emenda entre o corpo e a ponta
+        g.fillStyle = '#D4A574'; g.font = '700 26px Inter'; g.letterSpacing = '7px'; g.fillText('VICTOR · MAINTOR FLOW', 60, 84)
+        g.letterSpacing = '0px'; g.font = 'italic 84px "DM Serif Display"'
+        g.fillStyle = '#FAF7F2'; g.fillText('Oi! Eu sou o Victor.', 60, 184)
+        g.fillStyle = '#E6DDD0'; g.font = '400 36px Inter'
+        g.fillText('Vem comigo ver o que a gente', 60, 252); g.fillText('já construiu?', 60, 300)
+        botao(60, 344, 470, 92, '700 36px Inter', 'Começar o tour  →', 104)
+      } else {
+        // celular: o boneco fica no canto direito — a ponta sai da lateral direita, na altura da cabeça; letra maior
+        const dir = c.width - 64, py = 330
+        g.beginPath(); g.roundRect(6, 6, dir - 6, c.height - 12, 44)
+        g.moveTo(dir - 2, py - 36); g.lineTo(c.width - 6, py + 26); g.lineTo(dir - 2, py + 36)
+        g.fill(); g.stroke()
+        g.fillRect(dir - 8, py - 32, 10, 64)
+        g.fillStyle = '#FAF7F2'; g.font = 'italic 104px "DM Serif Display"'; g.fillText('Oi! Eu sou o Victor.', 54, 138)
+        g.fillStyle = '#E6DDD0'; g.font = '400 56px Inter'
+        g.fillText('Vem comigo ver o que a', 54, 232); g.fillText('gente já construiu?', 54, 302)
+        botao(54, 372, 640, 128, '700 58px Inter', 'Começar o tour  →', 112)
+      }
     })
-    const telaTotem = new THREE.Mesh(new THREE.PlaneGeometry(1.95, 1.95 * 440 / 1024), new THREE.MeshBasicMaterial({ map: placaTotem.tex, transparent: true, toneMapped: false }))
-    telaTotem.position.set(0, 1.55, 0.03); telaTotem.userData.acao = { tipo: 'pergunta' }
-    totem.add(telaTotem); clicaveis.push(telaTotem)
-    const costas = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.88, 0.04), matLatao); costas.position.set(0, 1.55, 0); totem.add(costas)
-    const haste = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.12, 16), matLatao); haste.position.y = 0.56; totem.add(haste)
-    const pe = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.4, 0.05, 32), matLatao); pe.position.y = 0.025; totem.add(pe)
-    const anel = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.47, 48), matBase(COR.mostarda))
-    anel.rotation.x = -Math.PI / 2; anel.position.y = 0.012; totem.add(anel)
-    const luzTotem = new THREE.PointLight(COR.mostarda, 3, 4, 2); luzTotem.position.set(0, 1.6, 0.8); totem.add(luzTotem)
+    const telaBalao = new THREE.Mesh(new THREE.PlaneGeometry(1, BAL.h / BAL.w), new THREE.MeshBasicMaterial({ map: placaBalao.tex, transparent: true, toneMapped: false, depthTest: false }))
+    telaBalao.renderOrder = 20; telaBalao.userData.acao = { tipo: 'tour' }
+    balao.add(telaBalao); clicaveis.push(telaBalao)
+    let balaoLado = true, balaoV = 0, acenoEm = 0, ctasEl = null, ctasBase = 0, ctasEm = 0
+    const cabB = new THREE.Vector3(), upCam = new THREE.Vector3()
 
     // 2) o LETREIRO dos serviços, pendurado sobre o corredor (era a faixa que passava no site)
     /* 10/11: no celular em pé o letreiro ficava escondido atrás do cabeçalho e cortado nas laterais
@@ -688,13 +702,13 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       const h = ray.intersectObjects(vis, false)[0]
       return h && h.distance < 30 ? h.object.userData.acao : null
     }
-    const interativo = (el) => el?.closest?.('a, button, input, textarea, select, label, .obra-legenda, .guia, header, .sala-painel, .pergunta-painel, .portas-lista')
+    const interativo = (el) => el?.closest?.('a, button, input, textarea, select, label, .obra-legenda, .guia, header, .sala-painel, .menu-painel, .portas-lista')
     let hoverAcao = null
     const aoClicar = (e) => {
       if (modo !== 'passeio' || trocando || interativo(e.target)) return
       const a = acima(e.clientX, e.clientY)
       if (!a) return
-      if (a.tipo === 'pergunta') cbRef.current.aoPergunta?.()
+      if (a.tipo === 'tour') cbRef.current.aoTour?.()
       if (a.tipo === 'porta') cbRef.current.aoPorta?.(a.k)
     }
     const aoPairar = (e) => {
@@ -705,7 +719,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       hoverAcao = a
       document.body.style.cursor = a ? 'pointer' : ''
       document.getElementById('cursor')?.classList.toggle('cresce', !!a)
-      placaTotem.pintar(a?.tipo === 'pergunta')
+      placaBalao.pintar(a?.tipo === 'tour', balaoLado)
       portas3d.forEach((p, k) => p.placa.pintar(a?.tipo === 'porta' && a.k === k))
     }
     window.addEventListener('click', aoClicar)
@@ -725,7 +739,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     let cabecas = []
     const LONGE = 150 // além disso a névoa já apagou tudo: não se desenha
     const yDoc = (el) => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y } // sem as transformações das animações de entrada
-    const LER = { nevoa: 0.035, luz: 1, fio: 0.985, cena: 0.82, latao: 0.75, lataoArq: 1, bonecoPc: 0.34, fora: 1.55, parede: 0.7, piso: 0.85, abrePcLado: 0.1, abrePcFrente: 3.4 }
+    const LER = { nevoa: 0.035, luz: 1, fio: 0.985, cena: 0.82, latao: 0.75, lataoArq: 1, bonecoPc: 0.34, fora: 1.55, parede: 0.7, piso: 0.85, abrePcLado: 0.21, abrePcFrente: -1.5 }
+    // 15/11 — a recepção: largura máxima do balão de fala na tela (px) no computador e no celular; abaixo do mínimo ele não aparece
+    const RECEBE = { balaoPc: 400, balaoCel: 290, minimo: 190 }
     const alaDe = (y) => {
       if (!centros.length || y <= centros[0]) return 0
       for (let i = 1; i < centros.length; i++) if (y <= centros[i]) return i - 1 + (y - centros[i - 1]) / Math.max(centros[i] - centros[i - 1], 1)
@@ -773,14 +789,21 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
            sumia atrás da divisória entre as alas. Agora é uma fileira com curva suave, centrada no
            caminho, à frente da divisória (5–7 m de quem chega), cada porta virada para o visitante;
            se não couberem em tamanho cheio, as portas encolhem por igual. */
-        const n = portas3d.length, MEIO = 4.2
+        // 15/11: no celular a fileira é um pouco mais estreita (3,8 m de meia-largura): sobra folga para centrá-la no olhar
+        const n = portas3d.length, MEIO = cam.aspect < 1 ? 3.8 : 4.2
         /* 11/11 (Fase 3): com o palco depois do título, quem chega está a ~2 m de uma divisória; a regra antiga
            puxava a fileira para a frente dela e as portas ficavam a 1,5 m do rosto (uma porta enchia a tela).
            Agora a fileira fica 10 m à frente — passa da divisória, cabe mais porta na tela do celular e as sete
            aparecem no computador; se cair em cima de uma divisória, vai para logo depois dela. */
         let zFila = c.z - 10
         for (let i = 0; i < N - 1; i++) { const zd = -i * PASSO - 27; if (Math.abs(zd - zFila) < 2) zFila = zd - 2.5 }
-        const cx = THREE.MathUtils.clamp(c.x, -1.2, 1.2)
+        /* 15/11: a fileira fica centrada para onde a câmera OLHA no palco (um ponto à frente no caminho), não só
+           onde ela está: numa curva o olhar puxa para o lado e as portas apareciam ~70 px deslocadas no celular
+           (uma delas no limite da margem de toque). */
+        const cF = new THREE.Vector3(); caminho.getPointAt(Math.min(uS + 0.012, 0.999), cF)
+        const dzF = Math.max(0.5, c.z - cF.z)
+        const folga = 5.4 - MEIO // a ponta da fileira fica a pelo menos 35 cm da parede, como antes
+        const cx = THREE.MathUtils.clamp(c.x + (cF.x - c.x) * ((c.z - zFila) / dzF), -folga, folga)
         const passoX = n > 1 ? (2 * MEIO) / (n - 1) : 0
         const esc = n > 1 ? Math.min(1, passoX / 1.78) : 1
         portas3d.forEach((p, k) => {
@@ -833,8 +856,6 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       }
     }
     // o painel "Qual é o seu problema?" (no celular abre na faixa do boneco)
-    const painelEl = document.querySelector('.pergunta-painel')
-    const painelNaTela = () => { const r = painelEl?.getBoundingClientRect(); return !!r && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight }
     const guiaRumo = new THREE.Vector3()
     const aoVis = () => { visivel = document.visibilityState === 'visible'; if (visivel) quadro() }
     document.addEventListener('visibilitychange', aoVis)
@@ -929,13 +950,8 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       cam.lookAt(olhar)
       cam.getWorldDirection(fwd); right.crossVectors(fwd, up).normalize()
 
-      // o letreiro corre; o totem fica na entrada e afunda quando se segue; as portas sobem no saguão
+      // o letreiro corre; as portas sobem no saguão (o balão do boneco é posicionado junto com ele, mais abaixo)
       correrLetreiro(dt)
-      const fTotem = (1 - suave(0.35, 0.9, pTopo)) * entrada.v * (1 - ler) // 11/11: afunda também quando um título entra em leitura
-      totem.visible = fTotem > 0.01 && !retrato // 10/11: no celular em pé o totem ficava atrás do título; lá o atalho é o botão em HTML
-      totem.position.y = (fTotem - 1) * 2.6
-      anel.material.opacity = 1; anel.scale.setScalar(1 + Math.sin(t * 3) * 0.08)
-      luzTotem.intensity = 2.2 + Math.sin(t * 3) * 0.8
       /* 11/11 (Fase 3): as portas sobem DEPOIS que o título e a lista foram lidos — quando a base do bloco passa
          de 30% para 10% da altura da tela —, ficam de pé por ~55% de tela de rolagem (o "palco" delas, sem
          texto por cima) e descem antes de o primeiro quadro da ala se soltar. Antes subiam enquanto a
@@ -995,11 +1011,53 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       // no computador, em modo LER, o foco dele fica do lado de fora (direita): a luz não cai na coluna do texto
       if (!retrato && ler > 0.001) luzGuia.position.addScaledVector(right, 1.0 * ler)
       // no celular ele some de cena enquanto o painel de opções está aberto (abre na faixa dele) e quando sai pela direita
-      bonecoSome += (((perguntaRef.current && retrato && painelNaTela()) || foraCel ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
+      bonecoSome += ((foraCel ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
       guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v) * (1 - bonecoSome)))
       // no modo LER o foco dele fecha: ilumina o boneco e o chão em volta, sem acender a parede atrás dos rótulos
       luzGuia.intensity = 5.5 * (1 - bonecoSome) * (1 - 0.3 * ler); luzGuia.distance = 7 - (retrato ? 3.5 : 4.2) * ler
-      guia.atualizar(dt, { v: vGuia, tangente: guiaRumo, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t })
+      /* 15/11 — a recepção: na abertura (antes de a rolagem começar) o boneco fica de frente para quem chega, acena
+         quando aparece e de novo a cada ~9 s, e o balão de fala fica ao lado da cabeça dele — à direita no computador
+         (o texto da abertura ocupa a esquerda), à esquerda no celular (ele fica no canto direito). */
+      const recebe = (1 - suave(0.03, 0.22, pTopo)) * (entrada.v > 0.98 ? 1 : 0) * (1 - ler) * (1 - bonecoSome)
+      balaoV += ((recebe > 0.5 ? 1 : 0) - balaoV) * Math.min(1, dt * (recebe > 0.5 ? 5 : 9))
+      if (recebe > 0.5 && Math.abs(vGuia) < 0.2) { acenoEm -= dt; if (acenoEm <= 0) { guia.acenar(); acenoEm = 9 } } else acenoEm = Math.min(acenoEm, 0.6)
+      const ladoB = !retrato
+      if (ladoB !== balaoLado) { balaoLado = ladoB; placaBalao.pintar(hoverAcao?.tipo === 'tour', balaoLado) }
+      balao.visible = balaoV > 0.02
+      if (balao.visible) {
+        /* O balão é colocado pela TELA: acha a cabeça do boneco em px e ocupa o espaço livre ao lado dela —
+           no computador, acima e à direita (até a borda); no celular, à esquerda, entre os botões da abertura e a
+           base da tela. Se não couber um balão legível (tela muito baixa), ele não aparece: o botão em HTML basta. */
+        const vw = window.innerWidth, vh = window.innerHeight, hB = guia.altura
+        const d = Math.max(0.5, cabB.copy(guiaPos).sub(cam.position).dot(fwd))
+        const mpp = (2 * d * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2))) / vh // metros por px, na profundidade do boneco
+        cabB.copy(guiaPos); cabB.y = hB * 0.8; cabB.project(cam)
+        const hx = (cabB.x + 1) / 2 * vw, hy = (1 - cabB.y) / 2 * vh, meiaLarg = (hB * 0.3) / mpp, cabeca = (hB * 0.2) / mpp
+        ctasEm -= dt
+        if (ctasEm <= 0) { ctasEm = 0.4; ctasEl = ctasEl || document.querySelector('.entrada-ctas'); ctasBase = ctasEl ? ctasEl.getBoundingClientRect().bottom : 0 }
+        let largPx, cx, cy
+        if (ladoB) {
+          largPx = Math.min(RECEBE.balaoPc, vw - 24 - (hx + meiaLarg * 0.4))
+          const altPx = largPx * BAL.h / BAL.w
+          cx = hx + meiaLarg * 0.4 - largPx * 0.084 + largPx / 2
+          cy = Math.max(topoUtil + 12 + altPx / 2, hy - cabeca - altPx / 2)
+        } else {
+          const topo = ctasBase + 12, base = vh - 10
+          largPx = Math.min(RECEBE.balaoCel, hx - meiaLarg - 6 - 12, (base - topo) * BAL.w / BAL.h)
+          const altPx = largPx * BAL.h / BAL.w
+          cx = hx - meiaLarg - 6 - largPx / 2
+          cy = THREE.MathUtils.clamp(hy + altPx * 0.09 - altPx * 0.5 + altPx * 0.0, topo + altPx / 2, base - altPx / 2)
+        }
+        if (largPx < RECEBE.minimo) balao.visible = false
+        else {
+          upCam.crossVectors(right, fwd)
+          balao.position.copy(cam.position).addScaledVector(fwd, d).addScaledVector(right, (cx - vw / 2) * mpp).addScaledVector(upCam, (vh / 2 - cy) * mpp)
+          balao.quaternion.copy(cam.quaternion)
+          const e = balaoV * balaoV * (3 - 2 * balaoV)
+          balao.scale.setScalar(largPx * mpp * (0.6 + 0.4 * e)); telaBalao.material.opacity = e
+        }
+      }
+            guia.atualizar(dt, { v: vGuia, tangente: guiaRumo, camera: cam.position, alvo: olharObra && olharPeso > 0.05 ? olharObra.grupo.position : null, t, receber: recebe > 0.5 })
 
       let maior = 0, maiorObra = null, atual = olharPeso > 0.05 ? olharObra : null, maiorLuz = olharPeso
       const dist = retrato ? 7.2 : 4.6
@@ -1087,7 +1145,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       matCreme.opacity = matLataoL.opacity = opPortico * opPortico
       matCreme.envMapIntensity = matLataoL.envMapIntensity = opPortico
       matCreme.emissiveIntensity = 0.14 * opPortico
-      // o totem e o letreiro entram depois da abertura
+      // o letreiro entra depois da abertura
       // (11/11: no retrato ele também se recolhe no teto quando o passeio começa — não passa por trás do cabeçalho)
       letreiroAtual.grupo.position.y = letreiroAtual.L.y + (1 - entrada.v) * 2.2 + (letreiroAtual.nome === 'retrato' ? (1 - abre) * 2 : 0)
 

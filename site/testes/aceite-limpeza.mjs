@@ -11,7 +11,7 @@
 //                   que lê bem: a legenda de uma obra em painel de vidro (VOKE), medida na hora.
 //   2. CONTRASTE    cor do texto contra o ponto mais claro (ou mais escuro) do fundo real ≥ 4,5:1.
 //   3. SEM COLISÃO  raios lançados da câmera pelos pixels de cada bloco: se o primeiro objeto
-//                   atingido é o boneco ou um texto 3D (logo, letreiro, totem, placa, quadro), falha.
+//                   atingido é o boneco ou um texto 3D (logo, letreiro, balão do boneco, placa, quadro), falha.
 //   4. GUIA         a barra não aparece sem obra em foco e não cruza botão nem link.
 //   5. RÉGUA        nenhuma régua de seção com mais de uma linha.
 //   6. ABERTURA     os dois botões principais inteiros dentro de 390×700.
@@ -51,8 +51,10 @@ const TELAS = [
 const PONTOS = [
   { id: 'abertura', nome: 'Abertura', topo: true },
   { id: 'ala01', nome: 'Cabeça da Ala 01', ancora: '#trabalhos .regua', secao: 'trabalhos', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
-  { id: 'grupo1', nome: 'Grupo 1 · Projetos para clientes', ancora: '#projetos-clientes .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
-  { id: 'grupo2', nome: 'Grupo 2 · Produtos da Maintor', ancora: '#produtos-maintor .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  // 15/11: a Ala 01 passou a ter três grupos, pelo tipo de projeto
+  { id: 'grupo1', nome: 'Grupo 1 · Lojas virtuais', ancora: '#lojas-virtuais .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'grupo2', nome: 'Grupo 2 · Sites que geram contato', ancora: '#sites .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'grupo3', nome: 'Grupo 3 · Sistemas e aplicativos', ancora: '#sistemas-e-aplicativos .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
   { id: 'ala02', nome: 'Entrada da Ala 02', ancora: '#problemas .regua', secao: 'problemas', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
   { id: 'portas', nome: 'Lista das 7 portas', ancora: '#problemas .portas-lista', leitura: 0.2 },
   { id: 'ala03', nome: 'Cabeça da Ala 03', ancora: '#sistemas .regua', secao: 'sistemas', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
@@ -76,7 +78,7 @@ const NOME = { 1: 'Fundo calmo', 2: 'Contraste', 3: 'Sem colisão', 4: 'Guia', 5
 /* ------------------------------------------------------------------ a sonda (só em tempo de teste) */
 const MARCA = 'if (navigator.webdriver) window.__guia = guia.raiz'
 const SONDA = `
-    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, caixaLetreiro, totem, portas3d, obras, guia, pecasAla, prog })`
+    if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, caixaLetreiro, balao, portas3d, obras, guia, pecasAla, prog })`
 const pluginSonda = () => ({
   name: 'limpeza-sonda', enforce: 'pre',
   transform(code, id) {
@@ -159,7 +161,7 @@ function sondar({ rects, nevoaMin }) {
   const add = (nome, tipo, raiz, extra = {}) => { if (raiz) alvos.push({ nome, tipo, raiz, ...extra }) }
   add('logo 3D', 'texto3d', e.lockup, { opacidade: e.matCreme.opacity })
   add('letreiro', 'texto3d', e.caixaLetreiro)
-  add('totem', 'texto3d', e.totem)
+  add('balão do boneco', 'texto3d', e.balao)
   e.portas3d.forEach((p, k) => { add(`porta ${k + 1} (foto)`, 'foto', p.g); add(`placa da porta ${k + 1}`, 'texto3d', p.g.children.find((c) => c.material?.map === p.placa.tex)) })
   e.obras.forEach((o) => add(`quadro ${o.el.id.replace('obra-', '')}`, 'texto3d', o.grupo, { foco: o.foco }))
   add('boneco', 'boneco', e.guia.raiz)

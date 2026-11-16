@@ -29,6 +29,12 @@ const PAGINAS = [
   { nome: 'voke-produto', url: 'https://www.vokewear.com.br/p/conjunto-aura-halter-flare-preto', maxCss: 4200 },
   { nome: 'bendita-home', url: 'https://benditaacessorios.com' },
   { nome: 'bendita-produto', url: 'https://benditaacessorios.com/product/anel-aurora-tamanho-20', maxCss: 4200 },
+  // 15/11: projetos que estavam fora do site (autorização dos clientes confirmada pelo Victor em 15/11)
+  { nome: 'maktub-home', url: 'https://www.maktubconquista.com.br' },
+  // A&O: abertura, especialidade, laboratório, lentes, prévia do sorriso e os dentistas — SEM as telas de antes e depois (fotos de pacientes)
+  { nome: 'ao-site', url: 'https://scarlet-glow-331.higgsfield.app', metodo: 'telas', escolher: [0, 3, 7, 8, 11, 12] },
+  // SorrIA: a entrada do sistema + a prévia de sorriso em uso no site da clínica (mais: telas de outra página, na sequência)
+  { nome: 'sorria-telas', url: 'https://sorria-mvp-sprint1.vercel.app/login', metodo: 'telas', escolher: [0], mais: [{ url: 'https://scarlet-glow-331.higgsfield.app', escolher: [11] }] },
   { nome: 'besten-home', url: 'https://besten-site.vercel.app' },
   { nome: 'besten-servicos', url: 'https://besten-site.vercel.app/servicos' },
   // sites com seções presas durante a rolagem (GSAP/sticky): o quadro passa pelas telas que o visitante vê, uma a uma
@@ -132,7 +138,7 @@ async function capturarPagina(pg) {
     // avisos de cookie; e o nome da plataforma dos apps em TEXTO VISÍVEL ou em selo/link (a regra é sobre o que se lê —
     // fotos servidas por um endereço com esse nome continuam: escondê-las apagava as fotos de produto da Bendita)
     for (const el of document.querySelectorAll('[class*=cookie],[id*=cookie],[class*=Cookie],[class*=consent],[id*=consent]')) el.style.setProperty('display', 'none', 'important')
-    for (const el of document.querySelectorAll('body *')) { const folha = !el.children.length; const t = ((folha ? el.textContent || '' : '') + (el.tagName === 'A' ? el.getAttribute('href') || '' : '')).toLowerCase(); if (t.includes('base44') && (folha || el.getBoundingClientRect().height < 80)) el.style.setProperty('visibility', 'hidden', 'important') }
+    for (const el of document.querySelectorAll('body *')) { const folha = !el.children.length; const t = ((folha ? el.textContent || '' : '') + (el.tagName === 'A' ? el.getAttribute('href') || '' : '')).toLowerCase(); if ((t.includes('base44') || t.includes('higgsfield')) && (folha || el.getBoundingClientRect().height < 80)) el.style.setProperty('visibility', 'hidden', 'important') }
     // preço da Maintor: desfocado nas páginas dos produtos (regra da casa: nenhum R$ nosso no site da Flow)
     if (semPreco) for (const el of document.querySelectorAll('body *')) { if (el.children.length > 2) continue; const t = el.textContent || ''; if (/R\$\s*\d|\d+,\d{2}\s*\/\s*m[eê]s|\/m[eê]s\b/i.test(t) && t.length < 160) el.style.filter = 'blur(9px)' }
   }, !!pg.semPreco)
@@ -197,6 +203,7 @@ async function capturarPagina(pg) {
 const relatorio = []
 for (const pg of PAGINAS.filter((x) => !SO || SO.includes(x.nome))) {
   const { costurada, telas, total, fatias, escolhidas } = await capturarPagina(pg)
+  for (const m of pg.mais || []) telas.push(...(await capturarPagina({ nome: pg.nome + '-mais', url: m.url, metodo: 'telas', escolher: m.escolher })).telas)
   const s = await oficina.evaluate(montar, telas ? { fontes: telas, tipo: 'telas', aspecto: 1.6, maxAltura: MAX_ALTURA, fundo: FUNDO } : { fontes: [costurada], tipo: 'pagina', aspecto: 1.6, maxAltura: MAX_ALTURA, fundo: FUNDO })
   for (const suf of ['720', '1280', 'r960', 'r640']) gravar(`${pg.nome}-${suf}.webp`, s[suf])
   relatorio.push({ nome: pg.nome, tipo: telas ? 'telas' : 'pagina', telas: s.n || null, url: pg.url, alturaCss: total, fatias, r960: s.r960altura, r640: s.r640altura })
