@@ -172,7 +172,10 @@ Aceites no build: home 104/104 · menu 22/22 · rolagem 25/25.
 - Bateria completa no build publicado: home 104/104 · menu 22/22 · fluxos 25/25 · portas 65/65 · revender 71/71 · rolagem 25/25 · limpeza 0 falhas em 51.
 - Em produção (maintorflow.com.br): home 104/104 · menu 22/22 · revender 71/71 · rolagem 25/25.
 - A trava do deploy pegou o `_capturas.json` (diário do `capturar-rolagem.mjs`) dentro de `public/midia/rolagem/`: ele ia para o site desde 16/11 com o endereço provisório de um site capturado. Passou para `testes/rolagem-capturas.json` e o endereço antigo responde 404.
-- Fica em aberto: o GitHub Pages serve o repositório inteiro, então a pasta de trabalho `site/` (fontes e testes) também responde em `maintorflow.com.br/site/...`. Nada no site aponta para lá, mas é acessível por quem souber o caminho. Tirar isso pede mudar a forma de publicar (ramo ou Actions só com o build).
+- **Fechado no mesmo dia** (pedido do Victor, "Sim, feche"): o GitHub Pages servia o repositório inteiro, então a pasta de trabalho `site/` respondia em `maintorflow.com.br/site/...`. Agora o Pages serve só o ramo `gh-pages`, que guarda o build puro (`4a6e909`, idêntico ao que já estava no ar). O `main` ficou só com o código (`df68b52`).
+  - Conferido em produção: home, páginas internas, mídia, `sitemap.xml` e `robots.txt` respondem 200; `/site/`, `/site/src/obras.js`, `/site/testes/rolagem-capturas.json` e `/README.md` respondem 404; rota desconhecida cai na home; `www` e `http` redirecionam para `https://maintorflow.com.br/`.
+  - Publicar daqui em diante: `npm run build` → aceites → `npm run publicar` (travas de conteúdo embutidas, copia para `C:devmaintor-app-publicado`) → `add -A`, `commit` e `push origin gh-pages` nessa pasta. O `deploy-root.mjs` foi aposentado e só avisa.
+  - O repositório segue público: o que não pode aparecer não entra nem em `site/`.
 
 ## 8. Pontos para o Victor conferir
 
