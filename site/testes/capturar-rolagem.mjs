@@ -218,7 +218,7 @@ for (const pl of PILHAS.filter((x) => !SO || SO.includes(x.nome))) {
   relatorio.push({ nome: pl.nome, tipo: pl.grade ? 'feed' : 'telas', telas: s.n, aspecto: +pl.aspecto.toFixed(4), r960: [s.r960largura, s.r960altura], r640: [s.r640largura, s.r640altura] })
   console.log(`ok ${pl.nome}: ${s.n || 'feed'} telas → ${s.r960largura}×${s.r960altura} (960) · ${s.r640largura}×${s.r640altura} (640)`)
 }
-const arqRel = path.join(SAIDA, '_capturas.json')
+const arqRel = path.join(SITE, 'testes/rolagem-capturas.json') // fora de public: é registro de trabalho, não vai para o site
 const antigo = existsSync(arqRel) ? JSON.parse(readFileSync(arqRel, 'utf8')) : {}
 for (const r of relatorio) antigo[r.nome] = { ...r, capturado: new Date().toISOString().slice(0, 10) }
 writeFileSync(arqRel, JSON.stringify(antigo, null, 1))
