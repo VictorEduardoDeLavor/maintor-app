@@ -4,22 +4,26 @@ Site da marca de **serviços** da MAINTOR TECNOLOGIA LTDA: sites, lojas
 virtuais, marketing, automação de atendimento e sistemas sob medida para
 pequenos negócios.
 
-> ⚠️ Este README é servido publicamente pelo GitHub Pages. Nada de segredo,
-> preço fechado, dado de cliente ou informação interna aqui.
+> ⚠️ Este repositório é público. Nada de segredo, preço fechado, dado de
+> cliente ou informação interna aqui.
 
 ## Como mexer
 
-A fonte fica em **`site/`** (Vite + React + React Three Fiber + GSAP + Lenis).
-A raiz do repo guarda o **build publicado** — não edite os arquivos da raiz
-à mão, eles são sobrescritos.
+A fonte fica em **`site/`** (Vite + React + React Three Fiber + GSAP + Lenis),
+no ramo `main`. O que vai ao ar fica no ramo **`gh-pages`**, que guarda só o
+build e é o único que o GitHub Pages serve. Não edite o `gh-pages` à mão: ele
+é sobrescrito a cada publicação.
 
 ```bash
 cd site
 npm install
 npm run dev            # servidor de desenvolvimento
-npm run build          # gera site/dist
-node deploy-root.mjs   # copia o build para a raiz (+404.html)
-git add -A && git commit && git push   # GitHub Pages publica
+npm run build          # gera site/dist (com prerender)
+npm run publicar       # travas de conteúdo + cópia para a pasta do ramo gh-pages
+                       # (../maintor-app-publicado, criada na primeira vez)
+git -C ../../maintor-app-publicado add -A
+git -C ../../maintor-app-publicado commit -m "deploy: … (build de <hash>)"
+git -C ../../maintor-app-publicado push origin gh-pages   # GitHub Pages publica
 ```
 
 ## Design system

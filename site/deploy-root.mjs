@@ -1,34 +1,5 @@
-/* Copia site/dist para a raiz do repo (onde o GitHub Pages serve),
-   preservando CNAME, .nojekyll e a pasta do próprio site/.
-   Uso: npm run build && npm run deploy:root  */
-import { cpSync, rmSync, readdirSync, existsSync } from 'node:fs'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const aqui = dirname(fileURLToPath(import.meta.url))
-const dist = join(aqui, 'dist')
-const raiz = join(aqui, '..')
-
-if (!existsSync(dist)) {
-  console.error('site/dist não existe — rode `npm run build` antes.')
-  process.exit(1)
-}
-
-const PRESERVAR = new Set(['.git', '.nojekyll', 'CNAME', 'site', 'README.md'])
-// 404.html não vem do build: é cópia do index (fallback de rota do GitHub Pages).
-// Recriar aqui evita depender de um `cp` manual lembrado a cada deploy.
-
-// limpa a raiz (só o que é build antigo)
-for (const item of readdirSync(raiz)) {
-  if (PRESERVAR.has(item)) continue
-  rmSync(join(raiz, item), { recursive: true, force: true })
-}
-
-// copia o build novo
-for (const item of readdirSync(dist)) {
-  cpSync(join(dist, item), join(raiz, item), { recursive: true })
-}
-
-cpSync(join(dist, 'index.html'), join(raiz, '404.html'))
-
-console.log('Build copiado para a raiz do repo (+404.html). Confira com git status.')
+/* APOSENTADO em 18/11/2026. Este arquivo copiava o build para a raiz do `main`, e o GitHub Pages servia o
+   repositório inteiro (a pasta de trabalho `site/` ficava acessível pelo site). Hoje o Pages serve só o ramo
+   `gh-pages`. Use `npm run publicar` (site/publicar.mjs) — o passo a passo está no topo dele. */
+console.error('\ndeploy-root.mjs foi aposentado: o site agora é publicado pelo ramo gh-pages.\nRode `npm run publicar` (site/publicar.mjs) e siga o passo a passo do topo do arquivo.\n')
+process.exit(1)

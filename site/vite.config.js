@@ -6,7 +6,7 @@ import { menuPaginas } from './menu-paginas.js'
 
 const aqui = fileURLToPath(new URL('.', import.meta.url))
 
-// Build fica em site/dist; o script deploy-root.mjs copia para a raiz do repo
+// Build fica em site/dist; o script publicar.mjs copia para a pasta do ramo gh-pages
 // (onde o GitHub Pages serve), preservando CNAME, .nojekyll e index.md.
 export default defineConfig({
   plugins: [react(), medicao(), menuPaginas()],

@@ -3,7 +3,7 @@
  * Por que um plugin e não colar a tag em cada HTML: o build tem 16 entradas
  * (home React + 15 páginas estáticas sem JS). O transformIndexHtml do Vite
  * roda em todas, e página nova entra coberta sem ninguém lembrar. O 404.html
- * é cópia do index (deploy-root.mjs), então também.
+ * é cópia do index (publicar.mjs), então também.
  *
  * Duas partes:
  *
