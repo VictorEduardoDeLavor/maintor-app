@@ -167,6 +167,13 @@ Decisões do Victor (17/11): capturar as telas rodando o SorrIA em local, com um
 
 Aceites no build: home 104/104 · menu 22/22 · rolagem 25/25.
 
+**Publicado em 18/11/2026**, com o "pode publicar" do Victor (deploy `a483c06`, build de `2cc8e22`).
+
+- Bateria completa no build publicado: home 104/104 · menu 22/22 · fluxos 25/25 · portas 65/65 · revender 71/71 · rolagem 25/25 · limpeza 0 falhas em 51.
+- Em produção (maintorflow.com.br): home 104/104 · menu 22/22 · revender 71/71 · rolagem 25/25.
+- A trava do deploy pegou o `_capturas.json` (diário do `capturar-rolagem.mjs`) dentro de `public/midia/rolagem/`: ele ia para o site desde 16/11 com o endereço provisório de um site capturado. Passou para `testes/rolagem-capturas.json` e o endereço antigo responde 404.
+- Fica em aberto: o GitHub Pages serve o repositório inteiro, então a pasta de trabalho `site/` (fontes e testes) também responde em `maintorflow.com.br/site/...`. Nada no site aponta para lá, mas é acessível por quem souber o caminho. Tirar isso pede mudar a forma de publicar (ramo ou Actions só com o build).
+
 ## 8. Pontos para o Victor conferir
 
 1. **Frase da Alves & Oliveira.** Decidido em 17/11: não afirmar que a clínica usa o SorrIA. O site descreve só o que aparece no site dela.
