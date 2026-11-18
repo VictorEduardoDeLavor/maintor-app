@@ -254,12 +254,16 @@
  "sorria-telas": {
   "nome": "sorria-telas",
   "tipo": "telas",
-  "telas": 2,
-  "url": "https://sorria-mvp-sprint1.vercel.app/login",
-  "alturaCss": 948,
-  "fatias": 2,
-  "r960": 1236,
-  "r640": 824,
-  "capturado": "2026-11-16"
+  "telas": 4,
+  "aspecto": 1.6,
+  "r960": [
+   960,
+   2508
+  ],
+  "r640": [
+   640,
+   1672
+  ],
+  "capturado": "2026-11-18"
  }
 }

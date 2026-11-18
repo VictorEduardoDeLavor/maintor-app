@@ -33,8 +33,6 @@ const PAGINAS = [
   { nome: 'maktub-home', url: 'https://www.maktubconquista.com.br' },
   // A&O: abertura, especialidade, laboratório, lentes, prévia do sorriso e os dentistas — SEM as telas de antes e depois (fotos de pacientes)
   { nome: 'ao-site', url: 'https://scarlet-glow-331.higgsfield.app', metodo: 'telas', escolher: [0, 3, 7, 8, 11, 12] },
-  // SorrIA: a entrada do sistema + a prévia de sorriso em uso no site da clínica (mais: telas de outra página, na sequência)
-  { nome: 'sorria-telas', url: 'https://sorria-mvp-sprint1.vercel.app/login', metodo: 'telas', escolher: [0], mais: [{ url: 'https://scarlet-glow-331.higgsfield.app', escolher: [11] }] },
   { nome: 'besten-home', url: 'https://besten-site.vercel.app' },
   { nome: 'besten-servicos', url: 'https://besten-site.vercel.app/servicos' },
   // sites com seções presas durante a rolagem (GSAP/sticky): o quadro passa pelas telas que o visitante vê, uma a uma
@@ -51,6 +49,10 @@ const PILHAS = [
   { nome: 'task-telas', aspecto: 1.6, telas: [PF('task-indicadores-1280.webp'), PF('task-relatorios-1280.webp')] },
   // 14/11: as telas do CMMS são 16:9 (em 1,6 o recorte comia 5% de cada lado — "ns de Serviço")
   { nome: 'cmms-telas', aspecto: 16 / 9, telas: [T('01_dashboard.png'), T('02_ordens_servico.png'), T('06_calendario_preventivas.png'), T('05_historico_ativo.png'), T('08_estoque.png')] },
+  /* SorrIA por dentro (18/11): telas capturadas do sistema rodando em local, com uma clínica de demonstração
+     ("Clínica Aurora Odontologia") e pacientes fictícios — nenhum dado de clínica real. Antes o quadro mostrava só
+     a tela de entrada. As quatro fontes ficam em public/midia/portfolio/sorria-*-1920.webp. */
+  { nome: 'sorria-telas', aspecto: 1.6, telas: [PF('sorria-agenda-1920.webp'), PF('sorria-crm-1920.webp'), PF('sorria-financeiro-1920.webp'), PF('sorria-estoque-1920.webp')] },
   { nome: 'besten-portal', aspecto: 1.6, telas: [PF('besten-kpis-1920.webp'), PF('besten-biblioteca-1920.webp'), PF('besten-onboarding-1920.webp')] },
   // 14/11: mistura 16:9 (CMMS) com 1,6 (Task, RH, Besten): quadro em 16:9 e cada tela INTEIRA, com faixa escura dos lados
   { nome: 'sistemas-telas', aspecto: 16 / 9, conter: true, telas: [T('02_ordens_servico.png'), PF('task-indicadores-1280.webp'), PF('rh-painel-1280.webp'), PF('besten-kpis-1920.webp'), T('06_calendario_preventivas.png')] },

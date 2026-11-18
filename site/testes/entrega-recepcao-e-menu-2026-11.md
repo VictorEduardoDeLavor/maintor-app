@@ -155,9 +155,21 @@ O `aceite-menu.mjs` passou a ter 22 verificações: as 16 aberturas com duas aç
 
 Bateria completa no build desta rodada (16/11): home 104/104 · menu 22/22 · fluxos 25/25 · portas 65/65 · revender 71/71 · rolagem 25/25 · limpeza 0 falhas em 51. Publicado em 16/11/2026, com o "pode publicar" do Victor.
 
+## 7c. Rodada de 18/11: o SorrIA por dentro
+
+Decisões do Victor (17/11): capturar as telas rodando o SorrIA em local, com uma clínica de demonstração; e **não afirmar** que a Alves & Oliveira usa o SorrIA.
+
+- O SorrIA não subia em local: as chaves do `.env.local` continuam por preencher. Em vez de usar chaves de produção, subi um banco local só para a demonstração (Supabase no WSL, pasta `~/sorria-demo`, portas 58321 e 58322) e um `.env.development.local` no projeto, que só vale no `npm run dev`.
+- Criei a clínica fictícia "Clínica Aurora Odontologia", com 8 pacientes, 7 consultas, 5 contatos, 7 lançamentos e 8 materiais, todos inventados. Nenhum dado de clínica real foi aberto e nada foi gravado no banco de produção.
+- O quadro do SorrIA passou a mostrar quatro telas do sistema: agenda, funil de contatos, financeiro e estoque. Antes mostrava a tela de entrada e um trecho do site da Alves & Oliveira, que saiu.
+- O quadro da Alves & Oliveira deixou de ter o link "Ver o SorrIA".
+- O banco local foi desligado no fim (os dados ficam guardados). Para religar: no WSL, `cd ~/sorria-demo && supabase start`; no Claude, o servidor `sorria-demo` (porta 3900).
+
+Aceites no build: home 104/104 · menu 22/22 · rolagem 25/25.
+
 ## 8. Pontos para o Victor conferir
 
-1. **Frase da Alves & Oliveira.** O quadro diz que o site tem "o pedido de uma prévia do sorriso". A nota do SorrIA diz: "Na tela, a entrada do SorrIA e o pedido de prévia do sorriso no site da Alves & Oliveira." Não afirmei que a clínica usa o SorrIA no dia a dia. Se usa, dá para dizer isso com todas as letras.
-2. **Telas de dentro do SorrIA.** Só capturei a entrada do sistema, que é pública. Para mostrar agenda, proposta e financeiro, preciso de uma conta de demonstração.
+1. **Frase da Alves & Oliveira.** Decidido em 17/11: não afirmar que a clínica usa o SorrIA. O site descreve só o que aparece no site dela.
+2. **Telas de dentro do SorrIA.** Resolvido em 18/11 (seção 7c). Falta só a tela da simulação de sorriso, que gasta crédito de IA e precisa de foto.
 3. **Site da Alves & Oliveira sem link externo.** Ele ainda está num endereço provisório. O botão do quadro leva à página "Site para clínicas". Quando o domínio da clínica estiver no ar, entra o "Visitar site".
 4. **Textos das páginas internas.** Reescritos na rodada de 15–16/11 (seção 7b).

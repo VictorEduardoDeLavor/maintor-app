@@ -112,7 +112,7 @@ export const ALAS = [
         texto: 'Site da clínica com as especialidades, o laboratório de prótese próprio, o agendamento da avaliação pelo WhatsApp e o pedido de uma prévia do sorriso.',
         ...tela('ao-site', 'telas', 6), w: 5.4,
         acao: { href: '/site-para-clinica-odontologica/', rotulo: 'Ver site para clínicas' },
-        mais: [{ href: '#obra-sorria', rotulo: 'Ver o SorrIA' }],
+        mais: [{ href: '/sites/', rotulo: 'Como fica o seu site' }],
         assunto: 'um site para clínica como o da Alves & Oliveira',
       },
       {
@@ -134,8 +134,8 @@ export const ALAS = [
       {
         id: 'sorria', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'SorrIA', categoria: 'Sistema para clínicas odontológicas',
         texto: 'Sistema para clínicas odontológicas: simula o novo sorriso do paciente a partir de uma foto, monta a proposta do tratamento e acompanha agenda, atendimentos e financeiro.',
-        ...tela('sorria-telas', 'telas', 2), w: 5.4,
-        nota: 'Na tela, a entrada do SorrIA e o pedido de prévia do sorriso no site da Alves & Oliveira.',
+        ...tela('sorria-telas', 'telas', 4), w: 5.4,
+        nota: 'Na tela, a agenda, o funil de contatos, o financeiro e o estoque do SorrIA, com uma clínica de demonstração.',
         acao: { whats: true, rotulo: 'Pedir uma demonstração' },
         mais: [{ href: '/site-para-clinica-odontologica/', rotulo: 'Site para clínicas' }],
         assunto: 'uma demonstração do SorrIA para a minha clínica',
