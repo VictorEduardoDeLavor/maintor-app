@@ -28,15 +28,19 @@ export const MENU = [
     titulo: 'O tour pelos projetos no ar',
     colunas: [
       {
-        titulo: 'Comece por aqui',
+        // 25/11: o tour abre com os projetos de site + gestão (Matuura, TRDD, Besten)
+        titulo: 'Site com gestão', href: '/#site-e-gestao',
         links: [
-          { href: '/#trabalhos', rotulo: 'Começar o tour', nota: '12 projetos, do primeiro ao último' },
-          { href: '/casos/voke-wear/', rotulo: 'Case VOKE WEAR', nota: 'A loja por dentro, do pedido à entrega' },
+          { href: '/#trabalhos', rotulo: 'Começar o tour', nota: '14 projetos, do primeiro ao último' },
+          { href: '/#obra-matuura', rotulo: 'Matuura Seguros', nota: 'Corretora: site, central e área do cliente' },
+          { href: '/#obra-trdd', rotulo: 'TRDD Records', nota: 'Gravadora: site e painel da equipe' },
+          { href: '/#obra-besten', rotulo: 'Besten Consultoria', nota: 'Site e portal interno' },
         ],
       },
       {
         titulo: 'Lojas virtuais', href: '/#lojas-virtuais',
         links: [
+          { href: '/casos/voke-wear/', rotulo: 'Case VOKE WEAR', nota: 'A loja por dentro, do pedido à entrega' },
           { href: '/#obra-voke', rotulo: 'VOKE WEAR', nota: 'Moda fitness' },
           { href: '/#obra-maktub', rotulo: 'Maktub Conquista', nota: 'Calçados femininos' },
           { href: '/#obra-bendita', rotulo: 'Bendita Acessórios', nota: 'Semijoias' },
@@ -47,7 +51,6 @@ export const MENU = [
         links: [
           { href: '/#obra-techtrainer', rotulo: 'Studio TechTrainer', nota: 'Studio de personal, com agendamento' },
           { href: '/#obra-ao', rotulo: 'Alves & Oliveira', nota: 'Clínica odontológica' },
-          { href: '/#obra-besten', rotulo: 'Besten Consultoria', nota: 'Site e portal interno' },
         ],
       },
       {

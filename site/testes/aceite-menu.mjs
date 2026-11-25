@@ -1,6 +1,6 @@
 // Aceite do MENU DO SITE e do PRÓXIMO PASSO (15/11/2026). Fonte única: src/menu.js.
 //   1. as 22 páginas internas com cabeçalho usam o mesmo menu da home: 4 grupos + Contato, a marca em imagem
-//   2. o painel lista TODAS as páginas do site e os 12 projetos (nada escondido); a página atual vem marcada
+//   2. o painel lista TODAS as páginas do site e os 14 projetos (nada escondido); a página atual vem marcada
 //   3. cada página guarda o WhatsApp dela (mensagem pronta própria) no cabeçalho
 //   4. o painel abre pelo grupo (computador) e pelo botão (celular), fecha com Esc e devolve a rolagem
 //   5. toda página tem o bloco "Veja funcionando" antes da chamada final, com projetos do tour e o passo seguinte;
@@ -49,7 +49,7 @@ for (const pg of PAGINAS) {
   if (d.abertura && d.abertura.nota) {
     comAbertura++
     const [wa, ver] = d.abertura.hrefs
-    const verOk = !!ver && (obras.has(ver) || PAGINAS.includes(ver) || ['/#lojas-virtuais', '/#sites', '/#sistemas-e-aplicativos', '/#trabalhos'].includes(ver))
+    const verOk = !!ver && (obras.has(ver) || PAGINAS.includes(ver) || ['/#site-e-gestao', '/#lojas-virtuais', '/#sites', '/#sistemas-e-aplicativos', '/#trabalhos'].includes(ver))
     if (d.abertura.hrefs.length !== 2 || !wa.includes('wa.me/5511946610634') || !verOk || d.abertura.nota.startsWith('Primeira conversa sem compromisso') || d.abertura.rotulos[0] === 'Conversar no WhatsApp' || !d.abertura.nota.endsWith('Sem compromisso · (11) 94661-0634')) ruins.abertura.push(pg)
     if (d.abertura.base > d.abertura.vh) ruins.dobra.push(`${pg} (${d.abertura.base} px)`)
   }

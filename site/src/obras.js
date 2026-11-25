@@ -35,6 +35,13 @@
    cliente ou produto da Maintor. A Ala 02 virou "você conta, a gente
    constrói": portas na ordem do que o cliente da Flow mais procura. Foto de ambiente leva a nota de imagem
    ilustrativa — não é trabalho entregue.
+
+   25/11/2026 — pedido do Victor: Matuura Seguros e TRDD Records abrem o tour, num grupo novo, "Site com
+   gestão" (com a Besten, que é site + portal). E cada projeto mostra o que existe POR TRÁS do que o
+   visitante vê (campo `gestao`): quem olha a Bendita vê uma loja, mas por trás tem estúdio de fotos com
+   IA, etiqueta de frete no pedido, cupons, afiliados… Só entra o que foi conferido no código ou na página
+   no ar de cada projeto; tela de demonstração ou de teste leva nota.
+     gestao: { rotulo, resumo: [3 frases curtas], itens: [{ t, d }], telas: [{ img, legenda }], nota }
    ================================================================ */
 
 const P = '/midia/portfolio/'
@@ -43,6 +50,7 @@ const S = '/midia/social/'
 const ROL = '/midia/rolagem/'
 /* a tela que rola: a primeira tela vira o quadro parado (e a imagem da legenda sem 3D); a faixa alta corre quando
    a obra está em leitura. 'pagina' = um site no ar descendo; 'telas' = n telas reais passando uma a uma. */
+const G = '/midia/gestao/' // telas de gestão ("Por trás"): <nome>-1280.webp e -640.webp, de testes/capturar-gestao.mjs
 const tela = (nome, modo = 'pagina', n = 0) => ({ img: ROL + nome + '-720.webp', rolagem: { base: ROL + nome, modo, n } })
 
 /* versão HD de cada imagem para o quadro em 3D (05/11): prints dos sites em 1920 px
@@ -61,6 +69,7 @@ const DEMO = 'Telas de uma empresa de demonstração.'
 /* Ala 01 em três grupos, pelo tipo de projeto (15/11). O id do grupo é âncora pública; `alias` mantém
    as âncoras antigas (/#projetos-clientes, /#produtos-maintor) chegando num lugar que faz sentido. */
 export const GRUPOS = {
+  gestao: { id: 'site-e-gestao', titulo: 'Site com gestão', lead: 'Por fora, o site que o cliente vê. Por dentro, o painel com que a empresa toca o dia a dia: pedidos, agenda, carteira, conteúdo.' },
   lojas: { id: 'lojas-virtuais', alias: 'projetos-clientes', titulo: 'Lojas virtuais', lead: 'Lojas no ar, com pedido, pagamento e frete funcionando. O domínio, a conta e o painel ficam no nome de quem é dono.' },
   sites: { id: 'sites', titulo: 'Sites que geram contato', lead: 'Para quem vende serviço ou atende com hora marcada: o visitante entende o que você faz, confia e chama.' },
   apps: { id: 'sistemas-e-aplicativos', alias: 'produtos-maintor', titulo: 'Sistemas e aplicativos', lead: 'Sistemas que a Maintor criou e mantém em operação. É a mesma engenharia que entra no seu projeto.' },
@@ -70,11 +79,95 @@ export const ALAS = [
   {
     id: 'trabalhos',
     eyebrow: 'Ala 01 · Trabalhos no ar',
-    eyebrowCurto: 'Ala 01 · No ar', // no celular estreito (360 px) a régua cabe em uma linha com "12 projetos"
-    contagem: '12 projetos',
-    titulo: 'Doze projetos no ar. Um deles parece com o seu.',
+    eyebrowCurto: 'Ala 01 · No ar', // no celular estreito (360 px) a régua cabe em uma linha com "14 projetos"
+    contagem: '14 projetos',
+    titulo: 'Catorze projetos no ar. Um deles parece com o seu.',
     lead: 'Abra uma loja, navegue por um site ou veja as telas de um sistema. Tudo aqui foi construído pela Maintor Flow e está funcionando.',
     obras: [
+      {
+        id: 'matuura', grupo: 'gestao', selo: 'Projeto para cliente', titulo: 'Matuura Seguros', categoria: 'Site e plataforma para corretora de seguros',
+        texto: 'Site da corretora com 66 anos de história, simulador de consórcio, sinistro guiado e pedido de avaliação. Por trás, uma central para acompanhar renovações, montar cotações e atender o cliente na área dele.',
+        ...tela('matuura-home', 'telas', 6), w: 5.4,
+        acao: { href: 'https://matuura-prototipo.vercel.app', rotulo: 'Visitar site', externo: true },
+        mais: [{ href: 'https://matuura-prototipo.vercel.app/central/', rotulo: 'Ver a Central (demonstração)', externo: true }],
+        nota: 'Endereço provisório até a publicação no domínio da corretora.',
+        assunto: 'um site com gestão como o da Matuura Seguros',
+        gestao: {
+          rotulo: 'Por trás do site',
+          resumo: ['Radar de renovação', 'Cotação Expressa', 'Área do cliente'],
+          itens: [
+            { t: 'Simulador de consórcio', d: 'O visitante simula pelo valor do bem ou pela parcela, em três passos, e manda o resultado pelo WhatsApp.' },
+            { t: 'Sinistro guiado', d: 'Um passo a passo do que fazer na hora do sinistro, que termina no WhatsApp da corretora.' },
+            { t: 'Pedido de avaliação', d: 'Página e cartão de balcão com QR para o cliente avaliar a corretora no Google.' },
+            { t: 'Central Matuura', d: 'O radar de renovação mostra quem vence nos próximos dias e quem chamar hoje; cada cliente tem a carteira com apólices e prazos.' },
+            { t: 'Cotação Expressa', d: 'O cliente manda a foto dos documentos, a corretora escolhe o que recomenda e o cliente recebe um link simples para comparar e aceitar.' },
+            { t: 'Área do cliente', d: 'O segurado entra com o celular e um código no WhatsApp e vê apólices, documentos, datas e o caminho do sinistro.' },
+          ],
+          telas: [
+            { img: G + 'matuura-central', legenda: 'Central Matuura: radar de renovação' },
+            { img: G + 'matuura-cotacao', legenda: 'Cotação Expressa' },
+            { img: G + 'matuura-carteira', legenda: 'A carteira do cliente' },
+            { img: G + 'matuura-area', legenda: 'Área do cliente' },
+          ],
+          nota: 'Central, Cotação Expressa e área do cliente com dados de demonstração.',
+        },
+      },
+      {
+        id: 'trdd', grupo: 'gestao', selo: 'Projeto para cliente', titulo: 'TRDD Records', categoria: 'Site e painel de gestão para gravadora',
+        texto: 'Site da gravadora com os artistas, o player do Spotify, os clipes e a venda de produção do TRDD Lab. Por trás, um painel em que a equipe edita tudo e recebe os pedidos de show já organizados.',
+        ...tela('trdd-home', 'telas', 6), w: 5.4,
+        acao: { href: 'https://trdd-records-previa.vercel.app', rotulo: 'Visitar site', externo: true },
+        nota: 'Endereço provisório até a publicação no domínio da gravadora.',
+        assunto: 'um site com painel de gestão como o da TRDD Records',
+        gestao: {
+          rotulo: 'Por trás do site',
+          resumo: ['Painel para editar o site todo', 'Pedidos de show com triagem', 'Agenda do TRDD Lab'],
+          itens: [
+            { t: 'Painel de edição', d: 'A equipe muda textos, fotos (com editor de recorte), artistas, músicas, clipes e números sem programador, vê a prévia e publica.' },
+            { t: 'Ordem do site', d: 'Arrastar para mudar a ordem das partes da página inicial ou esconder uma delas.' },
+            { t: 'Histórico', d: 'Cada publicação fica guardada; dá para abrir uma versão antiga e publicar de novo.' },
+            { t: 'Pedidos de show', d: 'Cada pedido chega com formato, evento, público e verba, já com a prioridade calculada e a resposta pronta para o WhatsApp. Exporta planilha.' },
+            { t: 'Família TRDD', d: 'O cadastro dos fãs que querem saber de lançamento, drop e show, com planilha para exportar.' },
+            { t: 'TRDD Lab', d: 'Página de venda de produção com questionário e reserva de horário de verdade na agenda do produtor.' },
+            { t: 'Acessos por convite', d: 'Dono, equipe e artista entram com o próprio login e veem só o que é seu; o artista preenche a ficha de lançamento na área dele.' },
+            { t: 'Loja TRDD Supply', d: 'A loja dos drops já está pronta e fica escondida até a gravadora decidir abrir.' },
+          ],
+          telas: [
+            { img: G + 'trdd-artistas', legenda: 'Painel: artistas' },
+            { img: G + 'trdd-pedidos', legenda: 'Pedidos de show e fãs' },
+            { img: G + 'trdd-producao', legenda: 'TRDD Lab: conversas marcadas e agenda' },
+            { img: G + 'trdd-ordem', legenda: 'Ordem das partes do site' },
+          ],
+          nota: 'Telas do painel com conteúdo de teste.',
+        },
+      },
+      {
+        id: 'besten', grupo: 'gestao', selo: 'Projeto para cliente', titulo: 'Besten Consultoria', categoria: 'Site institucional e portal interno',
+        texto: 'Site institucional e portal que reúne indicadores dos projetos, tarefas da equipe, materiais e trilha de integração dos consultores.',
+        ...tela('besten-home'), w: 5.4,
+        nota: 'Na tela, o site institucional. O portal interno é de uso da equipe e exige login.',
+        acao: { href: 'https://besten-site.vercel.app', rotulo: 'Visitar site institucional', externo: true },
+        assunto: 'um site com portal interno parecido com o da Besten Consultoria',
+        gestao: {
+          rotulo: 'Por trás do site',
+          resumo: ['Indicadores dos projetos', 'Tarefas do dia da equipe', 'Trilha de integração'],
+          itens: [
+            { t: 'Indicadores', d: 'Os números de cada projeto e o painel geral, com o ranking de todos os projetos da consultoria.' },
+            { t: 'Hoje', d: 'As tarefas do dia de cada consultor, em lista e em quadro.' },
+            { t: 'Projetos e documentos', d: 'Tudo de cada cliente num lugar só.' },
+            { t: 'Biblioteca', d: 'Os materiais e o padrão de e-mails da consultoria, para a equipe inteira falar do mesmo jeito.' },
+            { t: 'Trilha de integração', d: 'O caminho do consultor novo, do primeiro dia até atender sozinho.' },
+            { t: 'Gestão da equipe', d: 'Aprovações e time para o gerente; consultores, regras e pedidos de acesso para o administrador.' },
+            { t: 'Propostas com link', d: 'A proposta vai por um link e a consultoria vê quando o cliente abriu.' },
+          ],
+          telas: [
+            { img: '/midia/portfolio/besten-kpis', legenda: 'Indicadores de todos os projetos' },
+            { img: '/midia/portfolio/besten-biblioteca', legenda: 'Biblioteca da consultoria' },
+            { img: '/midia/portfolio/besten-onboarding', legenda: 'Trilha de integração' },
+          ],
+          nota: 'Telas do portal com os nomes dos projetos desfocados.',
+        },
+      },
       {
         id: 'voke', grupo: 'lojas', selo: 'Projeto para cliente', titulo: 'VOKE WEAR', categoria: 'Loja virtual para moda fitness',
         texto: 'Loja de moda fitness com estoque por tamanho, cálculo de frete pelo CEP e aviso de reposição. A equipe gerencia os produtos em um painel próprio.',
@@ -82,6 +175,18 @@ export const ALAS = [
         acao: { href: '/casos/voke-wear/', rotulo: 'Ver case' },
         mais: [{ href: 'https://vokewear.com.br', rotulo: 'Visitar loja', externo: true }],
         assunto: 'uma loja virtual parecida com a VOKE WEAR',
+        gestao: {
+          rotulo: 'Por trás da loja',
+          resumo: ['Painel da dona', 'Estoque por tamanho', 'Fila de espera'],
+          itens: [
+            { t: 'Painel da dona', d: 'Preço, produtos, fotos, estoque e pedidos do dia, mudados na hora, sem chamar programador.' },
+            { t: 'Estoque por tamanho', d: 'Grade por tamanho com baixa automática a cada venda.' },
+            { t: 'Fila de espera', d: 'Quem quis um tamanho esgotado deixa o e-mail e é avisada quando ele volta.' },
+            { t: 'Pagamento', d: 'Pix com desconto automático no checkout e cartão parcelado.' },
+            { t: 'Frete', d: 'Calculado sozinho pelo CEP, com frete grátis a partir de um valor.' },
+            { t: 'Relacionamento', d: 'Newsletter e integração com o Instagram da marca.' },
+          ],
+        },
       },
       {
         id: 'maktub', grupo: 'lojas', selo: 'Projeto para cliente', titulo: 'Maktub Conquista', categoria: 'Loja virtual de calçados femininos',
@@ -98,6 +203,21 @@ export const ALAS = [
         acao: { href: 'https://benditaacessorios.com', rotulo: 'Visitar loja', externo: true },
         mais: [{ href: 'https://benditaacessorios.com/descubra-seu-aro', rotulo: 'Ver o guia de aro', externo: true }, { href: '#obra-m-video', rotulo: 'Ver o comercial da marca' }],
         assunto: 'uma loja virtual parecida com a da Bendita Acessórios',
+        gestao: {
+          rotulo: 'Por trás da loja',
+          resumo: ['Estúdio de fotos com IA', 'Etiqueta de frete no pedido', 'Cupons e afiliados'],
+          itens: [
+            { t: 'Estúdio de fotos com IA', d: 'A partir da foto da peça, gera a foto de catálogo em 2K, no estilo da marca, sem mudar a joia. Cada foto usa 1 crédito; se a geração falhar, o crédito volta.' },
+            { t: 'Créditos e consumo', d: 'O saldo, as reservas e o histórico de cada foto, à vista no painel.' },
+            { t: 'Produtos, estoque e categorias', d: 'Cadastro das peças, quantidades, reposição e as seções do catálogo.' },
+            { t: 'Pedidos com etiqueta', d: 'Prepara, compra e imprime a etiqueta do Melhor Envio sem sair do pedido.' },
+            { t: 'Cupons e afiliados', d: 'Promoções com limite de uso e afiliadas com comissão e as vendas atribuídas a cada uma.' },
+            { t: 'Custos e margem', d: 'Os custos registrados e a receita, as comissões e a margem estimada.' },
+            { t: 'Vitrine e marca', d: 'Banners, textos da vitrine, logos e as versões aprovadas da marca, editados pela loja.' },
+            { t: 'Guia de aro', d: 'A cliente descobre o tamanho do anel em casa, com a tela do celular.' },
+            { t: 'Acesso seguro', d: 'Login com verificação em duas etapas.' },
+          ],
+        },
       },
       {
         id: 'techtrainer', grupo: 'sites', selo: 'Projeto para cliente', titulo: 'Studio TechTrainer', categoria: 'Site com agendamento online para studio de personal',
@@ -114,14 +234,6 @@ export const ALAS = [
         acao: { href: '/site-para-clinica-odontologica/', rotulo: 'Ver site para clínicas' },
         mais: [{ href: '/sites/', rotulo: 'Como fica o seu site' }],
         assunto: 'um site para clínica como o da Alves & Oliveira',
-      },
-      {
-        id: 'besten', grupo: 'sites', selo: 'Projeto para cliente', titulo: 'Besten Consultoria', categoria: 'Site institucional e portal interno',
-        texto: 'Site institucional e portal que reúne indicadores dos projetos, tarefas da equipe, materiais e trilha de integração dos consultores.',
-        ...tela('besten-home'), w: 5.4,
-        nota: 'Na tela, o site institucional. O portal interno é de uso da equipe e exige login (veja na porta 07, da Ala 02).',
-        acao: { href: 'https://besten-site.vercel.app', rotulo: 'Visitar site institucional', externo: true },
-        assunto: 'um site com portal interno parecido com o da Besten Consultoria',
       },
       {
         id: 'horaqui', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Horaqui', categoria: 'Agenda online',

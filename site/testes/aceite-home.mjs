@@ -14,7 +14,7 @@ const humano = (ctx) => ctx.addInitScript(() => Object.defineProperty(Navigator.
 // HTML pré-renderizado: sem abertura nem fio, com os trabalhos
 const estatico = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
 ok(!estatico.includes('id="abertura"') && !/<svg[^>]*class="fio"/.test(estatico), 'prerender sem a abertura e sem o fio');
-ok((estatico.match(/class="obra( obra-dir)?"/g) || []).length === 24, `prerender com as 24 obras (${(estatico.match(/class="obra( obra-dir)?"/g) || []).length})`);
+ok((estatico.match(/class="obra( obra-dir)?"/g) || []).length === 26, `prerender com as 26 obras (${(estatico.match(/class="obra( obra-dir)?"/g) || []).length})`);
 ok(estatico.includes("classList.add('com-abertura')") && estatico.includes('background:#0D2626'), 'index.html tem a capa escura antes do primeiro quadro');
 
 // 1ª visita: a abertura roda DENTRO da exposição e termina sozinha
@@ -72,8 +72,8 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   }));
   ok(d.icones === 0, 'sem ícones flutuantes nem números-fantasma');
   ok(d.fio || !!(await p.evaluate(() => document.querySelector('#canvas-root canvas'))), 'o fio está desenhado (ou a exposição 3D está montada)');
-  ok(d.obras.length === 24 && d.obras.every((o) => o.url && o.img && o.titulo), `24 obras com quadro, título e link (${d.obras.length})`);
-  ok(d.obras.filter((o) => o.ala === 'trabalhos').length === 12 && d.obras.filter((o) => o.ala === 'problemas').length === 7, 'ala trabalhos com 12 obras e ala de soluções com 7 portas');
+  ok(d.obras.length === 26 && d.obras.every((o) => o.url && o.img && o.titulo), `26 obras com quadro, título e link (${d.obras.length})`);
+  ok(d.obras.filter((o) => o.ala === 'trabalhos').length === 14 && d.obras.filter((o) => o.ala === 'problemas').length === 7, 'ala trabalhos com 14 obras e ala de soluções com 7 portas');
   ok(d.nav.includes('#trabalhos') && !d.nav.includes('#vitrine'), 'menu leva a "Trabalhos"');
   ok(!/base44/i.test(await p.evaluate(() => document.querySelector('#trabalhos').innerText)), 'trabalhos: a plataforma não aparece em texto')
   ok(d.logo === '/midia/marca/maintor-lockup-claro.svg', 'cabeçalho com o lockup oficial');
@@ -172,7 +172,7 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   });
   ok(rec.balaoVisivel && rec.escala > 0.9 && rec.boneco.x > 720 && rec.boneco.x < 1400 && rec.boneco.y > 450 && rec.boneco.y < 900, `o boneco recebe na abertura, à direita do texto (x ${Math.round(rec.boneco.x)}, y ${Math.round(rec.boneco.y)}), com o balão de fala`);
   await p.mouse.click(rec.balao.x, rec.balao.y); await p.waitForTimeout(4200);
-  ok(await p.evaluate(() => !!document.querySelector('#obra-voke.em-foco')), 'clicar no balão do boneco começa o tour: o primeiro projeto chega em leitura');
+  ok(await p.evaluate(() => !!document.querySelector('#obra-matuura.em-foco')), 'clicar no balão do boneco começa o tour: o primeiro projeto chega em leitura');
   await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(1500);
   const portas = await p.evaluate(() => [...document.querySelectorAll('#problemas button.porta-btn')].map((b) => b.innerText.replace(/\s+/g, ' ').trim()));
   ok(portas.length === 7 && portas[0] === '01 Vender online' && portas[2] === '03 Atrair novos clientes', `saguão da Ala 2 com 7 portas, na ordem nova (${portas.join(' | ')})`);
@@ -210,7 +210,7 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(!(await p.evaluate(() => document.querySelector('.guia')?.classList.contains('guia-on'))), 'guia escondido na entrada');
   await p.evaluate(() => { const el = document.getElementById('obra-bendita'); window.scrollTo(0, window.scrollY + el.getBoundingClientRect().top + el.offsetHeight / 2 - innerHeight / 2); }); await p.waitForTimeout(900);
   const g1 = await p.evaluate(() => ({ on: document.querySelector('.guia').classList.contains('guia-on'), titulo: document.querySelector('.guia-onde b').innerText, pontos: document.querySelectorAll('.guia-ponto').length, zap: decodeURIComponent(document.querySelector('.guia-quero').href) }));
-  ok(g1.on && g1.titulo === 'Bendita Acessórios' && g1.pontos === 24, `guia aparece no passeio e diz onde estou (${g1.titulo}, ${g1.pontos} pontos)`);
+  ok(g1.on && g1.titulo === 'Bendita Acessórios' && g1.pontos === 26, `guia aparece no passeio e diz onde estou (${g1.titulo}, ${g1.pontos} pontos)`);
   ok(/Bendita Acessórios/.test(g1.zap) && /Vim pelo portfólio da Maintor Flow/.test(g1.zap), '"Quero algo assim" leva a obra na mensagem do WhatsApp');
   await p.keyboard.press('ArrowRight'); await p.waitForTimeout(2600);
   const t2 = await p.evaluate(() => document.querySelector('.guia-onde b').innerText);
@@ -265,12 +265,12 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   const PAGINAS = ['/casos/voke-wear/', '/loja-virtual/', '/loja-no-instagram/', '/loja-virtual-moda-fitness/', '/sites/', '/site-para-clinica-odontologica/', '/automacao-de-atendimento/', '/sistemas-sob-medida/', '/para-consultorias/', '/manutencao-mensal/', '/sistema-para-revender/', '/sistema-para-revender/app-para-personal-trainer/', '/sistema-para-revender/sistema-para-salao-de-beleza/', '/marketing-e-redes/', '/trafego-pago/', '/videos-personalizados/', '/por-onde-comecar/', '/guias/', '/guias/quanto-custa-uma-loja-virtual/', '/guias/loja-propria-ou-plataforma-pronta/', '/guias/se-o-desenvolvedor-sumir/', '/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/'];
   const foraDoMenu = PAGINAS.filter((x) => !d.painel.links.includes(x));
   ok(d.painel.grupos.length === 4 && foraDoMenu.length === 0, `painel do menu com 4 grupos e as ${PAGINAS.length} páginas do site (${d.painel.links.length} links)${foraDoMenu.length ? ' — fora: ' + foraDoMenu.join(', ') : ''}`);
-  const projetosNoMenu = ['voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'besten', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task'].filter((x) => !d.painel.links.includes('#obra-' + x));
-  ok(projetosNoMenu.length === 0, `os 12 projetos estão no menu ${projetosNoMenu.join(', ')}`);
+  const projetosNoMenu = ['matuura', 'trdd', 'besten', 'voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task'].filter((x) => !d.painel.links.includes('#obra-' + x));
+  ok(projetosNoMenu.length === 0, `os 14 projetos estão no menu ${projetosNoMenu.join(', ')}`);
   ok(JSON.stringify(d.secoes) === JSON.stringify(['topo', 'trabalhos', 'problemas', 'sistemas', 'marketing', 'como', 'perguntas', 'contato']), `ordem da página: ${d.secoes.join(' → ')}`);
-  ok(JSON.stringify(d.ordem) === JSON.stringify(['voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'besten', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task']), `Ala 01 na ordem: ${d.ordem.join(', ')}`);
-  ok(JSON.stringify(d.grupos) === JSON.stringify([['lojas-virtuais', 'Lojas virtuais'], ['sites', 'Sites que geram contato'], ['sistemas-e-aplicativos', 'Sistemas e aplicativos']]), 'Ala 01 com os três grupos visíveis, por tipo de projeto');
-  ok(d.selos.slice(0, 6).every((s) => s === 'projeto para cliente') && d.selos.slice(6).every((s) => s === 'produto da maintor'), 'cada card diz se é projeto de cliente ou produto da Maintor');
+  ok(JSON.stringify(d.ordem) === JSON.stringify(['matuura', 'trdd', 'besten', 'voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task']), `Ala 01 na ordem: ${d.ordem.join(', ')}`);
+  ok(JSON.stringify(d.grupos) === JSON.stringify([['site-e-gestao', 'Site com gestão'], ['lojas-virtuais', 'Lojas virtuais'], ['sites', 'Sites que geram contato'], ['sistemas-e-aplicativos', 'Sistemas e aplicativos']]), 'Ala 01 com os quatro grupos visíveis, por tipo de projeto');
+  ok(d.selos.slice(0, 8).every((s) => s === 'projeto para cliente') && d.selos.slice(8).every((s) => s === 'produto da maintor'), 'cada card diz se é projeto de cliente ou produto da Maintor');
   ok(d.titulos[0] === 1 && d.titulos.every((n, i) => i === 0 || n <= d.titulos[i - 1] + 1), `títulos sem pular nível (${d.titulos.join('')})`);
   ok(d.regua[0] === 'Como trabalhamos', 'processo identificado como "Como trabalhamos"');
   ok(d.faq === 7 && JSON.stringify(d.faqLd) === JSON.stringify(d.faqVis), 'FAQ: 7 perguntas, JSON-LD igual ao visível');
@@ -282,11 +282,11 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok((await fetch(BASE + '/midia/og-portfolio.jpg')).status === 200, 'a imagem de compartilhamento existe no build');
   // "Começar o tour" leva ao primeiro projeto, em posição de leitura, com a barra do guia
   await p.locator('#topo .entrada-ctas a', { hasText: 'Começar o tour' }).click(); await p.waitForTimeout(4200);
-  const tour = await p.evaluate(() => ({ foco: !!document.querySelector('#obra-voke.em-foco'), guia: document.querySelector('.guia')?.classList.contains('guia-on') }));
+  const tour = await p.evaluate(() => ({ foco: !!document.querySelector('#obra-matuura.em-foco'), guia: document.querySelector('.guia')?.classList.contains('guia-on') }));
   ok(tour.foco && tour.guia, '"Começar o tour" leva ao primeiro projeto em leitura, com a barra do guia');
   // links de compatibilidade e atalho para clientes
   const faltam = []
-  for (const id of ['trabalhos', 'problemas', 'sistemas', 'marketing', 'como', 'perguntas', 'contato', 'projetos-clientes', 'produtos-maintor', 'lojas-virtuais', 'sites', 'sistemas-e-aplicativos']) {
+  for (const id of ['trabalhos', 'problemas', 'sistemas', 'marketing', 'como', 'perguntas', 'contato', 'projetos-clientes', 'produtos-maintor', 'site-e-gestao', 'lojas-virtuais', 'sites', 'sistemas-e-aplicativos']) {
     if (!(await p.evaluate((x) => !!document.getElementById(x), id))) faltam.push(id);
   }
   ok(faltam.length === 0, `âncoras antigas e novas existem ${faltam.join(', ')}`);

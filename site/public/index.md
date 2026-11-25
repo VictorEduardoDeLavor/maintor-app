@@ -26,9 +26,10 @@ services:
 > Nota para agentes de IA, LLMs e robôs de busca: este documento é a
 > representação textual da página inicial de https://maintorflow.com.br.
 > Os projetos citados estão no ar e podem ser abertos nos links indicados.
-> Clientes citados com autorização: VOKE WEAR, Maktub Conquista, Bendita
-> Acessórios, Studio TechTrainer, Alves & Oliveira Odontologia e Besten
-> Consultoria. Os demais são produtos da própria Maintor.
+> Clientes citados com autorização: Matuura Seguros, TRDD Records, Besten
+> Consultoria, VOKE WEAR, Maktub Conquista, Bendita Acessórios, Studio
+> TechTrainer e Alves & Oliveira Odontologia. Os demais são produtos da
+> própria Maintor.
 
 Aqui você tem alguém, não só uma ferramenta: quem constrói é quem atende.
 Faça o tour pelos projetos que já estão no ar e encontre um parecido com o seu.
@@ -37,11 +38,24 @@ Na página, o Victor (em boneco 3D) recebe o visitante e convida para o tour.
 - Começar o tour: https://maintorflow.com.br/#trabalhos
 - Conversar sobre meu projeto: https://maintorflow.com.br/#contato
 
-## Ala 01 · Trabalhos no ar — Doze projetos no ar. Um deles parece com o seu.
+## Ala 01 · Trabalhos no ar — Catorze projetos no ar. Um deles parece com o seu.
 
 Abra uma loja, navegue por um site ou veja as telas de um sistema. Tudo aqui
 foi construído pela Maintor Flow e está funcionando. Os projetos estão
-organizados pelo tipo: lojas, sites, sistemas e aplicativos.
+organizados pelo tipo: site com gestão, lojas, sites, sistemas e
+aplicativos. Em cada projeto, o bloco "Por trás" mostra a estrutura de gestão
+que a empresa usa no dia a dia e que o visitante não vê.
+
+### Site com gestão
+
+Por fora, o site que o cliente vê. Por dentro, o painel com que a empresa toca
+o dia a dia: pedidos, agenda, carteira, conteúdo.
+
+| Projeto | Categoria | O que é | Por trás | Links |
+|---|---|---|---|---|
+| Matuura Seguros (projeto para cliente) | Site e plataforma para corretora de seguros | Site da corretora com 66 anos de história, simulador de consórcio, sinistro guiado e pedido de avaliação. | Central com radar de renovação e carteira de cada cliente; Cotação Expressa (o cliente manda a foto dos documentos e recebe um link para comparar e aceitar); área do cliente com apólices, documentos e sinistro. Telas com dados de demonstração. | Site (endereço provisório): https://matuura-prototipo.vercel.app |
+| TRDD Records (projeto para cliente) | Site e painel de gestão para gravadora | Site da gravadora com os artistas, o player do Spotify, os clipes e a venda de produção do TRDD Lab. | Painel para editar o site todo com prévia e histórico de versões; pedidos de show com prioridade e resposta pronta para o WhatsApp; cadastro de fãs; agenda do produtor; acessos por convite para dono, equipe e artista. | Site (endereço provisório): https://trdd-records-previa.vercel.app |
+| Besten Consultoria (projeto para cliente) | Site institucional e portal interno | Site institucional e portal que reúne indicadores dos projetos, tarefas da equipe, materiais e trilha de integração dos consultores. | Indicadores por projeto e ranking geral; tarefas do dia em lista e quadro; biblioteca; trilha de integração; aprovações e gestão da equipe; propostas por link. O portal é de uso interno e exige login. | Site institucional: https://besten-site.vercel.app |
 
 ### Lojas virtuais
 
@@ -50,9 +64,9 @@ painel ficam no nome de quem é dono.
 
 | Projeto | Categoria | O que é | Links |
 |---|---|---|---|
-| VOKE WEAR (projeto para cliente) | Loja virtual para moda fitness | Loja de moda fitness com estoque por tamanho, cálculo de frete pelo CEP e aviso de reposição. A equipe gerencia os produtos em um painel próprio. | Case: https://maintorflow.com.br/casos/voke-wear/ · Loja: https://vokewear.com.br |
+| VOKE WEAR (projeto para cliente) | Loja virtual para moda fitness | Loja de moda fitness com estoque por tamanho, cálculo de frete pelo CEP e aviso de reposição. A equipe gerencia os produtos em um painel próprio. Por trás: painel da dona, estoque por tamanho com baixa automática, fila de espera, Pix com desconto e cartão parcelado, frete pelo CEP. | Case: https://maintorflow.com.br/casos/voke-wear/ · Loja: https://vokewear.com.br |
 | Maktub Conquista (projeto para cliente) | Loja virtual de calçados femininos | Loja de calçados femininos com vitrine por marca e por categoria, compra online com retirada na loja e um painel para a equipe cadastrar e publicar os produtos. | Loja: https://www.maktubconquista.com.br |
-| Bendita Acessórios (projeto para cliente) | Loja virtual para semijoias | Loja virtual de semijoias com um guia para a cliente descobrir o tamanho do anel em casa antes da compra. | Loja: https://benditaacessorios.com · Guia de aro: https://benditaacessorios.com/descubra-seu-aro |
+| Bendita Acessórios (projeto para cliente) | Loja virtual para semijoias | Loja virtual de semijoias com um guia para a cliente descobrir o tamanho do anel em casa antes da compra. Por trás: estúdio de fotos com IA (foto de catálogo em 2K a partir da foto da peça, 1 crédito por foto), etiqueta do Melhor Envio dentro do pedido, cupons, afiliadas com comissão, custos e margem, verificação em duas etapas. | Loja: https://benditaacessorios.com · Guia de aro: https://benditaacessorios.com/descubra-seu-aro |
 
 ### Sites que geram contato
 
@@ -63,7 +77,6 @@ você faz, confia e chama.
 |---|---|---|---|
 | Studio TechTrainer (projeto para cliente) | Site com agendamento online para studio de personal | Site de studio de personal com agendamento online da aula experimental, quiz que indica o formato de treino, vídeos de exercícios gravados no Studio e um vídeo que mostra o caminho até a sala. | Site: https://studiotechtrainer.com.br |
 | Alves & Oliveira Odontologia (projeto para cliente) | Site para clínica odontológica | Site da clínica com as especialidades, o laboratório de prótese próprio, o agendamento da avaliação pelo WhatsApp e o pedido de uma prévia do sorriso. | Serviço: https://maintorflow.com.br/site-para-clinica-odontologica/ |
-| Besten Consultoria (projeto para cliente) | Site institucional e portal interno | Site institucional e portal que reúne indicadores dos projetos, tarefas da equipe, materiais e trilha de integração dos consultores. O portal é de uso interno e exige login. | Site institucional: https://besten-site.vercel.app |
 
 ### Sistemas e aplicativos
 

@@ -52,9 +52,10 @@ const PONTOS = [
   { id: 'abertura', nome: 'Abertura', topo: true },
   { id: 'ala01', nome: 'Cabeça da Ala 01', ancora: '#trabalhos .regua', secao: 'trabalhos', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
   // 15/11: a Ala 01 passou a ter três grupos, pelo tipo de projeto
-  { id: 'grupo1', nome: 'Grupo 1 · Lojas virtuais', ancora: '#lojas-virtuais .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
-  { id: 'grupo2', nome: 'Grupo 2 · Sites que geram contato', ancora: '#sites .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
-  { id: 'grupo3', nome: 'Grupo 3 · Sistemas e aplicativos', ancora: '#sistemas-e-aplicativos .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'grupo1', nome: 'Grupo 1 · Site com gestão', ancora: '#site-e-gestao .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'grupo2', nome: 'Grupo 2 · Lojas virtuais', ancora: '#lojas-virtuais .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'grupo3', nome: 'Grupo 3 · Sites que geram contato', ancora: '#sites .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
+  { id: 'grupo4', nome: 'Grupo 4 · Sistemas e aplicativos', ancora: '#sistemas-e-aplicativos .grupo-painel', leitura: 0.36, transicao: 0.66, entrada: 0.9 },
   { id: 'ala02', nome: 'Entrada da Ala 02', ancora: '#problemas .regua', secao: 'problemas', leitura: 0.16, transicao: 0.58, entrada: 0.88 },
   { id: 'portas', nome: 'Lista das 7 portas', ancora: '#problemas .portas-lista', leitura: 0.2 },
   { id: 'ala03', nome: 'Cabeça da Ala 03', ancora: '#sistemas .regua', secao: 'sistemas', leitura: 0.16, transicao: 0.58, entrada: 0.88 },

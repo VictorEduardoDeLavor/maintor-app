@@ -265,5 +265,27 @@
    1672
   ],
   "capturado": "2026-11-18"
+ },
+ "matuura-home": {
+  "nome": "matuura-home",
+  "tipo": "telas",
+  "telas": 6,
+  "url": "https://matuura-prototipo.vercel.app",
+  "alturaCss": 12600,
+  "fatias": 14,
+  "r960": 3780,
+  "r640": 2520,
+  "capturado": "2026-11-25"
+ },
+ "trdd-home": {
+  "nome": "trdd-home",
+  "tipo": "telas",
+  "telas": 6,
+  "url": "https://trdd-records-previa.vercel.app",
+  "alturaCss": 12600,
+  "fatias": 14,
+  "r960": 3780,
+  "r640": 2520,
+  "capturado": "2026-11-25"
  }
 }

@@ -147,6 +147,9 @@ export default function App() {
   /* 10/11: vídeo de cliente aberto no player em janela (null = fechado). Nada baixa antes do clique. */
   const [video, setVideo] = useState(null)
   const videoDialogoRef = useRef(null)
+  // 25/11: janela "Por trás" — o que existe atrás do site de cada projeto (painel, central, área do cliente)
+  const [gestao, setGestao] = useState(null)
+  const gestaoDialogoRef = useRef(null)
   const progressoRef = useRef(0)
   const velocidadeRef = useRef(0)
   const [reduzido] = useState(
@@ -422,6 +425,12 @@ export default function App() {
     if (video) { if (!d.open) d.showModal(); lenisRef.current?.stop() }
     else { if (d.open) d.close(); lenisRef.current?.start() }
   }, [video])
+  useEffect(() => {
+    const d = gestaoDialogoRef.current
+    if (!d) return
+    if (gestao) { if (!d.open) d.showModal(); d.scrollTop = 0; lenisRef.current?.stop() }
+    else { if (d.open) d.close(); if (!video) lenisRef.current?.start() }
+  }, [gestao])
   /* link de dentro da sala para outra parte da página (#obra-voke, #marketing):
      sai da sala primeiro — lá dentro a página está parada — e depois anda até o destino */
   const irDaSala = (e, href) => {
@@ -700,6 +709,15 @@ export default function App() {
                               ))}
                             </ul>
                           )}
+                          {o.gestao && (
+                            <div className="obra-gestao">
+                              <span className="micro">{o.gestao.rotulo}</span>
+                              <ul>{o.gestao.resumo.map((r) => <li key={r}>{r}</li>)}</ul>
+                              <button type="button" className="gestao-abrir" onClick={() => setGestao(o)}>
+                                Ver as {o.gestao.itens.length} ferramentas <span aria-hidden="true">→</span>
+                              </button>
+                            </div>
+                          )}
                           {o.nota && <p className="obra-nota">{o.nota}</p>}
                           <div className="obra-links">
                             {lnk(o.acao, 'btn btn-fino')}
@@ -904,6 +922,47 @@ export default function App() {
             </div>
             <video src={video.src} poster={video.capa} controls autoPlay playsInline preload="metadata" width="720" height="1280" />
             <p>{video.legenda}</p>
+          </div>
+        )}
+      </dialog>
+
+      {/* "Por trás": a estrutura de gestão de cada projeto. Só abre com o clique; as telas carregam aqui dentro */}
+      <dialog
+        className="gestao-dialogo"
+        ref={gestaoDialogoRef}
+        aria-label={gestao ? `Por trás do projeto ${gestao.titulo}` : 'Por trás do projeto'}
+        onClose={() => setGestao(null)}
+        onClick={(e) => { if (e.target === e.currentTarget) setGestao(null) }}
+      >
+        {gestao && (
+          <div className="gestao-corpo">
+            <div className="gestao-topo">
+              <div>
+                <span className="micro">{gestao.gestao.rotulo}</span>
+                <h3 className="serif">{gestao.titulo}</h3>
+                <p>{gestao.categoria}</p>
+              </div>
+              <button type="button" className="pergunta-fechar" onClick={() => setGestao(null)} aria-label="Fechar">✕</button>
+            </div>
+            <p className="gestao-lead">Quem visita vê {gestao.grupo === 'lojas' ? 'a loja' : 'o site'}. Por trás, isto é o que {gestao.grupo === 'lojas' ? 'a dona usa' : 'a empresa usa'} no dia a dia:</p>
+            <ul className="gestao-itens">
+              {gestao.gestao.itens.map((it) => <li key={it.t}><b>{it.t}</b><span>{it.d}</span></li>)}
+            </ul>
+            {gestao.gestao.telas?.length > 0 && (
+              <ul className="gestao-telas">
+                {gestao.gestao.telas.map((s) => (
+                  <li key={s.img}>
+                    <img src={`${s.img}-640.webp`} srcSet={`${s.img}-640.webp 640w, ${s.img}-1280.webp 1280w`} sizes="(max-width: 820px) 92vw, 420px" alt={s.legenda} width="1280" height="800" loading="lazy" decoding="async" />
+                    <span>{s.legenda}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {gestao.gestao.nota && <p className="gestao-nota">{gestao.gestao.nota}</p>}
+            <div className="gestao-acoes">
+              <a className="btn" href={whatsDe(`uma estrutura de gestão como a do projeto ${gestao.titulo}`)} target="_blank" rel="noopener">Quero uma estrutura assim ↗</a>
+              {gestao.acao?.href && <a className="link-mostarda" href={gestao.acao.href} target="_blank" rel="noopener">{gestao.acao.rotulo} ↗</a>}
+            </div>
           </div>
         )}
       </dialog>
