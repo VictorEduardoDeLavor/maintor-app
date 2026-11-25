@@ -268,24 +268,24 @@
  },
  "matuura-home": {
   "nome": "matuura-home",
-  "tipo": "telas",
-  "telas": 6,
-  "url": "https://matuura-prototipo.vercel.app",
-  "alturaCss": 12600,
-  "fatias": 14,
-  "r960": 3780,
-  "r640": 2520,
+  "tipo": "pagina",
+  "telas": null,
+  "url": "https://matuura-prototipo.vercel.app/?captura=1",
+  "alturaCss": 6144,
+  "fatias": 7,
+  "r960": 4096,
+  "r640": 2731,
   "capturado": "2026-11-25"
  },
  "trdd-home": {
   "nome": "trdd-home",
-  "tipo": "telas",
-  "telas": 6,
+  "tipo": "pagina",
+  "telas": null,
   "url": "https://trdd-records-previa.vercel.app",
-  "alturaCss": 12600,
-  "fatias": 14,
-  "r960": 3780,
-  "r640": 2520,
+  "alturaCss": 6144,
+  "fatias": 7,
+  "r960": 4096,
+  "r640": 2731,
   "capturado": "2026-11-25"
  }
 }

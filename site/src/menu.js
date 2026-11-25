@@ -31,7 +31,7 @@ export const MENU = [
         // 25/11: o tour abre com os projetos de site + gestão (Matuura, TRDD, Besten)
         titulo: 'Site com gestão', href: '/#site-e-gestao',
         links: [
-          { href: '/#trabalhos', rotulo: 'Começar o tour', nota: '14 projetos, do primeiro ao último' },
+          { href: '/#trabalhos', rotulo: 'Começar o tour', nota: 'Os projetos selecionados, um a um' },
           { href: '/#obra-matuura', rotulo: 'Matuura Seguros', nota: 'Corretora: site, central e área do cliente' },
           { href: '/#obra-trdd', rotulo: 'TRDD Records', nota: 'Gravadora: site e painel da equipe' },
           { href: '/#obra-besten', rotulo: 'Besten Consultoria', nota: 'Site e portal interno' },
@@ -42,7 +42,6 @@ export const MENU = [
         links: [
           { href: '/casos/voke-wear/', rotulo: 'Case VOKE WEAR', nota: 'A loja por dentro, do pedido à entrega' },
           { href: '/#obra-voke', rotulo: 'VOKE WEAR', nota: 'Moda fitness' },
-          { href: '/#obra-maktub', rotulo: 'Maktub Conquista', nota: 'Calçados femininos' },
           { href: '/#obra-bendita', rotulo: 'Bendita Acessórios', nota: 'Semijoias' },
         ],
       },
@@ -56,12 +55,8 @@ export const MENU = [
       {
         titulo: 'Sistemas e aplicativos', href: '/#sistemas-e-aplicativos',
         links: [
-          { href: '/#obra-horaqui', rotulo: 'Horaqui', nota: 'Agenda online' },
           { href: '/#obra-sorria', rotulo: 'SorrIA', nota: 'Clínicas odontológicas' },
-          { href: '/#obra-fit', rotulo: 'Maintor FIT', nota: 'Treino e alimentação' },
           { href: '/#obra-cmms', rotulo: 'Maintor CMMS', nota: 'Manutenção' },
-          { href: '/#obra-rh', rotulo: 'Maintor RH', nota: 'Gestão de pessoas' },
-          { href: '/#obra-task', rotulo: 'Maintor Task', nota: 'Processos e qualidade' },
         ],
       },
     ],
@@ -160,11 +155,12 @@ export const MENU_CONTATO = { href: '/#contato', rotulo: 'Contato' }
 
 /* O PRÓXIMO PASSO de cada página interna: os projetos do tour que mostram aquilo funcionando e a página que
    costuma vir depois. Entra no fim de cada página (menu-paginas.js) — ninguém fica num beco sem saída. */
+// 26/11: maktub, horaqui, fit, rh e task saíram do tour (seleção): o link vai para o site do projeto
 const P = {
-  voke: { href: '/#obra-voke', rotulo: 'VOKE WEAR' }, maktub: { href: '/#obra-maktub', rotulo: 'Maktub Conquista' }, bendita: { href: '/#obra-bendita', rotulo: 'Bendita Acessórios' },
+  voke: { href: '/#obra-voke', rotulo: 'VOKE WEAR' }, maktub: { href: 'https://www.maktubconquista.com.br', rotulo: 'Maktub Conquista' }, bendita: { href: '/#obra-bendita', rotulo: 'Bendita Acessórios' },
   techtrainer: { href: '/#obra-techtrainer', rotulo: 'Studio TechTrainer' }, ao: { href: '/#obra-ao', rotulo: 'Alves & Oliveira' }, besten: { href: '/#obra-besten', rotulo: 'Besten Consultoria' },
-  horaqui: { href: '/#obra-horaqui', rotulo: 'Horaqui' }, sorria: { href: '/#obra-sorria', rotulo: 'SorrIA' }, fit: { href: '/#obra-fit', rotulo: 'Maintor FIT' },
-  cmms: { href: '/#obra-cmms', rotulo: 'Maintor CMMS' }, rh: { href: '/#obra-rh', rotulo: 'Maintor RH' }, task: { href: '/#obra-task', rotulo: 'Maintor Task' },
+  horaqui: { href: 'https://www.horaqui.com.br', rotulo: 'Horaqui' }, sorria: { href: '/#obra-sorria', rotulo: 'SorrIA' }, fit: { href: 'https://maintorfit.com', rotulo: 'Maintor FIT' },
+  cmms: { href: '/#obra-cmms', rotulo: 'Maintor CMMS' }, rh: { href: 'https://maintor-rh.base44.app', rotulo: 'Maintor RH' }, task: { href: 'https://maintor-task.base44.app', rotulo: 'Maintor Task' },
   posts: { href: '/#obra-m-conteudo', rotulo: 'Posts do @maintorflow' }, videos: { href: '/#obra-m-video', rotulo: 'Vídeos de clientes' }, destino: { href: '/#obra-m-trafego', rotulo: 'Página de destino' },
 }
 export const TRILHAS = {

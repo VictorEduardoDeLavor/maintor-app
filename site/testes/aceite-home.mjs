@@ -14,7 +14,7 @@ const humano = (ctx) => ctx.addInitScript(() => Object.defineProperty(Navigator.
 // HTML pré-renderizado: sem abertura nem fio, com os trabalhos
 const estatico = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
 ok(!estatico.includes('id="abertura"') && !/<svg[^>]*class="fio"/.test(estatico), 'prerender sem a abertura e sem o fio');
-ok((estatico.match(/class="obra( obra-dir)?"/g) || []).length === 26, `prerender com as 26 obras (${(estatico.match(/class="obra( obra-dir)?"/g) || []).length})`);
+ok((estatico.match(/class="obra( obra-dir)?"/g) || []).length === 21, `prerender com as 21 obras (${(estatico.match(/class="obra( obra-dir)?"/g) || []).length})`);
 ok(estatico.includes("classList.add('com-abertura')") && estatico.includes('background:#0D2626'), 'index.html tem a capa escura antes do primeiro quadro');
 
 // 1ª visita: a abertura roda DENTRO da exposição e termina sozinha
@@ -72,8 +72,8 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   }));
   ok(d.icones === 0, 'sem ícones flutuantes nem números-fantasma');
   ok(d.fio || !!(await p.evaluate(() => document.querySelector('#canvas-root canvas'))), 'o fio está desenhado (ou a exposição 3D está montada)');
-  ok(d.obras.length === 26 && d.obras.every((o) => o.url && o.img && o.titulo), `26 obras com quadro, título e link (${d.obras.length})`);
-  ok(d.obras.filter((o) => o.ala === 'trabalhos').length === 14 && d.obras.filter((o) => o.ala === 'problemas').length === 7, 'ala trabalhos com 14 obras e ala de soluções com 7 portas');
+  ok(d.obras.length === 21 && d.obras.every((o) => o.url && o.img && o.titulo), `21 obras com quadro, título e link (${d.obras.length})`);
+  ok(d.obras.filter((o) => o.ala === 'trabalhos').length === 9 && d.obras.filter((o) => o.ala === 'problemas').length === 7, 'ala trabalhos com 9 obras (seleção) e ala de soluções com 7 portas');
   ok(d.nav.includes('#trabalhos') && !d.nav.includes('#vitrine'), 'menu leva a "Trabalhos"');
   ok(!/base44/i.test(await p.evaluate(() => document.querySelector('#trabalhos').innerText)), 'trabalhos: a plataforma não aparece em texto')
   ok(d.logo === '/midia/marca/maintor-lockup-claro.svg', 'cabeçalho com o lockup oficial');
@@ -182,7 +182,7 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(JSON.stringify(passos) === JSON.stringify(['Conversa', 'Proposta', 'No ar']), `Ala 02 com os três passos (${passos.join(' → ')})`);
   await p.locator('#problemas button.porta-btn').nth(3).click(); await p.waitForTimeout(1200);
   const s1 = await p.evaluate(() => ({ painel: document.querySelector('.sala-painel')?.innerText || '', trava: document.documentElement.style.overflow, guia: document.querySelector('.guia')?.classList.contains('guia-on') || false, emSala: document.documentElement.classList.contains('em-sala') }));
-  ok(/Porta 04 de 07/i.test(s1.painel) && /atendimento/i.test(s1.painel) && /O que a gente constrói/.test(s1.painel) && s1.trava === 'hidden' && !s1.guia && s1.emSala, 'porta 04 leva à sala de atendimento, com a página parada e o corredor escondido');
+  ok(/Porta 04 de 07/i.test(s1.painel) && /atendimento/i.test(s1.painel) && /O que a gente constrói/.test(s1.painel) && s1.trava === 'hidden' && !s1.guia && s1.emSala, `porta 04 leva à sala de atendimento, com a página parada e o corredor escondido (${JSON.stringify({ ...s1, painel: s1.painel.slice(0, 60) })})`);
   const zapSala = decodeURIComponent(await p.evaluate(() => document.querySelector('.sala-painel a.btn').href));
   ok(/wa\.me\/5511946610634/.test(zapSala) && /portfólio da Maintor Flow e quero conversar sobre automatizar o atendimento\./.test(zapSala), 'a sala abre o WhatsApp comercial com o objetivo da porta');
   await p.keyboard.press('ArrowRight'); await p.waitForTimeout(900);
@@ -210,7 +210,7 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(!(await p.evaluate(() => document.querySelector('.guia')?.classList.contains('guia-on'))), 'guia escondido na entrada');
   await p.evaluate(() => { const el = document.getElementById('obra-bendita'); window.scrollTo(0, window.scrollY + el.getBoundingClientRect().top + el.offsetHeight / 2 - innerHeight / 2); }); await p.waitForTimeout(900);
   const g1 = await p.evaluate(() => ({ on: document.querySelector('.guia').classList.contains('guia-on'), titulo: document.querySelector('.guia-onde b').innerText, pontos: document.querySelectorAll('.guia-ponto').length, zap: decodeURIComponent(document.querySelector('.guia-quero').href) }));
-  ok(g1.on && g1.titulo === 'Bendita Acessórios' && g1.pontos === 26, `guia aparece no passeio e diz onde estou (${g1.titulo}, ${g1.pontos} pontos)`);
+  ok(g1.on && g1.titulo === 'Bendita Acessórios' && g1.pontos === 21, `guia aparece no passeio e diz onde estou (${g1.titulo}, ${g1.pontos} pontos)`);
   ok(/Bendita Acessórios/.test(g1.zap) && /Vim pelo portfólio da Maintor Flow/.test(g1.zap), '"Quero algo assim" leva a obra na mensagem do WhatsApp');
   await p.keyboard.press('ArrowRight'); await p.waitForTimeout(2600);
   const t2 = await p.evaluate(() => document.querySelector('.guia-onde b').innerText);
@@ -256,8 +256,8 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
       canon: document.querySelector('link[rel=canonical]')?.href,
     },
   }));
-  ok(d.h1 === 'Sites, lojas virtuais e sistemas sob medida para o seu negócio', `abertura: título da oferta (${d.h1})`);
-  ok(/^Aqui você tem alguém, não só uma ferramenta/.test(d.apoio || '') && /Faça o tour/.test(d.apoio || ''), 'abertura: texto de apoio convida para o tour');
+  ok(d.h1 === 'Sites, lojas virtuais e sistemas sob medida', `abertura: título da oferta (${d.h1})`);
+  ok(/^Quem constrói é quem atende/.test(d.apoio || '') && /projetos que já estão no ar/.test(d.apoio || ''), 'abertura: texto de apoio convida para o tour');
   ok(JSON.stringify(d.ctas) === JSON.stringify([['Começar o tour', '#trabalhos'], ['Conversar sobre meu projeto', '#contato']]), `abertura: as duas ações e destinos (${JSON.stringify(d.ctas)})`);
   const MENU = [['Projetos', '#trabalhos'], ['O que fazemos', '#problemas'], ['Marketing', '#marketing'], ['Guias', '/guias/'], ['Contato', '#contato']];
   ok(JSON.stringify(d.menu) === JSON.stringify(MENU), `menu do cabeçalho: ${d.menu.map((m) => m[0]).join(', ')}`);
@@ -265,12 +265,12 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   const PAGINAS = ['/casos/voke-wear/', '/loja-virtual/', '/loja-no-instagram/', '/loja-virtual-moda-fitness/', '/sites/', '/site-para-clinica-odontologica/', '/automacao-de-atendimento/', '/sistemas-sob-medida/', '/para-consultorias/', '/manutencao-mensal/', '/sistema-para-revender/', '/sistema-para-revender/app-para-personal-trainer/', '/sistema-para-revender/sistema-para-salao-de-beleza/', '/marketing-e-redes/', '/trafego-pago/', '/videos-personalizados/', '/por-onde-comecar/', '/guias/', '/guias/quanto-custa-uma-loja-virtual/', '/guias/loja-propria-ou-plataforma-pronta/', '/guias/se-o-desenvolvedor-sumir/', '/guias/como-ganhar-dinheiro-com-um-sistema-do-seu-nicho/'];
   const foraDoMenu = PAGINAS.filter((x) => !d.painel.links.includes(x));
   ok(d.painel.grupos.length === 4 && foraDoMenu.length === 0, `painel do menu com 4 grupos e as ${PAGINAS.length} páginas do site (${d.painel.links.length} links)${foraDoMenu.length ? ' — fora: ' + foraDoMenu.join(', ') : ''}`);
-  const projetosNoMenu = ['matuura', 'trdd', 'besten', 'voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task'].filter((x) => !d.painel.links.includes('#obra-' + x));
-  ok(projetosNoMenu.length === 0, `os 14 projetos estão no menu ${projetosNoMenu.join(', ')}`);
+  const projetosNoMenu = ['matuura', 'trdd', 'besten', 'voke', 'bendita', 'techtrainer', 'ao', 'sorria', 'cmms'].filter((x) => !d.painel.links.includes('#obra-' + x));
+  ok(projetosNoMenu.length === 0, `os 9 projetos da seleção estão no menu ${projetosNoMenu.join(', ')}`);
   ok(JSON.stringify(d.secoes) === JSON.stringify(['topo', 'trabalhos', 'problemas', 'sistemas', 'marketing', 'como', 'perguntas', 'contato']), `ordem da página: ${d.secoes.join(' → ')}`);
-  ok(JSON.stringify(d.ordem) === JSON.stringify(['matuura', 'trdd', 'besten', 'voke', 'maktub', 'bendita', 'techtrainer', 'ao', 'horaqui', 'sorria', 'fit', 'cmms', 'rh', 'task']), `Ala 01 na ordem: ${d.ordem.join(', ')}`);
+  ok(JSON.stringify(d.ordem) === JSON.stringify(['matuura', 'trdd', 'besten', 'voke', 'bendita', 'techtrainer', 'ao', 'sorria', 'cmms']), `Ala 01 na ordem: ${d.ordem.join(', ')}`);
   ok(JSON.stringify(d.grupos) === JSON.stringify([['site-e-gestao', 'Site com gestão'], ['lojas-virtuais', 'Lojas virtuais'], ['sites', 'Sites que geram contato'], ['sistemas-e-aplicativos', 'Sistemas e aplicativos']]), 'Ala 01 com os quatro grupos visíveis, por tipo de projeto');
-  ok(d.selos.slice(0, 8).every((s) => s === 'projeto para cliente') && d.selos.slice(8).every((s) => s === 'produto da maintor'), 'cada card diz se é projeto de cliente ou produto da Maintor');
+  ok(d.selos.slice(0, 7).every((s) => s === 'projeto para cliente') && d.selos.slice(7).every((s) => s === 'produto da maintor'), 'cada card diz se é projeto de cliente ou produto da Maintor');
   ok(d.titulos[0] === 1 && d.titulos.every((n, i) => i === 0 || n <= d.titulos[i - 1] + 1), `títulos sem pular nível (${d.titulos.join('')})`);
   ok(d.regua[0] === 'Como trabalhamos', 'processo identificado como "Como trabalhamos"');
   ok(d.faq === 7 && JSON.stringify(d.faqLd) === JSON.stringify(d.faqVis), 'FAQ: 7 perguntas, JSON-LD igual ao visível');
@@ -351,9 +351,11 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   await p.goto(BASE + '/', { waitUntil: 'networkidle' }); await p.waitForTimeout(2500);
   const z0 = await p.evaluate(() => window.__guia ? window.__guia.position.z : null);
   await p.evaluate(() => { const el = document.getElementById('obra-bendita'); window.scrollTo(0, scrollY + el.getBoundingClientRect().top) }); await p.waitForTimeout(2500);
-  const g = await p.evaluate(() => ({ z: window.__guia?.position.z, malhas: (() => { let n = 0; window.__guia?.traverse((o) => { if (o.isMesh) n++ }); return n })(), escala: window.__guia?.scale.x }));
+  const g = await p.evaluate(() => ({ z: window.__guia?.position.z, malhas: (() => { let n = 0; window.__guia?.traverse((o) => { if (o.isMesh) n++ }); return n })(), escala: window.__guia?.scale.x, comp: !!window.__companheiro?.visivel(), compEl: document.querySelector('.companheiro.on canvas') ? document.querySelector('.companheiro').getBoundingClientRect().toJSON() : null }));
   ok(z0 !== null && g.z < z0 - 1, `boneco anda pelo corredor com a rolagem (z ${z0?.toFixed(1)} → ${g.z?.toFixed(1)})`);
-  ok(g.malhas > 30 && g.malhas <= 60 && g.escala > 0.9, `boneco montado (${g.malhas} peças) e visível depois da abertura`);
+  // 26/11: depois da abertura o boneco do corredor sai e quem acompanha é o companheiro, num canto fixo da tela
+  ok(g.malhas > 30 && g.malhas <= 60 && g.escala < 0.05, `boneco montado (${g.malhas} peças) e fora do corredor depois da abertura (escala ${g.escala?.toFixed(2)})`);
+  ok(g.comp && g.compEl && g.compEl.width > 60 && g.compEl.right <= 1440 && g.compEl.bottom <= 900, `companheiro visível no canto da tela durante o passeio`);
   ok(erros.length === 0, `boneco sem erro de JavaScript (${erros.join(' | ')})`);
   const dist = new URL('../dist/', import.meta.url);
   const nomes = []; const andar = (u) => { for (const n of readdirSync(u, { withFileTypes: true })) { if (n.isDirectory()) andar(new URL(n.name + '/', u)); else nomes.push(n.name) } }; andar(dist);

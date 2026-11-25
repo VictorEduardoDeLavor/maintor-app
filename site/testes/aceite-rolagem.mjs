@@ -25,6 +25,8 @@ const CEL = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMob
 const PC = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }
 const AMOSTRA = ['voke', 'techtrainer', 'p-manut', 's-revender', 'm-trafego'] // página, telas (site), telas (sistema), em pé, página curta
 const centrar = (p, id) => p.evaluate((s) => { const el = document.getElementById(s); let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; window.scrollTo(0, y + el.offsetHeight / 2 - innerHeight / 2) }, 'obra-' + id)
+// 26/11: o site no quadro desce JUNTO COM A ROLAGEM (não mais por tempo): leva a obra a uma fração da altura dela
+const naFracao = (p, id, fr) => p.evaluate(([s, fr]) => { const el = document.getElementById(s); let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; window.scrollTo(0, y + el.offsetHeight * fr - innerHeight / 2) }, ['obra-' + id, fr])
 const estado = (p, id) => p.evaluate((id) => {
   const o = window.__expoSonda().obras.find((x) => x.el.id === 'obra-' + id), r = o.rol
   return { f: o.fs, tex: !!r.tex, faixa: !!r.tex && o.tela.material.map === r.tex, janela: r.janela, off: r.tex ? r.tex.offset.y : null, modo: r.modo, n: r.n }
@@ -49,9 +51,10 @@ for (const [nome, opts] of [['celular', CEL], ['computador', PC]]) {
 
   let maxVivas = 0
   for (const id of AMOSTRA) {
-    await centrar(p, id)
+    // entra no começo da leitura, espera a faixa baixar e rola até o fim dela em 13 passos
+    await naFracao(p, id, 0.24); await p.waitForTimeout(1800)
     const am = []
-    for (let k = 0; k < 13; k++) { await p.waitForTimeout(700); am.push(await estado(p, id)); maxVivas = Math.max(maxVivas, await vivas(p)) }
+    for (let k = 0; k < 13; k++) { await naFracao(p, id, 0.24 + 0.5 * k / 12); await p.waitForTimeout(700); am.push(await estado(p, id)); maxVivas = Math.max(maxVivas, await vivas(p)) }
     const fim = am.at(-1), offs = am.map((a) => a.off).filter((x) => x !== null)
     const anda = offs.length > 4 && Math.max(...offs) - Math.min(...offs) > 0.02
     const dentro = offs.every((o) => o >= -0.001 && o <= 1 - fim.janela + 0.001)

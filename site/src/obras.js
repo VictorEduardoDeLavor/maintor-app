@@ -68,6 +68,14 @@ const DEMO = 'Telas de uma empresa de demonstração.'
 
 /* Ala 01 em três grupos, pelo tipo de projeto (15/11). O id do grupo é âncora pública; `alias` mantém
    as âncoras antigas (/#projetos-clientes, /#produtos-maintor) chegando num lugar que faz sentido. */
+/* 26/11: obras com tela que rola (data-rolagem) são mais altas e ficam em leitura por mais tempo; o site no quadro
+   desce junto com a rolagem. O tour e o guia param no COMEÇO dessa leitura (site no topo), não no meio da obra. */
+export const LEITURA_ROLA = 0.26
+export const alvoLeitura = (el) => {
+  const r = el.getBoundingClientRect()
+  return window.scrollY + r.top + r.height * (el.dataset.rolagem ? LEITURA_ROLA : 0.5) - window.innerHeight / 2
+}
+
 export const GRUPOS = {
   gestao: { id: 'site-e-gestao', titulo: 'Site com gestão', lead: 'Por fora, o site que o cliente vê. Por dentro, o painel com que a empresa toca o dia a dia: pedidos, agenda, carteira, conteúdo.' },
   lojas: { id: 'lojas-virtuais', alias: 'projetos-clientes', titulo: 'Lojas virtuais', lead: 'Lojas no ar, com pedido, pagamento e frete funcionando. O domínio, a conta e o painel ficam no nome de quem é dono.' },
@@ -80,14 +88,14 @@ export const ALAS = [
     id: 'trabalhos',
     eyebrow: 'Ala 01 · Trabalhos no ar',
     eyebrowCurto: 'Ala 01 · No ar', // no celular estreito (360 px) a régua cabe em uma linha com "14 projetos"
-    contagem: '14 projetos',
-    titulo: 'Catorze projetos no ar. Um deles parece com o seu.',
-    lead: 'Abra uma loja, navegue por um site ou veja as telas de um sistema. Tudo aqui foi construído pela Maintor Flow e está funcionando.',
+    contagem: 'Seleção',
+    titulo: 'Alguns projetos no ar. Um deles parece com o seu.',
+    lead: 'Uma seleção do que construímos: abra uma loja, navegue por um site ou veja o painel que fica por trás.',
     obras: [
       {
         id: 'matuura', grupo: 'gestao', selo: 'Projeto para cliente', titulo: 'Matuura Seguros', categoria: 'Site e plataforma para corretora de seguros',
         texto: 'Site da corretora com 66 anos de história, simulador de consórcio, sinistro guiado e pedido de avaliação. Por trás, uma central para acompanhar renovações, montar cotações e atender o cliente na área dele.',
-        ...tela('matuura-home', 'telas', 6), w: 5.4,
+        ...tela('matuura-home'), w: 5.4,
         acao: { href: 'https://matuura-prototipo.vercel.app', rotulo: 'Visitar site', externo: true },
         mais: [{ href: 'https://matuura-prototipo.vercel.app/central/', rotulo: 'Ver a Central (demonstração)', externo: true }],
         nota: 'Endereço provisório até a publicação no domínio da corretora.',
@@ -115,7 +123,7 @@ export const ALAS = [
       {
         id: 'trdd', grupo: 'gestao', selo: 'Projeto para cliente', titulo: 'TRDD Records', categoria: 'Site e painel de gestão para gravadora',
         texto: 'Site da gravadora com os artistas, o player do Spotify, os clipes e a venda de produção do TRDD Lab. Por trás, um painel em que a equipe edita tudo e recebe os pedidos de show já organizados.',
-        ...tela('trdd-home', 'telas', 6), w: 5.4,
+        ...tela('trdd-home'), w: 5.4,
         acao: { href: 'https://trdd-records-previa.vercel.app', rotulo: 'Visitar site', externo: true },
         nota: 'Endereço provisório até a publicação no domínio da gravadora.',
         assunto: 'um site com painel de gestão como o da TRDD Records',
@@ -189,7 +197,7 @@ export const ALAS = [
         },
       },
       {
-        id: 'maktub', grupo: 'lojas', selo: 'Projeto para cliente', titulo: 'Maktub Conquista', categoria: 'Loja virtual de calçados femininos',
+        id: 'maktub', fora: true, grupo: 'lojas', selo: 'Projeto para cliente', titulo: 'Maktub Conquista', categoria: 'Loja virtual de calçados femininos',
         texto: 'Loja de calçados femininos com vitrine por marca e por categoria, compra online com retirada na loja e um painel para a equipe cadastrar e publicar os produtos.',
         ...tela('maktub-home'), w: 5.4,
         acao: { href: 'https://www.maktubconquista.com.br', rotulo: 'Visitar loja', externo: true },
@@ -236,7 +244,7 @@ export const ALAS = [
         assunto: 'um site para clínica como o da Alves & Oliveira',
       },
       {
-        id: 'horaqui', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Horaqui', categoria: 'Agenda online',
+        id: 'horaqui', fora: true, grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Horaqui', categoria: 'Agenda online',
         texto: 'Agenda online para negócios que atendem com hora marcada. O cliente escolhe o serviço, o profissional e o horário pelo link de agendamento.',
         ...tela('horaqui-site', 'telas', 6), w: 5.4,
         acao: { href: 'https://www.horaqui.com.br/demo', rotulo: 'Testar agendamento', externo: true },
@@ -253,7 +261,7 @@ export const ALAS = [
         assunto: 'uma demonstração do SorrIA para a minha clínica',
       },
       {
-        id: 'fit', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor FIT', categoria: 'Aplicativo de treino e alimentação',
+        id: 'fit', fora: true, grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor FIT', categoria: 'Aplicativo de treino e alimentação',
         texto: 'Aplicativo de treino e alimentação com a marca do profissional, painel de acompanhamento para personal trainers e nutricionistas e área para os alunos.',
         ...tela('fit-site', 'telas', 6), w: 5.4,
         acao: { href: 'https://maintorfit.com', rotulo: 'Conhecer o Maintor FIT', externo: true },
@@ -269,7 +277,7 @@ export const ALAS = [
         assunto: 'um sistema de manutenção como o Maintor CMMS',
       },
       {
-        id: 'rh', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor RH', categoria: 'Sistema de gestão de pessoas',
+        id: 'rh', fora: true, grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor RH', categoria: 'Sistema de gestão de pessoas',
         texto: 'Sistema de gestão de pessoas que reúne documentos, ponto, férias e recrutamento, com relatórios para acompanhar a equipe.',
         ...tela('rh-telas', 'telas', 2), w: 5.4,
         nota: DEMO,
@@ -277,7 +285,7 @@ export const ALAS = [
         assunto: 'um sistema de RH como o Maintor RH',
       },
       {
-        id: 'task', grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor Task', categoria: 'Sistema de processos e qualidade',
+        id: 'task', fora: true, grupo: 'apps', selo: 'Produto da Maintor', titulo: 'Maintor Task', categoria: 'Sistema de processos e qualidade',
         texto: 'Sistema para acompanhar o planejado e o executado, registrar evidências e tratar não conformidades.',
         ...tela('task-telas', 'telas', 2), w: 5.4,
         nota: DEMO,
@@ -312,7 +320,7 @@ export const ALAS = [
         ...tela('bendita-produto'), foto: 'loja-moda', w: 4.6,
         nota: 'Na tela, a página de um produto da Bendita Acessórios, loja feita pela Maintor Flow.',
         acao: { href: '/loja-virtual/', rotulo: 'Ver como fica a loja' },
-        mais: [{ href: '#obra-voke', rotulo: 'VOKE WEAR' }, { href: '#obra-maktub', rotulo: 'Maktub Conquista' }, { href: '#obra-bendita', rotulo: 'Bendita' }],
+        mais: [{ href: '#obra-voke', rotulo: 'VOKE WEAR' }, { href: '#obra-bendita', rotulo: 'Bendita' }],
         assunto: 'vender online',
       },
       {
@@ -360,7 +368,7 @@ export const ALAS = [
         ...tela('rh-telas', 'telas', 2), foto: 'rh-papelada', w: 4.6,
         nota: 'Na tela, o Maintor RH com uma empresa de demonstração.',
         acao: { href: '/sistemas-sob-medida/#rh', rotulo: 'Ver sistemas de RH' },
-        mais: [{ href: '#obra-rh', rotulo: 'Maintor RH' }],
+        mais: [{ href: 'https://maintor-rh.base44.app', rotulo: 'Maintor RH', externo: true }],
         assunto: 'digitalizar o RH',
       },
       {
@@ -457,6 +465,11 @@ export const ALAS = [
 ]
 
 /* As portas da Ala 02 (saguão): os mesmos dados das obras, no formato da sala e do 3D. */
+/* 26/11: a Ala 01 mostra uma SELEÇÃO (pedido do Victor). Quem tem `fora: true` continua aqui, com os dados, mas não
+   entra na home — os links das páginas internas para esses projetos vão para o site deles. Para voltar um projeto ao
+   tour, é só tirar o `fora`. */
+for (const a of ALAS) a.obras = a.obras.filter((o) => !o.fora)
+
 export const PORTAS = ALAS.find((a) => a.id === 'problemas').obras.map((o) => ({
   ...o,
   obra: o.id,

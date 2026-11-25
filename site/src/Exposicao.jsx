@@ -279,7 +279,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
        Para isso quem chega OLHA PARA CIMA, para o pórtico (a câmera inclina ~10°); quando a rolagem
        começa, o olhar desce, o boneco vem para o fio e o passeio segue como antes. As posições são
        ângulos (frações da altura da tela), então valem de 664 a 844 px de altura. */
-    const ABRE = { inclina: 0.235, nevoa: 0.03, logoD: 10, logoY: 6.19, logoLarg: 3.5, letD: 8, letY: 6.06, letLarg: 3.3, letAlt: 0.46, bonecoFrente: 0.8, bonecoLado: 0.6, bonecoProf: 6 }
+    const ABRE = { inclina: 0.235, nevoa: 0.03, logoD: 10, logoY: 6.19, logoLarg: 3.5, letD: 8, letY: 6.06, letLarg: 2.95, letAlt: 0.46, bonecoFrente: 0.8, bonecoLado: 0.6, bonecoProf: 6 }
     const p0 = caminho.getPointAt(0), dir0 = caminho.getPointAt(0.012).sub(p0).setY(0).normalize()
     const INT = { hemi: 0.55, sol: 0.5, spotA: 60, spotB: 42, portico: retratoIni ? 55 : 140, fio: 1.4, env: 0.42 } // portico: ver posicionarLockup
     let luzBaixa = false // as luzes estão rebaixadas pelo modo LER (ver aplicarLer)
@@ -294,6 +294,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     lockup.position.set(-470 * esc + 1.2, 300 * esc + 3.6, -24)
     // no retrato o logo vem para perto do teto, logo depois da entrada, e encolhe: cabe na faixa livre acima do título
     let lockupCaixa = null, lockupGiro = 0
+    /* 26/11 ("limpar e dar palco"): o logo 3D se monta na abertura e depois sobe e sai de cena — a marca fica só no
+       cabeçalho (eram dois logos na mesma tela). Sem a animação de abertura (visita repetida), ele nem aparece. */
+    let lockupFora = !intro
     const alvoLogo = new THREE.Vector3()
     const posicionarLockup = () => {
       // a luminária do teto que ficaria logo abaixo do logo (lida como um risco cinza) sai no retrato
@@ -305,6 +308,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       for (const lt of letreiros) lt.grupo.visible = lt === letreiroAtual
       INT.portico = retr ? 55 : 140
       if (introAcabou && !luzBaixa) luzPortico.intensity = INT.portico
+      if (lockupFora) lockup.visible = false
       if (!lockupCaixa) return
       if (cam.aspect < 1) {
         const e = ABRE.logoLarg / lockupCaixa.larg
@@ -332,6 +336,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       gsap.to(luzPortico, { intensity: INT.portico, duration: 0.6 }); gsap.to(matFio, { emissiveIntensity: INT.fio, duration: 0.6 })
       gsap.to(cena, { environmentIntensity: INT.env, duration: 0.9 })
       gsap.to(entrada, { v: 1, duration: 1.3, ease: 'power3.out', delay: 0.15 })
+      if (!lockupFora) gsap.to(lockup.position, { y: lockup.position.y + 6, duration: 1.2, delay: 0.7, ease: 'power2.in', onComplete: () => { lockupFora = true; lockup.visible = false } })
       cbRef.current.aoFimIntro?.()
     }
     if (pularRef) pularRef.current = terminarIntro
@@ -452,11 +457,16 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         }).catch(() => { r.carregando = false; r.falhou = true })
       }
       if (!r.tex) return
-      if (f <= 0.001 && o.ws < 0.01 && dz > 18) { o.tela.material.map = o.tex0; o.tela.material.needsUpdate = true; r.tex.dispose(); r.tex = null; r.t = 0; return }
-      const lendo = f > 0.6
-      if (lendo) r.t += dt; else r.t = 0
-      const alvo = lendo ? linhaDoTempo(r, r.t) : 0
-      r.frac += (alvo - r.frac) * Math.min(1, dt * (lendo ? 8 : 2.5))
+      // 26/11: com as obras mais altas, a faixa de quem já saiu demorava a ser descartada (até 4 na memória): fora de
+      // cena, ela sai também quando já há outra faixa carregada — no máximo 2 por vez, como pede o celular
+      if (f <= 0.001 && o.ws < 0.01 && (dz > 18 || obras.some((x) => x !== o && x.rol?.tex))) { o.tela.material.map = o.tex0; o.tela.material.needsUpdate = true; r.tex.dispose(); r.tex = null; r.t = 0; return }
+      /* 26/11 (pedido do Victor: "passa muito rápido, não dá para ver a tela"): o site desce JUNTO COM A ROLAGEM de
+         quem visita — parou de rolar, a tela para; voltou, ela sobe. 'telas' segura cada tela e desliza no fim do trecho
+         dela. (linhaDoTempo, por tempo, ficou para quem quiser voltar.) */
+      const k = suave(0.25, 0.72, o.p ?? 0)
+      let alvo = k
+      if (r.modo === 'telas' && r.n > 1) { const x = k * (r.n - 1), i = Math.min(r.n - 2, Math.floor(x)); alvo = (i + easeInOut(THREE.MathUtils.clamp((x - i - 0.55) / 0.45, 0, 1))) / (r.n - 1) }
+      r.frac += (alvo - r.frac) * Math.min(1, dt * 6)
       r.tex.offset.y = (1 - r.janela) * (1 - r.frac)
     }
 
@@ -918,7 +928,11 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
         const p = (yTela - o.topo) / o.alt
         // 11/11: o quadro volta um pouco antes (0,84 em vez de 0,9) e não se solta enquanto um título está em
         // leitura — o título nunca divide a tela com um quadro em destaque
-        const fAlvo = (p < -0.9 || p > 1.5 ? 0 : suave(-0.1, 0.38, p) * (1 - suave(0.56, 0.84, p))) * (1 - suave(0.05, 0.4, ler))
+        // 26/11: obra com tela que rola (mais alta na página): fica em leitura de 22% a 74% dela — o site
+        // no quadro desce junto com a rolagem nesse trecho (ver rolar). Sai antes do fim da obra: o título seguinte entra
+        // com o fundo calmo (aceite-limpeza). As outras seguem como antes.
+        o.p = p
+        const fAlvo = (p < -0.9 || p > 1.5 ? 0 : o.rol ? suave(0, 0.22, p) * (1 - suave(0.74, 0.88, p)) : suave(-0.1, 0.38, p) * (1 - suave(0.56, 0.84, p))) * (1 - suave(0.05, 0.4, ler))
         o.fs += (fAlvo - o.fs) * Math.min(1, dt * 6)
         if (Math.abs(fAlvo - o.fs) < 0.0005) o.fs = fAlvo
         // o olhar para o próximo começa quando o anterior volta para a parede (os dois gestos se encadeiam)
@@ -1012,7 +1026,12 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       if (!retrato && ler > 0.001) luzGuia.position.addScaledVector(right, 1.0 * ler)
       // no celular ele some de cena enquanto o painel de opções está aberto (abre na faixa dele) e quando sai pela direita
       bonecoSome += ((foraCel ? 1 : 0) - bonecoSome) * Math.min(1, dt * 7)
-      guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v) * (1 - bonecoSome)))
+      /* 26/11: o boneco do corredor recebe na abertura e sai quando o passeio começa — dali em diante quem acompanha é
+         o companheiro, num canto fixo da tela (Companheiro.jsx, entra a partir de 26% da primeira tela) */
+      const saiCorredor = suave(0.12, 0.3, pTopo)
+      bonecoSome = Math.max(bonecoSome, saiCorredor)
+      // 26/11: no celular ele recebe maior (o logo saiu e deixou espaço); volta ao tamanho do passeio quando a rolagem começa
+      guia.raiz.scale.setScalar(Math.max(0.001, suave(0, 1, entrada.v) * (1 - bonecoSome) * (1 + 0.32 * (retrato ? abre : 0))))
       // no modo LER o foco dele fecha: ilumina o boneco e o chão em volta, sem acender a parede atrás dos rótulos
       luzGuia.intensity = 5.5 * (1 - bonecoSome) * (1 - 0.3 * ler); luzGuia.distance = 7 - (retrato ? 3.5 : 4.2) * ler
       /* 15/11 — a recepção: na abertura (antes de a rolagem começar) o boneco fica de frente para quem chega, acena
@@ -1147,7 +1166,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       matCreme.emissiveIntensity = 0.14 * opPortico
       // o letreiro entra depois da abertura
       // (11/11: no retrato ele também se recolhe no teto quando o passeio começa — não passa por trás do cabeçalho)
-      letreiroAtual.grupo.position.y = letreiroAtual.L.y + (1 - entrada.v) * 2.2 + (letreiroAtual.nome === 'retrato' ? (1 - abre) * 2 : 0)
+      // (26/11: no computador também — com a página mais alta a câmera anda menos por rolagem e o letreiro ficava atrás
+      //  do título da abertura saindo por cima, quando a Ala 01 entrava)
+      letreiroAtual.grupo.position.y = letreiroAtual.L.y + (1 - entrada.v) * 2.2 + (letreiroAtual.nome === 'retrato' ? (1 - abre) * 2 : suave(0.15, 0.45, pTopo) * 2.6)
 
       // com uma obra flutuando, o grão de filme quase some (ele sujava o print)
       const foco = maior > 0.35

@@ -81,7 +81,7 @@ function trilha(caminho) {
     <div class="wrap">
       <div class="regua"><span class="micro">Veja funcionando</span><span class="micro">Projetos no ar, no tour</span></div>
       <h2 class="serif pg-h2">O que está nesta página, <em>já no ar.</em></h2>
-      <div class="trilha-links">${t.projetos.map((p) => `<a class="porta-btn" href="${p.href}">${esc(p.rotulo)} <i aria-hidden="true">→</i></a>`).join('')}</div>
+      <div class="trilha-links">${t.projetos.map((p) => `<a class="porta-btn" href="${p.href}"${/^https?:/.test(p.href) ? ' target="_blank" rel="noopener"' : ''}>${esc(p.rotulo)} <i aria-hidden="true">→</i></a>`).join('')}</div>
       <p class="trilha-depois"><a class="link-mostarda" href="/#trabalhos">Fazer o tour completo →</a><a class="link-mostarda" href="${t.depois.href}">Depois desta página: ${esc(t.depois.rotulo)} →</a></p>
     </div>
   </section>

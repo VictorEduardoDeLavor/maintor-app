@@ -1,6 +1,6 @@
 // Aceite do MENU DO SITE e do PRÓXIMO PASSO (15/11/2026). Fonte única: src/menu.js.
 //   1. as 22 páginas internas com cabeçalho usam o mesmo menu da home: 4 grupos + Contato, a marca em imagem
-//   2. o painel lista TODAS as páginas do site e os 14 projetos (nada escondido); a página atual vem marcada
+//   2. o painel lista TODAS as páginas do site e os 9 projetos da seleção (nada escondido); a página atual vem marcada
 //   3. cada página guarda o WhatsApp dela (mensagem pronta própria) no cabeçalho
 //   4. o painel abre pelo grupo (computador) e pelo botão (celular), fecha com Esc e devolve a rolagem
 //   5. toda página tem o bloco "Veja funcionando" antes da chamada final, com projetos do tour e o passo seguinte;
@@ -49,7 +49,7 @@ for (const pg of PAGINAS) {
   if (d.abertura && d.abertura.nota) {
     comAbertura++
     const [wa, ver] = d.abertura.hrefs
-    const verOk = !!ver && (obras.has(ver) || PAGINAS.includes(ver) || ['/#site-e-gestao', '/#lojas-virtuais', '/#sites', '/#sistemas-e-aplicativos', '/#trabalhos'].includes(ver))
+    const verOk = !!ver && (obras.has(ver) || PAGINAS.includes(ver) || /^https:\/\//.test(ver) || ['/#site-e-gestao', '/#lojas-virtuais', '/#sites', '/#sistemas-e-aplicativos', '/#trabalhos'].includes(ver))
     if (d.abertura.hrefs.length !== 2 || !wa.includes('wa.me/5511946610634') || !verOk || d.abertura.nota.startsWith('Primeira conversa sem compromisso') || d.abertura.rotulos[0] === 'Conversar no WhatsApp' || !d.abertura.nota.endsWith('Sem compromisso · (11) 94661-0634')) ruins.abertura.push(pg)
     if (d.abertura.base > d.abertura.vh) ruins.dobra.push(`${pg} (${d.abertura.base} px)`)
   }
@@ -58,7 +58,7 @@ for (const pg of PAGINAS) {
   if (!d.atual.includes(pg)) ruins.atual.push(pg)
   if (!/wa\.me\/5511946610634\?text=/.test(d.whats) || d.whats !== d.whatsCorpo) ruins.whats.push(pg)
   if (!d.trilha || !d.trilha.antesDaChamada || d.trilha.links.length < 3) ruins.trilha.push(pg)
-  else for (const l of d.trilha.links) { if (!(obras.has(l) || l === '/#trabalhos' || PAGINAS.includes(l))) ruins.links.push(`${pg} → ${l}`) }
+  else for (const l of d.trilha.links) { if (!(obras.has(l) || l === '/#trabalhos' || PAGINAS.includes(l) || /^https:\/\//.test(l))) ruins.links.push(`${pg} → ${l}`) } // 26/11: projeto fora da seleção leva ao site dele
   if (d.titulos[0] !== 1) ruins.titulos.push(pg)
 }
 ok(ruins.menu.length === 0, `1 · ${PAGINAS.length} páginas com o menu do site (4 grupos + Contato) e a marca em imagem${ruins.menu.length ? ' — falham: ' + ruins.menu.join(', ') : ''}`)
@@ -102,9 +102,9 @@ await ctx.close()
   await q.goto(BASE + '/', { waitUntil: 'networkidle' }); await q.waitForTimeout(2500)
   await q.locator('header .nav-grupo', { hasText: 'Projetos' }).click(); await q.waitForTimeout(400)
   ok(await q.evaluate(() => !document.getElementById('menu-secoes').hidden && !!document.querySelector('#menu-secoes .mega-grupo.em-destaque')), '7 · home: clicar em "Projetos" abre o painel')
-  await q.locator('#menu-secoes a[href="#obra-maktub"]').click(); await q.waitForTimeout(3800)
-  const h = await q.evaluate(() => ({ fechado: document.getElementById('menu-secoes').hidden, topo: Math.round(document.getElementById('obra-maktub').getBoundingClientRect().top), trava: document.body.style.overflow }))
-  ok(h.fechado && Math.abs(h.topo) < 160 && h.trava === '', `7 · home: o link "Maktub Conquista" fecha o painel e leva até o quadro (topo ${h.topo} px)`)
+  await q.locator('#menu-secoes a[href="#obra-bendita"]').click(); await q.waitForTimeout(3800)
+  const h = await q.evaluate(() => ({ fechado: document.getElementById('menu-secoes').hidden, topo: Math.round(document.getElementById('obra-bendita').getBoundingClientRect().top), trava: document.body.style.overflow }))
+  ok(h.fechado && Math.abs(h.topo) < 160 && h.trava === '', `7 · home: o link "Bendita Acessórios" fecha o painel e leva até o quadro (topo ${h.topo} px)`)
   await q.locator('header .nav-grupo', { hasText: 'Marketing' }).click(); await q.waitForTimeout(300); await q.keyboard.press('Escape'); await q.waitForTimeout(300)
   ok(await q.evaluate(() => document.getElementById('menu-secoes').hidden), '7 · home: Esc fecha o painel')
   ok(er.length === 0, `7 · home sem erro de JavaScript (${er.join(' | ')})`)

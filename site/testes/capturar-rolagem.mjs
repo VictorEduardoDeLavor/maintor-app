@@ -43,8 +43,9 @@ const PAGINAS = [
   { nome: 'fit-site', url: 'https://maintorfit.com', semPreco: true, metodo: 'telas', escolher: [0, 1, 2, 6, 7, 10] },
   { nome: 'horaqui-site', url: 'https://www.horaqui.com.br', semPreco: true, metodo: 'telas', escolher: [0, 1, 2, 3, 5, 9] },
   // 25/11: Matuura Seguros e TRDD Records (pedido do Victor: primeiros do tour). Endereços de prévia na Vercel até o domínio próprio
-  { nome: 'matuura-home', url: 'https://matuura-prototipo.vercel.app', metodo: 'telas', escolher: [0, 3, 6, 8, 10, 13] },
-  { nome: 'trdd-home', url: 'https://trdd-records-previa.vercel.app', metodo: 'telas', escolher: [0, 1, 3, 6, 7, 8] },
+  // 26/11: pedido do Victor — o site DESCENDO no quadro (como VOKE e Bendita), não telas soltas trocando
+  { nome: 'matuura-home', url: 'https://matuura-prototipo.vercel.app/?captura=1' }, // ?captura=1: o site desliga as animações e a seção presa (cartões que andam de lado)
+  { nome: 'trdd-home', url: 'https://trdd-records-previa.vercel.app' },
 ]
 const T = (n) => path.join(ESTUDIO, 'telas', n), FIT = (n) => path.join(ESTUDIO, 'fit', n), PF = (n) => path.join(PORT, n), PS = (n) => path.join(SOC, n)
 const PILHAS = [

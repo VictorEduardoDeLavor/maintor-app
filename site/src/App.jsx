@@ -11,7 +11,8 @@ const ABERTURA_CHAVE = 'flow.abertura' // o mesmo nome no index.html
 import Fio from './Fio.jsx'
 // a exposição 3D (home como galeria) baixa depois do primeiro paint
 const Exposicao = lazy(() => import('./Exposicao.jsx'))
-import { ALAS, GRUPOS, PORTAS, imagemHD, msgWhats } from './obras.js'
+const Companheiro = lazy(() => import('./Companheiro.jsx')) // 26/11: o boneco que acompanha a visita, num canto fixo
+import { ALAS, GRUPOS, PORTAS, imagemHD, msgWhats, alvoLeitura } from './obras.js'
 import Guia from './Guia.jsx'
 import { MENU, MENU_CONTATO } from './menu.js'
 
@@ -147,6 +148,7 @@ export default function App() {
   /* 10/11: vídeo de cliente aberto no player em janela (null = fechado). Nada baixa antes do clique. */
   const [video, setVideo] = useState(null)
   const videoDialogoRef = useRef(null)
+  const saidaSalaRef = useRef(0)
   // 25/11: janela "Por trás" — o que existe atrás do site de cada projeto (painel, central, área do cliente)
   const [gestao, setGestao] = useState(null)
   const gestaoDialogoRef = useRef(null)
@@ -318,13 +320,16 @@ export default function App() {
       if (alvoInicial) {
         const pular = () => {
           ScrollTrigger.refresh()
-          if (lenis) lenis.scrollTo(alvoInicial, { offset: -10, immediate: true })
+          // 26/11: a página cresce quando a exposição fica pronta (obras com tela que rola são mais altas) — o Lenis
+          // mede de novo antes de pular, senão o salto para no fim antigo da página
+          lenis?.resize()
+          if (lenis) lenis.scrollTo(alvoInicial, { offset: -10, immediate: true, force: true })
           else alvoInicial.scrollIntoView()
         }
         deepId = setTimeout(pular, 350)
         /* 12/11: quando a exposição desenha o 1º quadro (classe expo-pronta), a aparência da página ainda muda um
            pouco; se a pessoa ainda não rolou, o salto é refeito — /#contato chega no formulário, e não acima */
-        refazer = () => { if (!mexeu) setTimeout(pular, 60) }
+        refazer = () => { if (!mexeu) { setTimeout(pular, 60); setTimeout(() => { if (!mexeu) pular() }, 600) } }
         window.addEventListener('flow:expo-pronta', refazer)
         for (const ev of ['wheel', 'touchstart', 'keydown']) window.addEventListener(ev, marcarMexeu, { passive: true })
       }
@@ -385,6 +390,8 @@ export default function App() {
     document.documentElement.style.overflow = 'hidden'
     // o texto do corredor some enquanto se está dentro da sala
     const raiz = document.documentElement
+    // 26/11: uma saída recente (que tira a classe 380 ms depois) não pode apagar esta entrada
+    clearTimeout(saidaSalaRef.current)
     const tEntra = setTimeout(() => raiz.classList.add('em-sala'), 300)
     const t = setTimeout(() => salaTituloRef.current?.focus(), 450)
     const aoTeclar = (e) => {
@@ -395,7 +402,7 @@ export default function App() {
     document.addEventListener('keydown', aoTeclar)
     return () => {
       clearTimeout(t); clearTimeout(tEntra)
-      setTimeout(() => raiz.classList.remove('em-sala'), 380)
+      saidaSalaRef.current = setTimeout(() => raiz.classList.remove('em-sala'), 380)
       document.removeEventListener('keydown', aoTeclar)
       document.documentElement.style.overflow = ''
       lenis?.start()
@@ -414,7 +421,7 @@ export default function App() {
   const iniciarTour = useCallback(() => {
     const el = document.getElementById(`obra-${ALAS[0].obras[0].id}`)
     if (!el) return
-    const alvo = window.scrollY + el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2 - window.innerHeight / 2
+    const alvo = alvoLeitura(el)
     if (lenisRef.current) lenisRef.current.scrollTo(alvo, { duration: 2.4, easing: (t) => 1 - Math.pow(1 - t, 3) })
     else window.scrollTo({ top: alvo, behavior: 'smooth' })
   }, [])
@@ -597,10 +604,9 @@ export default function App() {
           <div className="wrap">
             <div className="entrada-oferta">
               <p className="micro entrada-selo">Maintor Flow · portfólio</p>
-              <h1 className="serif entrada-h1">Sites, lojas virtuais e sistemas sob medida para o seu negócio</h1>
+              <h1 className="serif entrada-h1">Sites, lojas virtuais e sistemas sob medida</h1>
               <p className="entrada-apoio">
-                Aqui você tem alguém, não só uma ferramenta: quem constrói é quem atende.
-                Faça o tour pelos projetos que já estão no ar e encontre um parecido com o seu.
+                Quem constrói é quem atende. Veja os projetos que já estão no ar e encontre um parecido com o seu.
               </p>
               <div className="entrada-ctas">
                 <a className="btn" href="#trabalhos" onMouseEnter={blipHover} onClick={(e) => { e.preventDefault(); e.stopPropagation(); iniciarTour() }}>Começar o tour</a>
@@ -880,6 +886,7 @@ export default function App() {
 
       {/* o guia da exposição: onde estou, próxima obra, "quero algo assim" */}
       <Guia lenisRef={lenisRef} ativo={!abrindo && sala == null} />
+      {!abrindo && sala == null && <Suspense fallback={null}><Companheiro /></Suspense>}
 
       {/* a sala de um tema do saguão: o 3D mostra o cômodo; aqui, o texto e a navegação */}
       {sala != null && (() => {

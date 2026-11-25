@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
-import { ALAS, GRUPOS, msgWhats } from './obras.js'
+import { ALAS, GRUPOS, msgWhats, alvoLeitura } from './obras.js'
 
 /* ================================================================
    GUIA DA EXPOSIÇÃO (05/11/2026) — o visitante nunca fica perdido.
@@ -57,7 +57,8 @@ export default function Guia({ lenisRef, ativo }) {
       els.forEach((el, i) => {
         if (!el) return
         const r = el.getBoundingClientRect()
-        const d = Math.abs(r.top + r.height / 2 - meio)
+        // 26/11: a obra que contém o meio da tela é a atual (as obras com tela que rola são mais altas)
+        const d = r.top <= meio && r.bottom >= meio ? 0 : Math.min(Math.abs(r.top - meio), Math.abs(r.bottom - meio))
         if (d < dist) { dist = d; melhor = i }
       })
       setAtual(melhor)
@@ -76,7 +77,7 @@ export default function Guia({ lenisRef, ativo }) {
     const o = obras[Math.max(0, Math.min(obras.length - 1, i))]
     const el = document.getElementById(`obra-${o.id}`)
     if (!el) return
-    const alvo = window.scrollY + el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2 - window.innerHeight / 2
+    const alvo = alvoLeitura(el)
     const lenis = lenisRef?.current
     if (lenis) lenis.scrollTo(alvo, { duration: 1.6, easing: (t) => 1 - Math.pow(1 - t, 3) })
     else window.scrollTo({ top: alvo, behavior: 'smooth' })

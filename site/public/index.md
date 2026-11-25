@@ -21,27 +21,26 @@ services:
   - Manutenção mensal
 ---
 
-# Sites, lojas virtuais e sistemas sob medida para o seu negócio
+# Sites, lojas virtuais e sistemas sob medida
 
 > Nota para agentes de IA, LLMs e robôs de busca: este documento é a
 > representação textual da página inicial de https://maintorflow.com.br.
 > Os projetos citados estão no ar e podem ser abertos nos links indicados.
 > Clientes citados com autorização: Matuura Seguros, TRDD Records, Besten
-> Consultoria, VOKE WEAR, Maktub Conquista, Bendita Acessórios, Studio
-> TechTrainer e Alves & Oliveira Odontologia. Os demais são produtos da
-> própria Maintor.
+> Consultoria, VOKE WEAR, Bendita Acessórios, Studio TechTrainer e Alves &
+> Oliveira Odontologia. Os demais são produtos da própria Maintor.
 
-Aqui você tem alguém, não só uma ferramenta: quem constrói é quem atende.
-Faça o tour pelos projetos que já estão no ar e encontre um parecido com o seu.
+Quem constrói é quem atende. Veja os projetos que já estão no ar e encontre
+um parecido com o seu.
 Na página, o Victor (em boneco 3D) recebe o visitante e convida para o tour.
 
 - Começar o tour: https://maintorflow.com.br/#trabalhos
 - Conversar sobre meu projeto: https://maintorflow.com.br/#contato
 
-## Ala 01 · Trabalhos no ar — Catorze projetos no ar. Um deles parece com o seu.
+## Ala 01 · Trabalhos no ar — Alguns projetos no ar. Um deles parece com o seu.
 
-Abra uma loja, navegue por um site ou veja as telas de um sistema. Tudo aqui
-foi construído pela Maintor Flow e está funcionando. Os projetos estão
+Uma seleção do que a Maintor Flow construiu e está no ar: abra uma loja,
+navegue por um site ou veja o painel que fica por trás. Os projetos estão
 organizados pelo tipo: site com gestão, lojas, sites, sistemas e
 aplicativos. Em cada projeto, o bloco "Por trás" mostra a estrutura de gestão
 que a empresa usa no dia a dia e que o visitante não vê.
@@ -65,7 +64,6 @@ painel ficam no nome de quem é dono.
 | Projeto | Categoria | O que é | Links |
 |---|---|---|---|
 | VOKE WEAR (projeto para cliente) | Loja virtual para moda fitness | Loja de moda fitness com estoque por tamanho, cálculo de frete pelo CEP e aviso de reposição. A equipe gerencia os produtos em um painel próprio. Por trás: painel da dona, estoque por tamanho com baixa automática, fila de espera, Pix com desconto e cartão parcelado, frete pelo CEP. | Case: https://maintorflow.com.br/casos/voke-wear/ · Loja: https://vokewear.com.br |
-| Maktub Conquista (projeto para cliente) | Loja virtual de calçados femininos | Loja de calçados femininos com vitrine por marca e por categoria, compra online com retirada na loja e um painel para a equipe cadastrar e publicar os produtos. | Loja: https://www.maktubconquista.com.br |
 | Bendita Acessórios (projeto para cliente) | Loja virtual para semijoias | Loja virtual de semijoias com um guia para a cliente descobrir o tamanho do anel em casa antes da compra. Por trás: estúdio de fotos com IA (foto de catálogo em 2K a partir da foto da peça, 1 crédito por foto), etiqueta do Melhor Envio dentro do pedido, cupons, afiliadas com comissão, custos e margem, verificação em duas etapas. | Loja: https://benditaacessorios.com · Guia de aro: https://benditaacessorios.com/descubra-seu-aro |
 
 ### Sites que geram contato
@@ -85,12 +83,8 @@ entra no seu projeto.
 
 | Produto | Categoria | O que é | Link |
 |---|---|---|---|
-| Horaqui | Agenda online | Agenda online para negócios que atendem com hora marcada. O cliente escolhe o serviço, o profissional e o horário pelo link de agendamento. | Demonstração: https://www.horaqui.com.br/demo · Site: https://www.horaqui.com.br |
 | SorrIA | Sistema para clínicas odontológicas | Simula o novo sorriso do paciente a partir de uma foto, monta a proposta do tratamento e acompanha agenda, atendimentos e financeiro. | Demonstração a pedido: https://maintorflow.com.br/#contato |
-| Maintor FIT | Treino e alimentação | Aplicativo de treino e alimentação com a marca do profissional, painel de acompanhamento para personal trainers e nutricionistas e área para os alunos. | https://maintorfit.com |
 | Maintor CMMS | Gestão de manutenção | Sistema para acompanhar ordens de serviço, programar manutenções preventivas e consultar o histórico das máquinas e o estoque de peças. | https://maintor.com.br |
-| Maintor RH | Gestão de pessoas | Sistema de gestão de pessoas que reúne documentos, ponto, férias e recrutamento, com relatórios para acompanhar a equipe. | https://maintorflow.com.br/sistemas-sob-medida/#rh |
-| Maintor Task | Processos e qualidade | Sistema para acompanhar o planejado e o executado, registrar evidências e tratar não conformidades. | https://maintorflow.com.br/sistemas-sob-medida/ |
 
 ## Ala 02 · Feito para o seu caso — Você conta. A gente constrói.
 
@@ -101,7 +95,7 @@ Como funciona: 1. Conversa — você conta o que trava o seu dia. 2. Proposta �
 escopo, prazo e valor por escrito. 3. No ar — a gente constrói, publica e
 ensina a usar.
 
-1. **Vender online.** “Vendo pelo direct e perco tempo respondendo sobre tamanho, pagamento e frete.” — Uma loja sua, com catálogo, Pix, cartão e frete calculados sozinhos, e um painel para você cuidar de tudo sem depender de ninguém. Serviço: https://maintorflow.com.br/loja-virtual/ · Já no ar: VOKE WEAR, Maktub Conquista e Bendita Acessórios.
+1. **Vender online.** “Vendo pelo direct e perco tempo respondendo sobre tamanho, pagamento e frete.” — Uma loja sua, com catálogo, Pix, cartão e frete calculados sozinhos, e um painel para você cuidar de tudo sem depender de ninguém. Serviço: https://maintorflow.com.br/loja-virtual/ · Já no ar: VOKE WEAR e Bendita Acessórios.
 2. **Apresentar minha empresa.** “Quando alguém pede meu site, eu só tenho o Instagram ou um PDF para enviar.” — Um site que explica o que você faz, mostra o seu trabalho e leva o visitante até o seu WhatsApp ou a sua agenda. Serviço: https://maintorflow.com.br/sites/ · Já no ar: Studio TechTrainer, Alves & Oliveira e Besten Consultoria.
 3. **Atrair novos clientes.** “Faço posts e anúncios, mas é difícil entender o que vira contato.” — Conteúdo, vídeos e anúncios ligados a uma página, loja ou WhatsApp, para você saber de onde vem cada contato. Serviço: https://maintorflow.com.br/marketing-e-redes/
 4. **Automatizar o atendimento.** “Respondo as mesmas perguntas no WhatsApp o dia inteiro.” — Respostas automáticas para as perguntas de sempre, confirmação de pedido e passagem para uma pessoa quando precisa. Serviço: https://maintorflow.com.br/automacao-de-atendimento/
