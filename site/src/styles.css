@@ -1253,15 +1253,34 @@ header, main#conteudo, footer { transition: opacity .8s ease; }
 /* as alas e as obras */
 .cena-ala { display: block; min-height: auto; padding: var(--s6) 0 var(--s5); }
 .ala-cabeca { min-height: 62vh; display: flex; flex-direction: column; justify-content: center; }
-/* 26/11: o companheiro — o boneco que acompanha a visita num canto fixo (Companheiro.jsx). Nunca pega clique. */
-.companheiro { position: fixed; right: 18px; bottom: 22px; width: 118px; height: 176px; z-index: 20; pointer-events: none;
-  opacity: 0; transform: translateY(14px) scale(.92); transform-origin: 50% 100%; transition: opacity .45s ease, transform .55s cubic-bezier(.2, .8, .2, 1), top .45s ease, bottom .45s ease; }
+/* 26/11 → 27/11: o companheiro — o Victor (boneco) acompanha a visita (Companheiro.jsx). A caixa é posta por JS
+   (left/top/tamanho): grande no palco, média nos cantos, espiando na borda. Só a figura pega clique (.comp-toque). */
+.companheiro { position: fixed; left: 0; top: 0; width: 187px; height: 220px; z-index: 20; pointer-events: none;
+  opacity: 0; transform: translateY(18px) scale(.9); transform-origin: 50% 100%;
+  transition: opacity .45s ease, transform .55s cubic-bezier(.2, .8, .2, 1), left .65s cubic-bezier(.3, .7, .2, 1), top .65s cubic-bezier(.3, .7, .2, 1), width .65s cubic-bezier(.3, .7, .2, 1), height .65s cubic-bezier(.3, .7, .2, 1); }
 .companheiro.on { opacity: 1; transform: none; }
+.companheiro.sem-trans { transition: none; }
 .companheiro canvas { display: block; width: 100%; height: 100%; }
-.companheiro-chao { position: absolute; left: 50%; bottom: 4px; width: 62%; height: 12px; transform: translateX(-50%); border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(212, 165, 116, .45), rgba(212, 165, 116, 0)); }
-@media (max-width: 820px) { .companheiro { right: 4px; width: 70px; height: 104px; } }
-@media (prefers-reduced-motion: reduce) { .companheiro { transition: opacity .3s; } }
+.companheiro-chao { position: absolute; left: 50%; bottom: 2%; width: 52%; height: 7%; transform: translateX(-50%); border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(212, 165, 116, .5), rgba(212, 165, 116, 0)); z-index: -1; }
+.comp-toque { position: absolute; left: 28%; top: 9%; width: 44%; height: 86%; padding: 0; border: 0; background: none; border-radius: 40% 40% 24% 24%; cursor: pointer; }
+.comp-toque:focus-visible { outline: 2px solid var(--mostarda); outline-offset: 2px; }
+/* o balão de fala: mesmo desenho do balão da abertura (painel escuro, fio mostarda), em HTML */
+.comp-balao { position: fixed; left: 0; top: 0; width: 264px; z-index: 21; padding: 12px 14px 13px; border: 1px solid rgba(212, 165, 116, .7); border-radius: 14px;
+  background: rgba(8, 24, 24, .96); color: var(--creme); box-shadow: 0 14px 40px rgba(0, 0, 0, .45); pointer-events: none;
+  opacity: 0; transform: translateY(8px) scale(.96); transition: opacity .3s ease, transform .35s cubic-bezier(.2, .8, .2, 1), left .5s ease, top .5s ease; }
+.comp-balao.on { opacity: 1; transform: none; }
+.comp-balao .micro { color: var(--mostarda); display: block; margin-bottom: 4px; }
+.comp-balao p { margin: 0; font-size: 14.5px; line-height: 1.42; color: var(--creme); }
+.comp-balao .comp-link { display: none; margin-top: 9px; color: var(--mostarda); font: 600 13.5px/1.3 'Inter', system-ui, sans-serif; text-underline-offset: 3px; }
+.comp-balao.com-link.on { pointer-events: auto; }
+.comp-balao.com-link .comp-link { display: inline-block; }
+.comp-balao::after { content: ''; position: absolute; width: 12px; height: 12px; background: rgba(8, 24, 24, .96); border: solid rgba(212, 165, 116, .7); border-width: 0 1px 1px 0; }
+.comp-balao[data-cauda="baixo"]::after { left: var(--cauda-x, 50%); bottom: -7px; transform: translateX(-50%) rotate(45deg); }
+.comp-balao[data-cauda="dir"]::after { right: -7px; top: 50%; transform: translateY(-50%) rotate(-45deg); }
+.comp-balao[data-cauda="esq"]::after { left: -7px; top: 50%; transform: translateY(-50%) rotate(135deg); }
+@media (max-width: 820px) { .comp-balao { width: 196px; padding: 10px 12px 11px; } .comp-balao p { font-size: 13.5px; } }
+@media (prefers-reduced-motion: reduce) { .companheiro, .comp-balao { transition: opacity .3s; } }
 .obra { min-height: 88vh; display: flex; flex-direction: column; justify-content: center; }
 /* 26/11: obra com tela que rola: mais rolagem para ver o site descer no quadro. No computador a legenda fica presa
    no meio da tela durante todo o trecho (no celular ela já é presa embaixo) */

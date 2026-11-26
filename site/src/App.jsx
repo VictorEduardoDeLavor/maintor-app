@@ -886,7 +886,7 @@ export default function App() {
 
       {/* o guia da exposição: onde estou, próxima obra, "quero algo assim" */}
       <Guia lenisRef={lenisRef} ativo={!abrindo && sala == null} />
-      {!abrindo && sala == null && <Suspense fallback={null}><Companheiro /></Suspense>}
+      {!abrindo && sala == null && <Suspense fallback={null}><Companheiro whats={WHATS} /></Suspense>}
 
       {/* a sala de um tema do saguão: o 3D mostra o cômodo; aqui, o texto e a navegação */}
       {sala != null && (() => {

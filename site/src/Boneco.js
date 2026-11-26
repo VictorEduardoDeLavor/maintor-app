@@ -350,7 +350,7 @@ export function criarBoneco({ altura = 0.8, celular = false, detalhe = celular ?
   }
 
   // ---------- estado da animação ----------
-  const E = { fase: 0, v: 0, rumo: 0, parado: 0, piscar: 2.5, piscando: 0, acenou: false, aceno: -1, olharYaw: 0, olharPitch: 0 }
+  const E = { fase: 0, v: 0, rumo: 0, parado: 0, piscar: 2.5, piscando: 0, acenou: false, aceno: -1, olharYaw: 0, olharPitch: 0, aponta: 0, apontaAlvo: 0, apontaK: 1 }
   const tmp = new THREE.Vector3()
   const ABRE = 0.34                                    // braços em "A" (16°) em repouso
 
@@ -422,6 +422,15 @@ export function criarBoneco({ altura = 0.8, celular = false, detalhe = celular ?
       if (E.aceno > 2.4) E.aceno = -1
     }
 
+    // ---------- apontar (27/11): estende um braço para o lado, para mostrar o que está na tela ----------
+    E.aponta += (E.apontaAlvo - E.aponta) * Math.min(1, dt * 6)
+    if (E.aponta > 0.01 && E.aceno < 0) {
+      const k = E.apontaK, w = E.aponta * (1 - anda)
+      ombros[k].rotation.z += (k === 0 ? 1 : -1) * (1.12 + 0.05 * Math.sin(t * 3.2)) * w   // quase na horizontal, com um leve balanço
+      ombros[k].rotation.x += -0.3 * w
+      cotovelos[k].rotation.x *= 1 - w
+    }
+
     // ---------- cabeça: equilibra o balanço, olha para o quadro em destaque ou para a câmera ----------
     let yaw = -tronco.rotation.y, pitch = 0
     const olharPara = alvo || (E.parado > 1.5 || receber ? camera : null)
@@ -445,5 +454,7 @@ export function criarBoneco({ altura = 0.8, celular = false, detalhe = celular ?
 
   /* 15/11: aceno sob pedido (a recepção na abertura). Não interrompe um aceno em curso. */
   const acenar = () => { if (E.aceno < 0) { E.acenou = true; E.aceno = 0 } }
-  return { raiz, atualizar, altura, acenar }
+  /* 27/11: aponta com o braço do lado pedido da TELA quando ele está de frente ('esq' | 'dir'); apontar(null) baixa o braço */
+  const apontar = (lado) => { E.apontaAlvo = lado ? 1 : 0; if (lado) E.apontaK = lado === 'dir' ? 0 : 1 }
+  return { raiz, atualizar, altura, acenar, apontar }
 }

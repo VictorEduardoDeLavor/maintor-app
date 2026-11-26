@@ -355,7 +355,7 @@ for (const [nome, opts, url] of [['link #contato', {}, '/#contato'], ['movimento
   ok(z0 !== null && g.z < z0 - 1, `boneco anda pelo corredor com a rolagem (z ${z0?.toFixed(1)} → ${g.z?.toFixed(1)})`);
   // 26/11: depois da abertura o boneco do corredor sai e quem acompanha é o companheiro, num canto fixo da tela
   ok(g.malhas > 30 && g.malhas <= 60 && g.escala < 0.05, `boneco montado (${g.malhas} peças) e fora do corredor depois da abertura (escala ${g.escala?.toFixed(2)})`);
-  ok(g.comp && g.compEl && g.compEl.width > 60 && g.compEl.right <= 1440 && g.compEl.bottom <= 900, `companheiro visível no canto da tela durante o passeio`);
+  ok(g.comp && g.compEl && g.compEl.height >= 200 && g.compEl.left < 1440 && g.compEl.right > 0 && g.compEl.top >= 60 && g.compEl.bottom <= 900, `companheiro visível na tela durante o passeio (${Math.round(g.compEl?.height)} px de altura)`);
   ok(erros.length === 0, `boneco sem erro de JavaScript (${erros.join(' | ')})`);
   const dist = new URL('../dist/', import.meta.url);
   const nomes = []; const andar = (u) => { for (const n of readdirSync(u, { withFileTypes: true })) { if (n.isDirectory()) andar(new URL(n.name + '/', u)); else nomes.push(n.name) } }; andar(dist);

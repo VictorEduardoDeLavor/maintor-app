@@ -255,6 +255,29 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     halo.rotation.x = -Math.PI / 2; halo.position.y = 0.012; guia.raiz.add(halo)
     guia.raiz.scale.setScalar(0.001); cena.add(guia.raiz)
     if (navigator.webdriver) window.__guia = guia.raiz // só para a bateria de aceite (robôs): conferir que ele anda
+    /* 27/11: o que o 3D ocupa na tela agora (portas de pé, esculturas das alas, quadro em leitura), em retângulos de px.
+       O companheiro (Companheiro.jsx) consulta isto 4× por segundo para não parar em cima de uma peça. */
+    const cxO = new THREE.Box3(), vO = new THREE.Vector3()
+    window.__expoOcupado = () => {
+      const out = [], vw = window.innerWidth, vh = window.innerHeight
+      const add = (g) => {
+        if (!g?.visible) return
+        cxO.setFromObject(g); if (cxO.isEmpty()) return
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, frente = 0
+        for (let i = 0; i < 8; i++) {
+          vO.set(i & 1 ? cxO.max.x : cxO.min.x, i & 2 ? cxO.max.y : cxO.min.y, i & 4 ? cxO.max.z : cxO.min.z).project(cam)
+          if (vO.z < 1) frente++
+          const x = (vO.x + 1) / 2 * vw, y = (1 - vO.y) / 2 * vh
+          x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y)
+        }
+        if (frente < 8 || x1 < 0 || x0 > vw || y1 < 0 || y0 > vh) return
+        out.push({ x0, y0, x1, y1 })
+      }
+      for (const p of portas3d) add(p.g)
+      for (const g of pecasAla) if (Math.abs(g.position.z - cam.position.z) < 30) add(g)
+      for (const o of obras) if (o.fs > 0.2) add(o.grupo)
+      return out
+    }
     // 11/11: sonda da limpeza visual (só robôs) — testes/aceite-limpeza.mjs lê daqui os objetos da cena e projeta os retângulos de tela.
     // Só as classes usadas, nunca o módulo THREE inteiro: passar o módulo como valor desliga o tree-shaking (+45 KB em gzip)
     if (navigator.webdriver) window.__expoSonda = () => ({ T: { Raycaster: THREE.Raycaster, Vector2: THREE.Vector2, Vector3: THREE.Vector3, Box3: THREE.Box3, AdditiveBlending: THREE.AdditiveBlending }, cam, cena, lockup, matCreme, balao, portas3d, obras, guia, pecasAla, prog, ler, lado, get caixaLetreiro() { return letreiroAtual.grupo } })
@@ -840,7 +863,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
     const fwd = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), alvoPos = new THREE.Vector3()
     const dirOlhar = new THREE.Vector3(), dirObra = new THREE.Vector3(), ctrl = new THREE.Vector3()
     const balanco = new THREE.Quaternion(), eixoZ = new THREE.Vector3(0, 0, 1)
-    let prog = 0, raf, visivel = true, primeiro = true, emFoco = false, abre = -1, bonecoSome = 0
+    let prog = 0, raf, visivel = true, primeiro = true, emFoco = false, abre = -1, bonecoSome = 0, lendoCls = false
     let fPortas = 0 // quanto as portas do saguão estão de pé (0..1), do quadro anterior
     let ler = 0, lado = -1, legendaCel = false, focoId = null, frentePc = 0, focoAnt = null
     /* modo LER: as luzes da galeria baixam (névoa, luminárias, fio, focos) — fica aceso o foco do boneco.
@@ -1173,6 +1196,9 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       // com uma obra flutuando, o grão de filme quase some (ele sujava o print)
       const foco = maior > 0.35
       if (foco !== emFoco) { emFoco = foco; document.documentElement.classList.toggle('obra-em-foco', foco) }
+      // 27/11: modo LER à vista do companheiro — com um título em leitura o 3D está calmo e sobra palco para ele
+      const lendoAgora = ler > 0.5
+      if (lendoAgora !== lendoCls) { lendoCls = lendoAgora; document.documentElement.classList.toggle('lendo', lendoAgora) }
       const ala = Math.round(prog * (N - 1)), alaZ = (i) => -i * PASSO
       if (atual) { spotA.position.copy(cam.position).addScaledVector(up, ALT - 0.2 - OLHO).addScaledVector(fwd, 1.5); spotA.target.position.copy(atual.grupo.position) }
       else { spotA.position.set(0, ALT - 0.2, alaZ(ala) - 4); spotA.target.position.set(0, 1.4, alaZ(ala) - 14) }
@@ -1219,7 +1245,7 @@ export default function Exposicao({ intro = false, aoFimIntro, pularRef, portas 
       document.body.style.cursor = ''
       document.removeEventListener('visibilitychange', aoVis)
       acab.dispose(); pmrem.dispose(); renderer.dispose(); host.innerHTML = ''
-      document.documentElement.classList.remove('obra-em-foco')
+      document.documentElement.classList.remove('obra-em-foco', 'lendo'); delete window.__expoOcupado
       window.dispatchEvent(new CustomEvent('flow:obra-foco', { detail: null }))
       obras.forEach((o) => o.el.classList.remove('em-foco'))
       if (pularRef) pularRef.current = null
